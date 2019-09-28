@@ -18,7 +18,7 @@ public class MatchGame {
 
     @Column(nullable = false, unique = false)
     private boolean retrieving = false;
-
+/*
     @Column(nullable = false, unique = false)
     private Season season;
 
@@ -68,7 +68,7 @@ public class MatchGame {
     public void setRetrieving(boolean retrieving) {
         this.retrieving = retrieving;
     }
-
+/*
     public Season getSeason() {
         return season;
     }
@@ -116,4 +116,4 @@ public class MatchGame {
     public void setGameCreation(Long gameCreation) {
         this.gameCreation = gameCreation;
     }
-}
+*/}
