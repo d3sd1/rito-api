@@ -1,8 +1,5 @@
-package com.onlol.fetcher.Logger;
+package com.onlol.fetcher.logger;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import java.io.Serializable;
 import javax.persistence.*;
 
 

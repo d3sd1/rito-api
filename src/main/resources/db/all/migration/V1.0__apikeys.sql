@@ -1,1 +1,0 @@
-INSERT INTO `api_key` VALUES ('RGAPI-a5435ca3-ad49-4a9d-97a1-c42341da504f',_binary '\0',_binary '',0);
