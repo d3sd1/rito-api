@@ -73,4 +73,18 @@ public class SamplePlayer {
     public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
+
+    @Override
+    public String toString() {
+        return "SamplePlayer{" +
+                "currentPlatformId='" + currentPlatformId + '\'' +
+                ", summonerName='" + summonerName + '\'' +
+                ", matchHistoryUri='" + matchHistoryUri + '\'' +
+                ", platformId='" + platformId + '\'' +
+                ", currentAccountId='" + currentAccountId + '\'' +
+                ", profileIcon=" + profileIcon +
+                ", summonerId='" + summonerId + '\'' +
+                ", accountId='" + accountId + '\'' +
+                '}';
+    }
 }

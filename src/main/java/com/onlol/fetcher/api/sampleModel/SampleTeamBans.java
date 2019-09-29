@@ -19,4 +19,12 @@ public class SampleTeamBans {
     public void setChampionId(Integer championId) {
         this.championId = championId;
     }
+
+    @Override
+    public String toString() {
+        return "SampleTeamBans{" +
+                "pickTurn=" + pickTurn +
+                ", championId=" + championId +
+                '}';
+    }
 }

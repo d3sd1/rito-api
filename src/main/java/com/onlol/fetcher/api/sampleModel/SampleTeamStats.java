@@ -147,4 +147,26 @@ public class SampleTeamStats {
     public void setDragonKills(Integer dragonKills) {
         this.dragonKills = dragonKills;
     }
+
+    @Override
+    public String toString() {
+        return "SampleTeamStats{" +
+                "firstDragon=" + firstDragon +
+                ", firstInhibitor=" + firstInhibitor +
+                ", bans=" + bans +
+                ", baronKills=" + baronKills +
+                ", firstRiftHerald=" + firstRiftHerald +
+                ", firstBaron=" + firstBaron +
+                ", riftHeraldKills=" + riftHeraldKills +
+                ", firstBlood=" + firstBlood +
+                ", teamId=" + teamId +
+                ", firstTower=" + firstTower +
+                ", vilemawKills=" + vilemawKills +
+                ", inhibitorKills=" + inhibitorKills +
+                ", towerKills=" + towerKills +
+                ", dominionVictoryScore=" + dominionVictoryScore +
+                ", win='" + win + '\'' +
+                ", dragonKills=" + dragonKills +
+                '}';
+    }
 }

@@ -120,4 +120,23 @@ public class SampleMatchGame {
     public void setGameCreation(Long gameCreation) {
         this.gameCreation = gameCreation;
     }
+
+    @Override
+    public String toString() {
+        return "SampleMatchGame{" +
+                "seasonId=" + seasonId +
+                ", queueId=" + queueId +
+                ", gameId=" + gameId +
+                ", participantIdentities=" + participantIdentities +
+                ", gameVersion='" + gameVersion + '\'' +
+                ", platformId='" + platformId + '\'' +
+                ", gameMode='" + gameMode + '\'' +
+                ", mapId=" + mapId +
+                ", gameType='" + gameType + '\'' +
+                ", teams=" + teams +
+                ", participants=" + participants +
+                ", gameDuration=" + gameDuration +
+                ", gameCreation=" + gameCreation +
+                '}';
+    }
 }

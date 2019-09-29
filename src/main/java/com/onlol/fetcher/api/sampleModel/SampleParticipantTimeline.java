@@ -93,4 +93,20 @@ public class SampleParticipantTimeline {
     public void setDamageTakenPerMinDeltas(Map<String, Double> damageTakenPerMinDeltas) {
         this.damageTakenPerMinDeltas = damageTakenPerMinDeltas;
     }
+
+    @Override
+    public String toString() {
+        return "SampleParticipantTimeline{" +
+                "lane='" + lane + '\'' +
+                ", participantId=" + participantId +
+                ", role='" + role + '\'' +
+                ", csDiffPerMinDeltas=" + csDiffPerMinDeltas +
+                ", goldPerMinDeltas=" + goldPerMinDeltas +
+                ", xpDiffPerMinDeltas=" + xpDiffPerMinDeltas +
+                ", creepsPerMinDeltas=" + creepsPerMinDeltas +
+                ", xpPerMinDeltas=" + xpPerMinDeltas +
+                ", damageTakenDiffPerMinDeltas=" + damageTakenDiffPerMinDeltas +
+                ", damageTakenPerMinDeltas=" + damageTakenPerMinDeltas +
+                '}';
+    }
 }

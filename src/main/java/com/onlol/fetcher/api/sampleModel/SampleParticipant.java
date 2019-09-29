@@ -93,4 +93,20 @@ public class SampleParticipant {
     public void setMasteries(List<SampleMastery> masteries) {
         this.masteries = masteries;
     }
+
+    @Override
+    public String toString() {
+        return "SampleParticipant{" +
+                "stats=" + stats +
+                ", participantId=" + participantId +
+                ", runes=" + runes +
+                ", timeline=" + timeline +
+                ", teamId=" + teamId +
+                ", championId=" + championId +
+                ", spell1Id=" + spell1Id +
+                ", spell2Id=" + spell2Id +
+                ", highestAchievedSeasonTier='" + highestAchievedSeasonTier + '\'' +
+                ", masteries=" + masteries +
+                '}';
+    }
 }

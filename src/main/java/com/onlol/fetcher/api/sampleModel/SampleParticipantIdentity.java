@@ -19,4 +19,12 @@ public class SampleParticipantIdentity {
     public void setPlayer(SamplePlayer player) {
         this.player = player;
     }
+
+    @Override
+    public String toString() {
+        return "SampleParticipantIdentity{" +
+                "participantId=" + participantId +
+                ", player=" + player +
+                '}';
+    }
 }

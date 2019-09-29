@@ -19,4 +19,12 @@ public class SampleRune {
     public void setRank(Integer rank) {
         this.rank = rank;
     }
+
+    @Override
+    public String toString() {
+        return "SampleRune{" +
+                "runeId=" + runeId +
+                ", rank=" + rank +
+                '}';
+    }
 }

@@ -205,6 +205,7 @@ public class MatchConnector {
 
         SampleMatchGame matchGame = resp.getBody();
 
+        System.out.println("PARTTIDA: " + matchGame);
         //TODO: recuperar partida aqui
         return null;
     }

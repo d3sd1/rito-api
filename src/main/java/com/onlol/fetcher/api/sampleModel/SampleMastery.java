@@ -19,4 +19,12 @@ public class SampleMastery {
     public void setRank(Integer rank) {
         this.rank = rank;
     }
+
+    @Override
+    public String toString() {
+        return "SampleMastery{" +
+                "masteryId=" + masteryId +
+                ", rank=" + rank +
+                '}';
+    }
 }
