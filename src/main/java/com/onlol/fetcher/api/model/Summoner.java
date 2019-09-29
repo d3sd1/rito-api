@@ -4,6 +4,7 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,20 +17,23 @@ public class Summoner {
     @Column(nullable = false, unique = true)
     private String accountId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String puuid;
 
     @Column(nullable = false, unique = false)
     private String name;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Integer profileIconId;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Long revisionDate;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Integer summonerLevel;
+
+    @Column(nullable = false, unique = false)
+    private LocalDateTime lastTimeUpdated = LocalDateTime.now();
 
     public String getId() {
         return id;
@@ -87,6 +91,14 @@ public class Summoner {
         this.summonerLevel = summonerLevel;
     }
 
+    public LocalDateTime getLastTimeUpdated() {
+        return lastTimeUpdated;
+    }
+
+    public void setLastTimeUpdated(LocalDateTime lastTimeUpdated) {
+        this.lastTimeUpdated = lastTimeUpdated;
+    }
+
     @Override
     public String toString() {
         return "Summoner{" +
@@ -97,6 +109,7 @@ public class Summoner {
                 ", profileIconId=" + profileIconId +
                 ", revisionDate=" + revisionDate +
                 ", summonerLevel=" + summonerLevel +
+                ", lastTimeUpdated=" + lastTimeUpdated +
                 '}';
     }
 }

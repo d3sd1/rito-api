@@ -41,7 +41,7 @@ public class MatchesScraper {
 
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame.getGameId());
         //TODO: recuperar partidas
-        //TODO: meter jugadores pendientes de datos a la tabla summoners con lastUpdate = 0
+        //TODO: flyway debe ejecutarse despues de hibernate
         //TODO: cron para que con los lastUpdate se recupern si el sumoner no se actualizo! (actualizar summoners + antiguos)
         /*
         *

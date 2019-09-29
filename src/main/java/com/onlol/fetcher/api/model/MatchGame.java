@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,29 +20,35 @@ public class MatchGame {
 
     @Column(nullable = false, unique = false)
     private boolean retrieving = false;
-/*
-    @Column(nullable = false, unique = false)
+
+    @OneToOne
     private Season season;
 
-    @Column(nullable = false, unique = false)
+    @OneToOne
     private Queue queue;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private String gameVersion; // major.minor version
 
-    @Column(nullable = false, unique = false)
+    @OneToOne
     private Platform platform;
 
-    @Column(nullable = false, unique = false)
-    private Long gameDuration; // Match duration in seconds
+    @OneToOne
+    private GameMap gameMap;
+
+    @OneToOne
+    private GameMode gameMode;
+
+    @OneToOne
+    private GameType gameType;
 
     @Column(nullable = false, unique = false)
-    private Long gameCreation; // Designates the timestamp when champion select ended and the loading screen appeared, NOT when the game timer was at 0:00.
+    private Long gameDuration = 0L; // Match duration in seconds
+
+    @Column(nullable = true, unique = false)
+    private LocalDateTime gameCreation; // Designates the timestamp when champion select ended and the loading screen appeared, NOT when the game timer was at 0:00.
 /*
-    participantIdentities	List[ParticipantIdentityDto]	Participant identity information.
-    gameMode	string	Please refer to the Game Constants documentation.
-    mapId	int	Please refer to the Game Constants documentation.
-    gameType	string	Please refer to the Game Constants documentation.
+TODO: meter estas dos key
     teams	List[TeamStatsDto]	Team information.
     participants	List[ParticipantDto]	Participant information.
 */
@@ -68,7 +76,7 @@ public class MatchGame {
     public void setRetrieving(boolean retrieving) {
         this.retrieving = retrieving;
     }
-/*
+
     public Season getSeason() {
         return season;
     }
@@ -109,11 +117,35 @@ public class MatchGame {
         this.gameDuration = gameDuration;
     }
 
-    public Long getGameCreation() {
+    public LocalDateTime getGameCreation() {
         return gameCreation;
     }
 
-    public void setGameCreation(Long gameCreation) {
+    public void setGameCreation(LocalDateTime gameCreation) {
         this.gameCreation = gameCreation;
     }
-*/}
+
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(GameMap gameMap) {
+        this.gameMap = gameMap;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public GameType getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
+    }
+}

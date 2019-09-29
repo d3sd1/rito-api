@@ -120,4 +120,20 @@ public class MatchList {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "MatchList{" +
+                "id=" + id +
+                ", lane=" + lane +
+                ", match=" + match +
+                ", summoner=" + summoner +
+                ", champ=" + champ +
+                ", platform=" + platform +
+                ", season=" + season +
+                ", queue=" + queue +
+                ", role=" + role +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
