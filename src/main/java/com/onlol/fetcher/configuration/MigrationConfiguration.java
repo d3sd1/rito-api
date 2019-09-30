@@ -9,7 +9,12 @@ import org.springframework.context.annotation.DependsOn;
 @Configuration
 public class MigrationConfiguration {
 
-
+   /* @Bean(initMethod = "migrate")
+    Flyway flyway() {
+        Flyway flyway = new Flyway();
+        flyway.setBaselineOnMigrate(true);
+        return flyway;
+    }*/
     /**
      * Override default flyway initializer to do nothing
      */
@@ -27,6 +32,7 @@ public class MigrationConfiguration {
      * Create a second flyway initializer to run after jpa has created the schema
      */
     @Bean
+    @DependsOn("entityManagerFactory")
     FlywayMigrationInitializer delayedFlywayInitializer(Flyway flyway) {
         return new FlywayMigrationInitializer(flyway, null);
     }
