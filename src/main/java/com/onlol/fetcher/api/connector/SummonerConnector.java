@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class SummonerConnector {
         }
         Summoner summoner = resp.getBody();
         if(summoner != null) {
+            summoner.setLastTimeUpdated(LocalDateTime.now());
             this.summonerRepository.save(summoner);
         }
         return summoner;
@@ -93,6 +95,7 @@ public class SummonerConnector {
         }
         Summoner summoner = resp.getBody();
         if(summoner != null) {
+            summoner.setLastTimeUpdated(LocalDateTime.now());
             this.summonerRepository.save(summoner);
         }
         return summoner;
@@ -127,6 +130,7 @@ public class SummonerConnector {
         }
         Summoner summoner = resp.getBody();
         if(summoner != null) {
+            summoner.setLastTimeUpdated(LocalDateTime.now());
             this.summonerRepository.save(summoner);
         }
         return summoner;
@@ -163,6 +167,7 @@ public class SummonerConnector {
         }
         Summoner summoner = resp.getBody();
         if(summoner != null) {
+            summoner.setLastTimeUpdated(LocalDateTime.now());
             this.summonerRepository.save(summoner);
         }
         return summoner;

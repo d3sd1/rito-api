@@ -21,6 +21,9 @@ public class MatchGame {
     @Column(nullable = false, unique = false)
     private boolean retrieving = false;
 
+    @Column(nullable = false, unique = false)
+    private boolean expired = false; // if api returns 404
+
     @OneToOne
     private Season season;
 
@@ -147,5 +150,32 @@ TODO: meter estas dos key
 
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
+    }
+
+    public boolean isExpired() {
+        return expired;
+    }
+
+    public void setExpired(boolean expired) {
+        this.expired = expired;
+    }
+
+    @Override
+    public String toString() {
+        return "MatchGame{" +
+                "gameId=" + gameId +
+                ", retrieved=" + retrieved +
+                ", retrieving=" + retrieving +
+                ", expired=" + expired +
+                ", season=" + season +
+                ", queue=" + queue +
+                ", gameVersion='" + gameVersion + '\'' +
+                ", platform=" + platform +
+                ", gameMap=" + gameMap +
+                ", gameMode=" + gameMode +
+                ", gameType=" + gameType +
+                ", gameDuration=" + gameDuration +
+                ", gameCreation=" + gameCreation +
+                '}';
     }
 }

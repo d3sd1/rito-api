@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.Timestamp;
@@ -181,6 +182,7 @@ public class MatchConnector {
     }
 
 
+    // MÁS SOFISTICADO
     public MatchGame match(Long gameId) {
         ApiKey apiKey = this.apiKeyManager.getKey();
         if (apiKey == null) {
@@ -189,29 +191,41 @@ public class MatchConnector {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Riot-Token", apiKey.getApiKey());
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<SampleMatchGame> resp = restTemplate.exchange(
-                V4.MATCHES.replace("{{GAME_ID}}", gameId.toString()),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<SampleMatchGame>() {
-                });
+        MatchGame matchGame = new MatchGame();
+        SampleMatchGame sampleMatchGame = new SampleMatchGame();
 
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.match(gameId);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<SampleMatchGame> resp = restTemplate.exchange(
+                    V4.MATCHES.replace("{{GAME_ID}}", gameId.toString()),
+                    HttpMethod.GET, new HttpEntity(headers),
+                    new ParameterizedTypeReference<SampleMatchGame>() {
+                    });
+            sampleMatchGame = resp.getBody();
+        } catch (final HttpClientErrorException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    apiKey.setBanned(true);
+                    apiKey.setValid(false);
+                    this.apiKeyRepository.save(apiKey);
+                    return matchGame;
+                case 404:
+                    matchGame.setGameId(gameId);
+                    matchGame.setRetrieved(true);
+                    matchGame.setRetrieving(false);
+                    matchGame.setExpired(true);
+                    this.matchGameRepository.save(matchGame);
+                    return matchGame;
+                case 429:
+                    apiKey.setBanned(true);
+                    apiKey.setValid(true);
+                    this.apiKeyRepository.save(apiKey);
+                    return this.match(gameId);
+            }
         }
 
-        SampleMatchGame sampleMatchGame = resp.getBody();
+        matchGame = this.matchGameRepository.findByGameId(sampleMatchGame.getGameId());
 
-        MatchGame matchGame = this.matchGameRepository.findByGameId(sampleMatchGame.getGameId());
         if (matchGame == null) {
             matchGame = new MatchGame();
         }
@@ -312,7 +326,6 @@ public class MatchConnector {
         }
 
         System.out.println("PARTTIDA: " + sampleMatchGame);
-        // TODO: que los summoner actualizados aqui tengan lastUpdate a 0 y crear cron que los actualice
         return null;
     }
 }

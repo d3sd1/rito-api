@@ -34,22 +34,17 @@ public class MatchesScraper {
 
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
     public void ret() {
-        System.out.println("Retrieving games...");
+        System.out.println("Retrieving matches...");
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
+        if(matchGame == null) {
+            System.out.println("No matches to update...");
+            return;
+        }
         matchGame.setRetrieving(true);
         this.matchGameRepository.save(matchGame);
+        System.out.println("Updating match: " + matchGame.getGameId());
 
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame.getGameId());
-        //TODO: recuperar partidas
-        //TODO: flyway debe ejecutarse despues de hibernate
-        //TODO: cron para que con los lastUpdate se recupern si el sumoner no se actualizo! (actualizar summoners + antiguos)
-        /*
-        *
-        *
-        matchGame.setRetrieved(true);
-        matchGame.setRetrieving(false);
-        this.matchGameRepository.save(matchGame);
-        * */
 
     }
 }

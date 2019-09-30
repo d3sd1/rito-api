@@ -13,6 +13,7 @@ public class ApiKeyManager {
     @Autowired
     private LogService logger;
 
+    //TODO: tener en cuenta rate limit y balancear carga entre las keys.
     public ApiKey getKey() {
         ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalse();
         if(apiKey == null) {

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SummonerRepository extends JpaRepository<Summoner, String> {
     Summoner findByAccountId(String s);
+    Summoner findTopByOrderByLastTimeUpdated();
 }
