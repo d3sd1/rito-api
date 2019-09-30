@@ -33,5 +33,7 @@ public class SummonerScraper {
         summoner = this.summonerConnector.bySummonerId(summoner.getId());
         System.out.println("Retrieving games of summoner " + summoner.getName());
         this.matchConnector.matchListByAccount(summoner.getAccountId());
+        //TODO: guardar masteries (another endpoint)
+        //TODO: guardar historial nombres cuenta (nombre != "" y != null y nuevoNombre != viejoNombre)
     }
 }
