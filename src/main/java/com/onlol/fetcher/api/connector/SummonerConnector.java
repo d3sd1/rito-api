@@ -4,7 +4,9 @@ import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.ApiKey;
 import com.onlol.fetcher.api.model.Summoner;
+import com.onlol.fetcher.api.model.SummonerNameHistorical;
 import com.onlol.fetcher.api.repository.ApiKeyRepository;
+import com.onlol.fetcher.api.repository.SummonerNameHistoricalRepository;
 import com.onlol.fetcher.api.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,6 +32,9 @@ public class SummonerConnector {
 
     @Autowired
     private SummonerRepository summonerRepository;
+
+    @Autowired
+    private SummonerNameHistoricalRepository summonerNameHistoricalRepository;
 
     public Summoner byName(String name) {
         ApiKey apiKey = this.apiKeyManager.getKey();
@@ -61,7 +66,14 @@ public class SummonerConnector {
         Summoner summoner = resp.getBody();
         if(summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
-            this.summonerRepository.save(summoner);
+            summoner = this.summonerRepository.save(summoner);
+            // Update historical name if needed
+            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
+                summonerNameHistorical.setName(summoner.getName());
+                summonerNameHistorical.setSummoner(summoner);
+                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+            }
         }
         return summoner;
     }
@@ -96,7 +108,14 @@ public class SummonerConnector {
         Summoner summoner = resp.getBody();
         if(summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
-            this.summonerRepository.save(summoner);
+            summoner = this.summonerRepository.save(summoner);
+            // Update historical name if needed
+            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
+                summonerNameHistorical.setName(summoner.getName());
+                summonerNameHistorical.setSummoner(summoner);
+                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+            }
         }
         return summoner;
     }
@@ -131,7 +150,14 @@ public class SummonerConnector {
         Summoner summoner = resp.getBody();
         if(summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
-            this.summonerRepository.save(summoner);
+            summoner = this.summonerRepository.save(summoner);
+            // Update historical name if needed
+            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
+                summonerNameHistorical.setName(summoner.getName());
+                summonerNameHistorical.setSummoner(summoner);
+                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+            }
         }
         return summoner;
     }
@@ -168,7 +194,14 @@ public class SummonerConnector {
         Summoner summoner = resp.getBody();
         if(summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
-            this.summonerRepository.save(summoner);
+            summoner = this.summonerRepository.save(summoner);
+            // Update historical name if needed
+            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
+                summonerNameHistorical.setName(summoner.getName());
+                summonerNameHistorical.setSummoner(summoner);
+                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+            }
         }
         return summoner;
     }
