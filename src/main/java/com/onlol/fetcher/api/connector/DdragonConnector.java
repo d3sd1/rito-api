@@ -98,19 +98,16 @@ public class DdragonConnector {
         for (Map.Entry<String, SampleChampion> entry : sampleChampions.entrySet()) {
             SampleChampion champion = entry.getValue();
 
-            System.out.println("--------");
             // Since LoL swapped key and ID, let's swap it for performance
             Champion dbChampion = this.championRepository.findByChampId(Integer.parseInt(champion.getKey()));
-            System.out.println(Integer.parseInt(champion.getKey()));
-            System.out.println(dbChampion);
+
             if(dbChampion == null) {
                 dbChampion = new Champion();
             }
 
             dbChampion.setChampId(Integer.parseInt(champion.getKey()));
             dbChampion.setKeyName(champion.getId().toLowerCase());
-            System.out.println(dbChampion.getChampId());
-            System.out.println("--------");
+
             dbChampion = this.championRepository.save(dbChampion);
             champions.add(dbChampion);
 

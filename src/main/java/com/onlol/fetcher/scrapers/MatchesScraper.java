@@ -6,6 +6,8 @@ import com.onlol.fetcher.api.repository.MatchGameRepository;
 import com.onlol.fetcher.api.sampleModel.SampleMatchGame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
+@EnableAsync
 public class MatchesScraper {
     @Autowired
     private MatchGameRepository matchGameRepository;
@@ -23,6 +26,7 @@ public class MatchesScraper {
 
     @PostConstruct
     @DependsOn("entityManagerFactory")
+    @Async
     private void clearOrphanGames() {
         System.out.println("Limpiando partidas huérfanas...");
         List<MatchGame> orphanGames = this.matchGameRepository.findAllByRetrievedIsFalseAndRetrievingIsTrue();
@@ -32,8 +36,7 @@ public class MatchesScraper {
         }
     }
 
-
-    //TODO: matches no funciona ya que scheduled no es async.
+    @Async
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
     public void getMatches() {
         System.out.println("Retrieving matches...");

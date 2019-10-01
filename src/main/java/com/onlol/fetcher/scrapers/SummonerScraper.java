@@ -5,6 +5,8 @@ import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@EnableAsync
 public class SummonerScraper {
 
     @Autowired
@@ -23,9 +26,10 @@ public class SummonerScraper {
 
     @Autowired
     private SummonerRepository summonerRepository;
-/*
+
+    @Async
     @Scheduled(fixedRate = 5000)
-    public void ret() {
+    public void getSummonerInfo() {
         Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
         if(summoner == null) {
             System.out.println("No summoners to update...");
@@ -50,5 +54,5 @@ public class SummonerScraper {
         //TODO: revisar DB y rellenar huecos vacios con constants api etc (hay tablas que no estan al 100% rellenas)
     }
 
- */
+
 }
