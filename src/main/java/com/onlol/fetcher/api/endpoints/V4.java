@@ -10,4 +10,5 @@ public class V4 {
     public static final String DDRAGON_VERSIONS = "https://ddragon.leagueoflegends.com/api/versions.json";
     public static final String DDRAGON_CHAMPIONS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/champion.json";
     public static final String DDRAGON_LANGUAGES = "https://ddragon.leagueoflegends.com/cdn/languages.json";
+    public static final String SUMMONER_CHAMPION_MASTERY = "https://euw1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/{{SUMMONER_ID}}";
 }

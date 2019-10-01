@@ -50,7 +50,8 @@ public class SummonerScraper {
         summoner = this.summonerConnector.bySummonerId(summoner.getId());
         System.out.println("Retrieving games of summoner " + summoner.getName());
         this.matchConnector.matchListByAccount(summoner.getAccountId());
-        //TODO: guardar masteries (another endpoint)
+        System.out.println("Retrieving summoner champion mastery...");
+        this.summonerConnector.championMastery(summoner.getId());
         //TODO: revisar DB y rellenar huecos vacios con constants api etc (hay tablas que no estan al 100% rellenas)
     }
 
