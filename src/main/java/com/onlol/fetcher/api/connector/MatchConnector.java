@@ -65,7 +65,11 @@ public class MatchConnector {
     @Autowired
     private MatchListRepository matchListRepository;
 
-    public List<MatchList> matchListByAccount(String encryptedAccountId) {
+    public List<MatchList> matchListByAccount(String encryptedAccountId) { // WRAPPER
+        return this.matchListByAccount(encryptedAccountId, 0L);
+    }
+
+    public List<MatchList> matchListByAccount(String encryptedAccountId, Long beginIndex) {
         ApiKey apiKey = this.apiKeyManager.getKey();
         if (apiKey == null) {
             return new ArrayList<>();
@@ -75,7 +79,8 @@ public class MatchConnector {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SampleMatchLists> resp = restTemplate.exchange(
-                V4.MATCHLIST_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", encryptedAccountId),
+                V4.MATCHLIST_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", encryptedAccountId)
+                        .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
                 HttpMethod.GET, new HttpEntity(headers),
                 new ParameterizedTypeReference<SampleMatchLists>() {
                 });
@@ -99,6 +104,7 @@ public class MatchConnector {
         List<MatchList> matchLists = new ArrayList<>();
 
         Summoner summoner = this.summonerRepository.findByAccountId(encryptedAccountId);
+
         for (SampleMatchList sampleMatchList : sampleMatchLists.getMatches()) {
             MatchList matchList = this.matchListRepository.findByMatchGameIdAndSummonerAccountId(sampleMatchList.getGameId(), encryptedAccountId);
             if (matchList == null) {
@@ -170,6 +176,7 @@ public class MatchConnector {
                 matchList.setLane(lane);
 
                 /*matchList.setChamp();
+                //TODO: añadir listado de campeones y clave foranea aqui
                  * */
                 matchList.setTimestamp((new Timestamp(sampleMatchList.getTimestamp()).toLocalDateTime()));
                 matchList.setSummoner(summoner);
@@ -177,7 +184,10 @@ public class MatchConnector {
             }
             matchLists.add(matchList);
         }
-        //TODO: iterar para todas las partidas
+        // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
+        if (sampleMatchLists.getEndIndex() < sampleMatchLists.getTotalGames()) {
+            this.matchListByAccount(encryptedAccountId, sampleMatchLists.getEndIndex() + 1);
+        }
         return matchLists;
     }
 
