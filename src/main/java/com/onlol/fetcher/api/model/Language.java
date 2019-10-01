@@ -1,25 +1,28 @@
 package com.onlol.fetcher.api.model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Champion {
-    @Id
-    @Column(nullable = false, unique = true)
-    private Integer champId;
+public class Language {
 
-    @Column(nullable = false, unique = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, unique = true)
+    private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String keyName;
 
-    public Integer getChampId() {
-        return champId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setChampId(Integer champId) {
-        this.champId = champId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getKeyName() {
@@ -28,13 +31,5 @@ public class Champion {
 
     public void setKeyName(String keyName) {
         this.keyName = keyName;
-    }
-
-    @Override
-    public String toString() {
-        return "Champion{" +
-                "champId=" + champId +
-                ", keyName='" + keyName + '\'' +
-                '}';
     }
 }

@@ -24,6 +24,9 @@ import java.util.List;
 public class MatchConnector {
 
     @Autowired
+    private DdragonConnector ddragonConnector;
+
+    @Autowired
     private ApiKeyManager apiKeyManager;
 
     @Autowired
@@ -175,9 +178,19 @@ public class MatchConnector {
                 }
                 matchList.setLane(lane);
 
-                /*matchList.setChamp();
-                //TODO: añadir listado de campeones y clave foranea aqui
-                 * */
+
+                /* Get champ */
+                Champion champion = this.championRepository.findByChampId(sampleMatchList.getChampion());
+                if(champion != null) {
+                    matchList.setChamp(champion);
+                }
+                else {
+                    // Actualizar campeones ya que falta alguno en la DB y volver al mismo proceso
+                    this.ddragonConnector.champions();
+                    this.matchListByAccount(encryptedAccountId,beginIndex);
+                }
+                matchList.setLane(lane);
+
                 matchList.setTimestamp((new Timestamp(sampleMatchList.getTimestamp()).toLocalDateTime()));
                 matchList.setSummoner(summoner);
                 this.matchListRepository.save(matchList);

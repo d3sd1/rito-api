@@ -24,6 +24,7 @@ public class MatchesScraper {
     @PostConstruct
     @DependsOn("entityManagerFactory")
     private void clearOrphanGames() {
+        System.out.println("Limpiando partidas huérfanas...");
         List<MatchGame> orphanGames = this.matchGameRepository.findAllByRetrievedIsFalseAndRetrievingIsTrue();
         for(MatchGame matchGame:orphanGames) {
             matchGame.setRetrieving(false);
@@ -32,8 +33,9 @@ public class MatchesScraper {
     }
 
 
+    //TODO: matches no funciona ya que scheduled no es async.
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
-    public void ret() {
+    public void getMatches() {
         System.out.println("Retrieving matches...");
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
         if(matchGame == null) {

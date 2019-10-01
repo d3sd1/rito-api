@@ -23,7 +23,7 @@ public class SummonerScraper {
 
     @Autowired
     private SummonerRepository summonerRepository;
-
+/*
     @Scheduled(fixedRate = 5000)
     public void ret() {
         Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
@@ -49,4 +49,6 @@ public class SummonerScraper {
         //TODO: guardar masteries (another endpoint)
         //TODO: revisar DB y rellenar huecos vacios con constants api etc (hay tablas que no estan al 100% rellenas)
     }
+
+ */
 }

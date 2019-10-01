@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LoLVersion {
+public class Version {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
