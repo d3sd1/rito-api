@@ -6,10 +6,8 @@ import com.onlol.fetcher.api.model.ApiKey;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.model.SummonerChampionMastery;
 import com.onlol.fetcher.api.model.SummonerNameHistorical;
-import com.onlol.fetcher.api.repository.ApiKeyRepository;
-import com.onlol.fetcher.api.repository.SummonerChampionMasteryRepository;
-import com.onlol.fetcher.api.repository.SummonerNameHistoricalRepository;
-import com.onlol.fetcher.api.repository.SummonerRepository;
+import com.onlol.fetcher.api.repository.*;
+import com.onlol.fetcher.api.sampleModel.SampleSummonerChampionMastery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +39,9 @@ public class SummonerConnector {
 
     @Autowired
     private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
+
+    @Autowired
+    private ChampionRepository championRepository;
 
     public Summoner byName(String name) {
         ApiKey apiKey = this.apiKeyManager.getKey();
@@ -221,10 +223,10 @@ public class SummonerConnector {
         headers.set("X-Riot-Token", apiKey.getApiKey());
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<SummonerChampionMastery>> resp = restTemplate.exchange(
+        ResponseEntity<ArrayList<SampleSummonerChampionMastery>> resp = restTemplate.exchange(
                 V4.SUMMONER_CHAMPION_MASTERY.replace("{{SUMMONER_ID}}", summonerId),
                 HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<ArrayList<SummonerChampionMastery>>() {
+                new ParameterizedTypeReference<ArrayList<SampleSummonerChampionMastery>>() {
                 });
 
         switch (resp.getStatusCode().value()) {
@@ -239,8 +241,28 @@ public class SummonerConnector {
                 this.apiKeyRepository.save(apiKey);
                 return this.championMastery(summonerId);
         }
-        ArrayList<SummonerChampionMastery> summonerChampionMasteries = resp.getBody();
-        for(SummonerChampionMastery summonerChampionMastery:summonerChampionMasteries) {
+
+        //TODO: validar que se añaden bien las maestrias
+        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = resp.getBody();
+        ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
+        for(SampleSummonerChampionMastery sampleSummonerChampionMastery:sampleSummonerChampionMasteries) {
+            Summoner summoner = this.summonerRepository.findById(sampleSummonerChampionMastery.getSummonerId()).get();
+            if(summoner == null) {
+                continue;
+            }
+            SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
+            if(summonerChampionMastery == null) {
+                summonerChampionMastery = new SummonerChampionMastery();
+            }
+            summonerChampionMastery.setSummoner(summoner);
+            summonerChampionMastery.setChampion(this.championRepository.findByChampId(sampleSummonerChampionMastery.getChampionId()));
+            summonerChampionMastery.setChampionLevel(sampleSummonerChampionMastery.getChampionLevel());
+            summonerChampionMastery.setChampionPoints(sampleSummonerChampionMastery.getChampionPoints());
+            summonerChampionMastery.setChampionPointsSinceLastLevel(sampleSummonerChampionMastery.getChampionPointsSinceLastLevel());
+            summonerChampionMastery.setChampionPointsUntilNextLevel(sampleSummonerChampionMastery.getChampionPointsUntilNextLevel());
+            summonerChampionMastery.setChestGranted(sampleSummonerChampionMastery.isChestGranted());
+            summonerChampionMastery.setLastPlayTime(new Timestamp(sampleSummonerChampionMastery.getLastPlayTime()).toLocalDateTime());
+            summonerChampionMastery.setTokensEarned(sampleSummonerChampionMastery.getTokensEarned());
             this.summonerChampionMasteryRepository.save(summonerChampionMastery);
         }
         return summonerChampionMasteries;
