@@ -242,7 +242,6 @@ public class SummonerConnector {
                 return this.championMastery(summonerId);
         }
 
-        //TODO: validar que se añaden bien las maestrias
         ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = resp.getBody();
         ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
         for(SampleSummonerChampionMastery sampleSummonerChampionMastery:sampleSummonerChampionMasteries) {

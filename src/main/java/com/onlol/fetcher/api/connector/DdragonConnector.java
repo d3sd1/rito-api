@@ -1,17 +1,24 @@
 package com.onlol.fetcher.api.connector;
 
+import com.onlol.fetcher.api.ApiKeyManager;
+import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.SampleChampion;
+import com.onlol.fetcher.api.sampleModel.SampleChampionRotation;
 import com.onlol.fetcher.api.sampleModel.SampleDdragon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -28,6 +35,15 @@ public class DdragonConnector {
 
     @Autowired
     private ChampionStatsRepository championStatsRepository;
+
+    @Autowired
+    private ChampionRotationRepository championRotationRepository;
+
+    @Autowired
+    private ApiKeyManager apiKeyManager;
+
+    @Autowired
+    private PlatformRepository platformRepository;
 
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
@@ -83,6 +99,7 @@ public class DdragonConnector {
         Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
         return this.champions(usedVersion);
     }
+
     public ArrayList<Champion> champions(Version version) { // Retrieves selected patch champion data
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SampleDdragon<LinkedHashMap<String, SampleChampion>>> resp = restTemplate.exchange(
@@ -101,7 +118,7 @@ public class DdragonConnector {
             // Since LoL swapped key and ID, let's swap it for performance
             Champion dbChampion = this.championRepository.findByChampId(Integer.parseInt(champion.getKey()));
 
-            if(dbChampion == null) {
+            if (dbChampion == null) {
                 dbChampion = new Champion();
             }
 
@@ -113,7 +130,7 @@ public class DdragonConnector {
 
             // Update champion stats for version
             ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndVersion(dbChampion, version);
-            if(dbChampionStats == null) {
+            if (dbChampionStats == null) {
                 dbChampionStats = new ChampionStats();
                 dbChampionStats.setChampion(dbChampion);
                 dbChampionStats.setVersion(version);
@@ -147,9 +164,71 @@ public class DdragonConnector {
     public ArrayList<ArrayList<Champion>> championsHistorical() { // Retrieves all patches champ data
         ArrayList<ArrayList<Champion>> champions = new ArrayList<>();
         List<Version> versions = this.versionRepository.findAll();
-        for(Version version:versions) {
+        for (Version version : versions) {
             champions.add(this.champions(version));
         }
         return champions;
+    }
+
+    public ArrayList<ChampionRotation> championRotation() {
+        RestTemplate restTemplate = new RestTemplate();
+        ArrayList<ChampionRotation> championRotations = new ArrayList<>();
+        ApiKey apiKey = this.apiKeyManager.getKey();
+        if (apiKey == null) {
+            return new ArrayList<>();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Riot-Token", apiKey.getApiKey());
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+        for (Platform platform : this.platformRepository.findAll()) {
+            ResponseEntity<SampleChampionRotation> resp = restTemplate.exchange(
+                    V3.CHAMPION_ROTATION.replace("{{PLATFORM}}", platform.getKeyName()),
+                    HttpMethod.GET, new HttpEntity(headers),
+                    new ParameterizedTypeReference<>() {
+                    });
+            SampleChampionRotation champRotation = resp.getBody();
+            for (Integer champId : champRotation.getFreeChampionIds()) {
+                Champion champion = this.championRepository.findByChampId(champId);
+                ChampionRotation championRotation =
+                        this.championRotationRepository.findByRotationDateAndPlatformAndChampionAndForNewPlayers(
+                                dateFormat.format(new Date()), platform, champion, false
+                        );
+
+                if(championRotation == null) {
+                    championRotation = new ChampionRotation();
+                    championRotation.setChampion(champion);
+                    championRotation.setForNewPlayers(false);
+                    championRotation.setPlatform(platform);
+                    championRotation.setRotationDate(dateFormat.format(new Date()));
+                    championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
+                    this.championRotationRepository.save(championRotation);
+                }
+                championRotations.add(championRotation);
+            }
+
+            for (Integer champId : champRotation.getFreeChampionIdsForNewPlayers()) {
+                Champion champion = this.championRepository.findByChampId(champId);
+                ChampionRotation championRotation =
+                        this.championRotationRepository.findByRotationDateAndPlatformAndChampionAndForNewPlayers(
+                                dateFormat.format(new Date()), platform,champion, true
+                                );
+
+                if(championRotation == null) {
+                    championRotation = new ChampionRotation();
+                    championRotation.setChampion(champion);
+                    championRotation.setForNewPlayers(true);
+                    championRotation.setPlatform(platform);
+                    championRotation.setRotationDate(dateFormat.format(new Date()));
+                    championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
+                    this.championRotationRepository.save(championRotation);
+                }
+                championRotations.add(championRotation);
+            }
+        }
+
+
+        return championRotations;
     }
 }

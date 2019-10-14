@@ -34,7 +34,6 @@ public class DdragonScraper {
     @PostConstruct
     public void gameChampions() { // Used for lower init time
         try {
-// TMP FIX PRE-reflection on consumer
             this.ddragonConnector.champions();
         } catch(Exception e) {
 
@@ -47,6 +46,26 @@ public class DdragonScraper {
             this.ddragonConnector.championsHistorical();
         } catch(Exception e) {
 
+        }
+    }
+
+
+    @Async
+    @PostConstruct
+    public void championRotation() { // Used for lower init time
+        try {
+            this.ddragonConnector.championRotation();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void championRotationCron() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.championRotation();
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
