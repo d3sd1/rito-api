@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+//TODO: que los connector usen una clase padre comun para el api key y las llamadas al REST
 @Service
 public class DdragonConnector {
 

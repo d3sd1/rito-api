@@ -69,4 +69,6 @@ public class DdragonScraper {
         }
     }
 
+    //TODO: Recuperar estado lol
+    // GET /lol/status/v3/shard-data
 }

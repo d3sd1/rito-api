@@ -27,7 +27,7 @@ public class MatchesScraper {
     @PostConstruct
     @DependsOn("entityManagerFactory")
     @Async
-    private void clearOrphanGames() {
+    public void clearOrphanGames() {
         System.out.println("Limpiando partidas huérfanas...");
         List<MatchGame> orphanGames = this.matchGameRepository.findAllByRetrievedIsFalseAndRetrievingIsTrue();
         for(MatchGame matchGame:orphanGames) {
@@ -50,6 +50,6 @@ public class MatchesScraper {
         System.out.println("Updating match: " + matchGame.getGameId());
 
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame.getGameId());
-
+        //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}
     }
 }
