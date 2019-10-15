@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GameTypeRepository extends JpaRepository<GameType, String> {
-    GameType findByKeyName(String s);
+    GameType findByGametype(String gametype);
 }

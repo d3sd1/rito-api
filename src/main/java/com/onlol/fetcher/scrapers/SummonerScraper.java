@@ -52,7 +52,6 @@ public class SummonerScraper {
         this.matchConnector.matchListByAccount(summoner.getAccountId());
         System.out.println("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner.getId());
-        //TODO: revisar DB y rellenar huecos vacios con constants api etc (hay tablas que no estan al 100% rellenas)
 
         //TODO: recuperar ligas del invocador
         // /lol/league/v4/entries/by-summoner/{encryptedSummonerId}

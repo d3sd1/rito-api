@@ -145,6 +145,27 @@ public class DdragonScraper {
         }
     }
 
+    @Async
+    @PostConstruct
+    public void gameTypesInit() { // Used for lower init time
+        try {
+            //TODO: decomentar esto cuando el endpoint quite la trailing comma
+            //this.ddragonConnector.gameTypes();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void gameTypesQueue() { // Used for retrieving all data
+        try {
+            //TODO: decomentar esto cuando el endpoint quite la trailing comma
+            //this.ddragonConnector.gameTypes();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
 }

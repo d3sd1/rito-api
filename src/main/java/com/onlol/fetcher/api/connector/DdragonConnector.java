@@ -71,6 +71,10 @@ public class DdragonConnector {
     @Autowired
     private GameModeRepository gameModeRepository;
 
+
+    @Autowired
+    private GameTypeRepository gameTypeRepository;
+
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
@@ -140,6 +144,21 @@ public class DdragonConnector {
             this.gameMapRepository.save(map);
         }
         return maps;
+    }
+
+    public ArrayList<GameType> gameTypes() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ArrayList<GameType>> resp = restTemplate.exchange(
+                V4.DDRAGON_TYPES,
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        ArrayList<GameType> gameTypes = resp.getBody();
+
+        for (GameType gameType : gameTypes) {
+            this.gameTypeRepository.save(gameType);
+        }
+        return gameTypes;
     }
 
     public ArrayList<GameMode> gameModes() {

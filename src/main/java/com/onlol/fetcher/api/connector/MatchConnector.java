@@ -318,10 +318,10 @@ public class MatchConnector {
 
 
         /* Get game type */
-        GameType gameType = this.gameTypeRepository.findByKeyName(sampleMatchGame.getGameType());
+        GameType gameType = this.gameTypeRepository.findByGametype(sampleMatchGame.getGameType());
         if (gameType == null) {
             GameType dbGameType = new GameType();
-            dbGameType.setKeyName(sampleMatchGame.getGameType());
+            dbGameType.setGametype(sampleMatchGame.getGameType());
 
             this.gameTypeRepository.save(dbGameType);
             gameType = dbGameType;

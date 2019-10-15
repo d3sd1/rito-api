@@ -12,6 +12,7 @@ public class V4 {
     public static final String DDRAGON_QUEUES = "http://static.developer.riotgames.com/docs/lol/queues.json";
     public static final String DDRAGON_MAPS = "http://static.developer.riotgames.com/docs/lol/maps.json";
     public static final String DDRAGON_MODES = "http://static.developer.riotgames.com/docs/lol/gameModes.json";
+    public static final String DDRAGON_TYPES = "http://static.developer.riotgames.com/docs/lol/gameTypes.json";
     public static final String DDRAGON_CHAMPIONS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/champion.json";
     public static final String DDRAGON_LANGUAGES = "https://ddragon.leagueoflegends.com/cdn/languages.json";
     public static final String SUMMONER_CHAMPION_MASTERY = "https://euw1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/{{SUMMONER_ID}}";
