@@ -53,6 +53,7 @@ public class SummonerScraper {
         System.out.println("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner.getId());
 
+        //TODO: utilizar tosdas las regiones
         //TODO: recuperar ligas del invocador
         // /lol/league/v4/entries/by-summoner/{encryptedSummonerId}
     }
