@@ -9,7 +9,7 @@ public class SampleTeamStats {
     private Integer baronKills;
     private boolean firstRiftHerald;
     private boolean firstBaron;
-    private boolean riftHeraldKills;
+    private Integer riftHeraldKills;
     private boolean firstBlood;
     private Integer teamId; // int	100 for blue side. 200 for red side.
     private boolean firstTower;
@@ -68,11 +68,11 @@ public class SampleTeamStats {
         this.firstBaron = firstBaron;
     }
 
-    public boolean isRiftHeraldKills() {
+    public Integer getRiftHeraldKills() {
         return riftHeraldKills;
     }
 
-    public void setRiftHeraldKills(boolean riftHeraldKills) {
+    public void setRiftHeraldKills(Integer riftHeraldKills) {
         this.riftHeraldKills = riftHeraldKills;
     }
 

@@ -2,11 +2,9 @@ package com.onlol.fetcher.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,11 +48,16 @@ public class MatchGame {
 
     @Column(nullable = true, unique = false)
     private LocalDateTime gameCreation; // Designates the timestamp when champion select ended and the loading screen appeared, NOT when the game timer was at 0:00.
-/*
-TODO: meter estas dos key
-    teams	List[TeamStatsDto]	Team information.
-    participants	List[ParticipantDto]	Participant information.
-*/
+
+    /*
+    TODO: meter estas dos key
+        participants	List[ParticipantDto]	Participant information.
+    */
+    @OneToMany
+    private List<MatchGameTeamStats> matchGameTeam;
+
+    @OneToMany
+    private List<MatchGameParticipant> matchGameParticipants;
 
     public Long getGameId() {
         return gameId;
@@ -160,6 +163,22 @@ TODO: meter estas dos key
         this.expired = expired;
     }
 
+    public List<MatchGameTeamStats> getMatchGameTeam() {
+        return matchGameTeam;
+    }
+
+    public void setMatchGameTeam(List<MatchGameTeamStats> matchGameTeamStats) {
+        this.matchGameTeam = matchGameTeamStats;
+    }
+
+    public List<MatchGameParticipant> getMatchGameParticipants() {
+        return matchGameParticipants;
+    }
+
+    public void setMatchGameParticipants(List<MatchGameParticipant> matchGameParticipants) {
+        this.matchGameParticipants = matchGameParticipants;
+    }
+
     @Override
     public String toString() {
         return "MatchGame{" +
@@ -176,6 +195,8 @@ TODO: meter estas dos key
                 ", gameType=" + gameType +
                 ", gameDuration=" + gameDuration +
                 ", gameCreation=" + gameCreation +
+                ", matchGameTeam=" + matchGameTeam +
+                ", matchGameParticipants=" + matchGameParticipants +
                 '}';
     }
 }

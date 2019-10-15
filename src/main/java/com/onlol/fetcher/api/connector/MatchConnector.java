@@ -68,6 +68,15 @@ public class MatchConnector {
     @Autowired
     private MatchListRepository matchListRepository;
 
+    @Autowired
+    private MatchGameTeamStatsRepository matchGameTeamStatsRepository;
+
+    @Autowired
+    private MatchGameTeamRepository matchGameTeamRepository;
+
+    @Autowired
+    private MatchGameTeamBanRepository matchGameTeamBanRepository;
+
     public List<MatchList> matchListByAccount(String encryptedAccountId) { // WRAPPER
         return this.matchListByAccount(encryptedAccountId, 0L);
     }
@@ -151,7 +160,7 @@ public class MatchConnector {
                     Role dbRole = new Role();
                     dbRole.setKeyName(sampleMatchList.getRole());
 
-                    if(dbRole.getKeyName() != null) {
+                    if (dbRole.getKeyName() != null) {
                         this.roleRepository.save(dbRole);
                         role = dbRole;
                     }
@@ -183,13 +192,12 @@ public class MatchConnector {
 
                 /* Get champ */
                 Champion champion = this.championRepository.findByChampId(sampleMatchList.getChampion());
-                if(champion != null) {
+                if (champion != null) {
                     matchList.setChamp(champion);
-                }
-                else {
+                } else {
                     // Actualizar campeones ya que falta alguno en la DB y volver al mismo proceso
                     this.ddragonConnector.champions();
-                    this.matchListByAccount(encryptedAccountId,beginIndex);
+                    this.matchListByAccount(encryptedAccountId, beginIndex);
                 }
                 matchList.setLane(lane);
 
@@ -349,6 +357,59 @@ public class MatchConnector {
                 this.summonerRepository.save(dbSummoner);
             }
         }
+
+        /* Match game stats */
+
+        for (SampleTeamStats sampleTeamStats : sampleMatchGame.getTeams()) {
+            MatchGameTeam matchGameTeam = this.matchGameTeamRepository.findByTeamId(sampleTeamStats.getTeamId());
+            if (matchGameTeam == null) {
+                matchGameTeam = new MatchGameTeam();
+                matchGameTeam.setTeamId(sampleTeamStats.getTeamId());
+                matchGameTeam = this.matchGameTeamRepository.save(matchGameTeam);
+            }
+            MatchGameTeamStats matchGameTeamStats = this.matchGameTeamStatsRepository.
+                    findByGameIdAndTeam(sampleMatchGame.getGameId(), matchGameTeam);
+
+            if (matchGameTeamStats == null) {
+                MatchGameTeamStats dbMatchGameTeamStats = new MatchGameTeamStats();
+                dbMatchGameTeamStats.setGameId(sampleMatchGame.getGameId());
+                dbMatchGameTeamStats.setTeam(matchGameTeam);
+
+                matchGameTeamStats = this.matchGameTeamStatsRepository.save(dbMatchGameTeamStats);
+            }
+            matchGameTeamStats.setFirstDragon(sampleTeamStats.isFirstDragon());
+            matchGameTeamStats.setFirstInhibitor(sampleTeamStats.isFirstInhibitor());
+            matchGameTeamStats.setFirstRiftHerald(sampleTeamStats.isFirstRiftHerald());
+            matchGameTeamStats.setFirstBaron(sampleTeamStats.isFirstBaron());
+            matchGameTeamStats.setFirstBlood(sampleTeamStats.isFirstBlood());
+            matchGameTeamStats.setFirstTower(sampleTeamStats.isFirstTower());
+            matchGameTeamStats.setBaronKills(sampleTeamStats.getBaronKills());
+            matchGameTeamStats.setRiftHeraldKills(sampleTeamStats.getRiftHeraldKills());
+            matchGameTeamStats.setVilemawKills(sampleTeamStats.getVilemawKills());
+            matchGameTeamStats.setInhibitorKills(sampleTeamStats.getInhibitorKills());
+            matchGameTeamStats.setTowerKills(sampleTeamStats.getTowerKills());
+            matchGameTeamStats.setDragonKills(sampleTeamStats.getDragonKills());
+            matchGameTeamStats.setDominionVictoryScore(sampleTeamStats.getDominionVictoryScore());
+            matchGameTeamStats.setWon(sampleTeamStats.getWin().equalsIgnoreCase("Win"));
+
+            /* Fill bans for team just if not set (IMPORTANT) */
+
+            if (matchGameTeamStats.getBans() == null) {
+                ArrayList<MatchGameTeamBan> matchGameTeamBans = new ArrayList<>();
+                for (SampleTeamBans sampleTeamBans : sampleTeamStats.getBans()) {
+                    MatchGameTeamBan matchGameTeamBan = new MatchGameTeamBan();
+                    matchGameTeamBan.setPickTurn(sampleTeamBans.getPickTurn());
+                    matchGameTeamBan.setChampion(this.championRepository.findByChampId(sampleTeamBans.getChampionId()));
+                    matchGameTeamBan = this.matchGameTeamBanRepository.save(matchGameTeamBan);
+                    matchGameTeamBans.add(matchGameTeamBan);
+                }
+                matchGameTeamStats.setBans(matchGameTeamBans);
+            }
+
+
+            this.matchGameTeamStatsRepository.save(matchGameTeamStats);
+        }
+
 
         System.out.println("PARTTIDA: " + sampleMatchGame);
         return null;
