@@ -151,8 +151,10 @@ public class MatchConnector {
                     Role dbRole = new Role();
                     dbRole.setKeyName(sampleMatchList.getRole());
 
-                    this.roleRepository.save(dbRole);
-                    role = dbRole;
+                    if(dbRole.getKeyName() != null) {
+                        this.roleRepository.save(dbRole);
+                        role = dbRole;
+                    }
                 }
                 matchList.setRole(role);
 
