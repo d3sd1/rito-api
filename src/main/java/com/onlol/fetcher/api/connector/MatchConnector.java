@@ -77,6 +77,9 @@ public class MatchConnector {
     @Autowired
     private MatchGameTeamBanRepository matchGameTeamBanRepository;
 
+    @Autowired
+    private MatchGameParticipantRepository matchGameParticipantRepository;
+
     public List<MatchList> matchListByAccount(String encryptedAccountId) { // WRAPPER
         return this.matchListByAccount(encryptedAccountId, 0L);
     }
@@ -408,6 +411,27 @@ public class MatchConnector {
 
 
             this.matchGameTeamStatsRepository.save(matchGameTeamStats);
+        }
+
+        /* Fill participants */
+        for (SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
+            Summoner summoner = this.summonerRepository.findBySummonerId(sampleParticipantIdentity.getPlayer().getSummonerId());
+            if(summoner == null) {
+                summoner = new Summoner();
+                summoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
+                summoner = this.summonerRepository.save(summoner);
+            }
+            MatchGameParticipant matchGameParticipant = this.matchGameParticipantRepository.
+                    findBySummonerAndMatchGame(summoner, matchGame);
+            if(matchGameParticipant == null) {
+                matchGameParticipant = new MatchGameParticipant();
+                matchGameParticipant.setSummoner(summoner);
+                matchGameParticipant.setMatchGame(matchGame);
+                matchGameParticipant = this.matchGameParticipantRepository.save(matchGameParticipant);
+            }
+            //matchGameParticipant.set
+
+            this.matchGameParticipantRepository.save(matchGameParticipant);
         }
 
 

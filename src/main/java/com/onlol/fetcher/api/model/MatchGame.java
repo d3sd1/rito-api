@@ -49,10 +49,6 @@ public class MatchGame {
     @Column(nullable = true, unique = false)
     private LocalDateTime gameCreation; // Designates the timestamp when champion select ended and the loading screen appeared, NOT when the game timer was at 0:00.
 
-    /*
-    TODO: meter estas dos key
-        participants	List[ParticipantDto]	Participant information.
-    */
     @OneToMany
     private List<MatchGameTeamStats> matchGameTeam;
 
