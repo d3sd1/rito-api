@@ -11,24 +11,56 @@ import javax.persistence.Id;
 public class Queue {
     @Id
     @Column(nullable = false, unique = true)
-    private Integer id;
+    private Integer queueId;
 
-    @Column(nullable = true, unique = true)
-    private String keyName;
+    @Column(nullable = true, unique = false)
+    private String map;
 
-    public Integer getId() {
-        return id;
+    @Column(nullable = true, unique = false)
+    private String description;
+
+    @Column(nullable = true, unique = false)
+    private String notes;
+
+    public Integer getQueueId() {
+        return queueId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setQueueId(Integer queueId) {
+        this.queueId = queueId;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public String getMap() {
+        return map;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setMap(String map) {
+        this.map = map;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    @Override
+    public String toString() {
+        return "Queue{" +
+                "queueId=" + queueId +
+                ", map='" + map + '\'' +
+                ", description='" + description + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 }

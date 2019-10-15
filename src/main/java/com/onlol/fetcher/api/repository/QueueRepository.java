@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QueueRepository extends JpaRepository<Queue, String> {
-    Queue findTopById(Integer id);
+    Queue findTopByQueueId(Integer queueId);
 }

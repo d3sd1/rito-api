@@ -4,6 +4,7 @@ import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
+import com.onlol.fetcher.api.model.Queue;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.SampleChampion;
 import com.onlol.fetcher.api.sampleModel.SampleChampionRotation;
@@ -61,6 +62,9 @@ public class DdragonConnector {
     @Autowired
     private SeasonRepository seasonRepository;
 
+    @Autowired
+    private QueueRepository queueRepository;
+
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
@@ -100,6 +104,21 @@ public class DdragonConnector {
             this.seasonRepository.save(season);
         }
         return seasons;
+    }
+
+    public ArrayList<Queue> queues() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ArrayList<Queue>> resp = restTemplate.exchange(
+                V4.DDRAGON_QUEUES,
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        ArrayList<Queue> queues = resp.getBody();
+
+        for (Queue queue : queues) {
+            this.queueRepository.save(queue);
+        }
+        return queues;
     }
 
     public ArrayList<Language> languages() {

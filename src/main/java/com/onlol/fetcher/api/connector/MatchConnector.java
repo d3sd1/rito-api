@@ -134,10 +134,10 @@ public class MatchConnector {
 
 
                 /* Get queue */
-                Queue queue = this.queueRepository.findTopById(sampleMatchList.getQueue());
+                Queue queue = this.queueRepository.findTopByQueueId(sampleMatchList.getQueue());
                 if (queue == null) {
                     Queue dbQueue = new Queue();
-                    dbQueue.setId(sampleMatchList.getQueue());
+                    dbQueue.setQueueId(sampleMatchList.getQueue());
 
                     this.queueRepository.save(dbQueue);
                     queue = dbQueue;
@@ -270,10 +270,10 @@ public class MatchConnector {
 
 
         /* Get queue */
-        Queue queue = this.queueRepository.findTopById(sampleMatchGame.getQueueId());
+        Queue queue = this.queueRepository.findTopByQueueId(sampleMatchGame.getQueueId());
         if (queue == null) {
             Queue dbQueue = new Queue();
-            dbQueue.setId(sampleMatchGame.getQueueId());
+            dbQueue.setQueueId(sampleMatchGame.getQueueId());
 
             this.queueRepository.save(dbQueue);
             queue = dbQueue;
