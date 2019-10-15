@@ -8,7 +8,6 @@ import javax.persistence.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Region {
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Integer id;

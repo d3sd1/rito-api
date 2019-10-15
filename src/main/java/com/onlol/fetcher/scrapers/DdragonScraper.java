@@ -166,6 +166,25 @@ public class DdragonScraper {
         }
     }
 
+    @Async
+    @PostConstruct
+    public void realmsInit() { // Used for lower init time
+        try {
+            this.ddragonConnector.realms();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void realmsCron() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.realms();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
 }

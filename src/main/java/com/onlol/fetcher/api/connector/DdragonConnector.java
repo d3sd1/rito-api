@@ -9,6 +9,7 @@ import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.SampleChampion;
 import com.onlol.fetcher.api.sampleModel.SampleChampionRotation;
 import com.onlol.fetcher.api.sampleModel.SampleDdragon;
+import com.onlol.fetcher.api.sampleModel.SampleRealm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -71,9 +72,14 @@ public class DdragonConnector {
     @Autowired
     private GameModeRepository gameModeRepository;
 
-
     @Autowired
     private GameTypeRepository gameTypeRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
+
+    @Autowired
+    private RealmRepository realmRepository;
 
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
@@ -159,6 +165,46 @@ public class DdragonConnector {
             this.gameTypeRepository.save(gameType);
         }
         return gameTypes;
+    }
+
+    public ArrayList<Realm> realms() {
+        RestTemplate restTemplate = new RestTemplate();
+        ArrayList<Realm> realms = new ArrayList<>();
+        for (Region region : this.regionRepository.findAll()) {
+            ResponseEntity<SampleRealm> resp = restTemplate.exchange(
+                    V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion()),
+                    HttpMethod.GET, null,
+                    new ParameterizedTypeReference<>() {
+                    });
+            SampleRealm sampleRealm = resp.getBody();
+
+            Realm realm = this.realmRepository.findByRegion(region);
+            if(realm == null) {
+                realm = new Realm();
+                realm.setRegion(region);
+            }
+            realm.setCdnUrl(sampleRealm.getCss());
+            realm.setChampionLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getChampion()));
+            realm.setCssLastUpdate(this.versionRepository.findByVersion(sampleRealm.getCss()));
+            realm.setDataDdragonLastUpdate(this.versionRepository.findByVersion(sampleRealm.getDd()));
+            realm.setDefaultLanguage(this.languageRepository.findByKeyName(sampleRealm.getL()));
+            realm.setItemLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getItem()));
+            realm.setLanguageLastUpdate(this.versionRepository.findByVersion(sampleRealm.getLg()));
+            realm.setLg(this.versionRepository.findByVersion(sampleRealm.getLg()));
+            realm.setMapLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getMap()));
+            realm.setMasteriesLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getMastery()));
+            realm.setPatchLastUpdate(this.versionRepository.findByVersion(sampleRealm.getV()));
+            realm.setProfileIconLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getProfileicon()));
+            realm.setProfileIconMax(sampleRealm.getProfileiconmax());
+            realm.setRuneLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getRune()));
+            realm.setStoreUrl(sampleRealm.getStore());
+            realm.setStickerLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getSticker()));
+            realm.setSummonerLastUpdate(this.versionRepository.findByVersion(sampleRealm.getN().getSummoner()));
+
+            realms.add(realm);
+            this.realmRepository.save(realm);
+        }
+        return realms;
     }
 
     public ArrayList<GameMode> gameModes() {
@@ -302,7 +348,7 @@ public class DdragonConnector {
                                 dateFormat.format(new Date()), platform, champion, false
                         );
 
-                if(championRotation == null) {
+                if (championRotation == null) {
                     championRotation = new ChampionRotation();
                     championRotation.setChampion(champion);
                     championRotation.setForNewPlayers(false);
@@ -318,10 +364,10 @@ public class DdragonConnector {
                 Champion champion = this.championRepository.findByChampId(champId);
                 ChampionRotation championRotation =
                         this.championRotationRepository.findByRotationDateAndPlatformAndChampionAndForNewPlayers(
-                                dateFormat.format(new Date()), platform,champion, true
-                                );
+                                dateFormat.format(new Date()), platform, champion, true
+                        );
 
-                if(championRotation == null) {
+                if (championRotation == null) {
                     championRotation = new ChampionRotation();
                     championRotation.setChampion(champion);
                     championRotation.setForNewPlayers(true);
