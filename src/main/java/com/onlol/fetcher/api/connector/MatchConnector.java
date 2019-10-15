@@ -306,10 +306,10 @@ public class MatchConnector {
 
 
         /* Get game mode */
-        GameMode gameMode = this.gameModeRepository.findByKeyName(sampleMatchGame.getGameMode());
+        GameMode gameMode = this.gameModeRepository.findByGameMode(sampleMatchGame.getGameMode());
         if (gameMode == null) {
             GameMode dbGameMode = new GameMode();
-            dbGameMode.setKeyName(sampleMatchGame.getGameMode());
+            dbGameMode.setGameMode(sampleMatchGame.getGameMode());
 
             this.gameModeRepository.save(dbGameMode);
             gameMode = dbGameMode;

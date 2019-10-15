@@ -11,13 +11,32 @@ import javax.persistence.Id;
 public class GameMode {
     @Id
     @Column(nullable = false, unique = true)
-    private String keyName;
+    private String gameMode;
 
-    public String getKeyName() {
-        return keyName;
+    @Column(nullable = true, unique = false)
+    private String description;
+
+    public String getGameMode() {
+        return gameMode;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "GameMode{" +
+                "gameMode='" + gameMode + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

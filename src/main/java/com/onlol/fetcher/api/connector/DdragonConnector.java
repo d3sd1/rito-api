@@ -68,6 +68,9 @@ public class DdragonConnector {
     @Autowired
     private GameMapRepository gameMapRepository;
 
+    @Autowired
+    private GameModeRepository gameModeRepository;
+
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
@@ -137,6 +140,21 @@ public class DdragonConnector {
             this.gameMapRepository.save(map);
         }
         return maps;
+    }
+
+    public ArrayList<GameMode> gameModes() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ArrayList<GameMode>> resp = restTemplate.exchange(
+                V4.DDRAGON_MODES,
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        ArrayList<GameMode> modes = resp.getBody();
+
+        for (GameMode mode : modes) {
+            this.gameModeRepository.save(mode);
+        }
+        return modes;
     }
 
     public ArrayList<Language> languages() {

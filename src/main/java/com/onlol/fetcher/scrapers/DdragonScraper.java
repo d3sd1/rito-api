@@ -125,6 +125,26 @@ public class DdragonScraper {
         }
     }
 
+
+    @Async
+    @PostConstruct
+    public void gameModesInit() { // Used for lower init time
+        try {
+            this.ddragonConnector.gameModes();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void gameModesQueue() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.gameModes();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
 }

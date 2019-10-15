@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GameModeRepository extends JpaRepository<GameMode, String> {
-    GameMode findByKeyName(String s);
+    GameMode findByGameMode(String gameMode);
 }
