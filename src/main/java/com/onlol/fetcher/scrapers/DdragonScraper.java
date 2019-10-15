@@ -68,6 +68,26 @@ public class DdragonScraper {
         }
     }
 
+
+    @Async
+    @PostConstruct
+    public void seasonsInit() { // Used for lower init time
+        try {
+            this.ddragonConnector.seasons();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void seasonsCron() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.seasons();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
 }

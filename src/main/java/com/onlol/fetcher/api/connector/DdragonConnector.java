@@ -58,6 +58,9 @@ public class DdragonConnector {
     @Autowired
     private PlatformRepository platformRepository;
 
+    @Autowired
+    private SeasonRepository seasonRepository;
+
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
@@ -81,6 +84,22 @@ public class DdragonConnector {
             versions.add(version);
         }
         return versions;
+    }
+
+
+    public ArrayList<Season> seasons() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ArrayList<Season>> resp = restTemplate.exchange(
+                V4.DDRAGON_SEASONS,
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        ArrayList<Season> seasons = resp.getBody();
+
+        for (Season season : seasons) {
+            this.seasonRepository.save(season);
+        }
+        return seasons;
     }
 
     public ArrayList<Language> languages() {

@@ -14,7 +14,7 @@ public class Season {
     private Integer id;
 
     @Column(nullable = true, unique = true)
-    private String keyName;
+    private String season;
 
     public Integer getId() {
         return id;
@@ -24,11 +24,19 @@ public class Season {
         this.id = id;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public String getSeason() {
+        return season;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    @Override
+    public String toString() {
+        return "Season{" +
+                "id=" + id +
+                ", season='" + season + '\'' +
+                '}';
     }
 }
