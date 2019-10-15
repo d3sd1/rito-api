@@ -187,4 +187,14 @@ public class DdragonScraper {
 
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
+
+    //TODO: scrappear las siguientes URL (tener en cuenta los idiomas y las verisones. se han de iterar
+    // para todas las versiones solo cuando la app no este inicializando
+    // y para la version actual cuando este inicializando.
+    // se han de recuperar siempre para todos los idiomas.
+    /*
+    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/item.json
+    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/summoner.json
+    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/profileicon.json
+     */
 }
