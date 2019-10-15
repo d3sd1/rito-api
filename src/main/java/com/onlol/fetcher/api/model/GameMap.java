@@ -11,24 +11,44 @@ import javax.persistence.Id;
 public class GameMap {
     @Id
     @Column(nullable = false, unique = true)
-    private Integer id;
+    private Integer mapId;
 
-    @Column(nullable = true, unique = true)
-    private String keyName;
+    @Column(nullable = true, unique = false)
+    private String mapName;
 
-    public Integer getId() {
-        return id;
+    @Column(nullable = true, unique = false)
+    private String notes;
+
+    public Integer getMapId() {
+        return mapId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setMapId(Integer mapId) {
+        this.mapId = mapId;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public String getMapName() {
+        return mapName;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setMapName(String mapName) {
+        this.mapName = mapName;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    @Override
+    public String toString() {
+        return "GameMap{" +
+                "mapId=" + mapId +
+                ", mapName='" + mapName + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 }

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GameMapRepository extends JpaRepository<GameMap, Integer> {
-    GameMap findTopById(Integer id);
+    GameMap findTopByMapId(Integer mapId);
 }

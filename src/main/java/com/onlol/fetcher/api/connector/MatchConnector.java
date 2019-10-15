@@ -294,10 +294,10 @@ public class MatchConnector {
 
 
         /* Get game map */
-        GameMap gameMap = this.gameMapRepository.findTopById(sampleMatchGame.getMapId());
+        GameMap gameMap = this.gameMapRepository.findTopByMapId(sampleMatchGame.getMapId());
         if (gameMap == null) {
             GameMap dbGameMap = new GameMap();
-            dbGameMap.setId(sampleMatchGame.getSeasonId());
+            dbGameMap.setMapId(sampleMatchGame.getSeasonId());
 
             this.gameMapRepository.save(dbGameMap);
             gameMap = dbGameMap;

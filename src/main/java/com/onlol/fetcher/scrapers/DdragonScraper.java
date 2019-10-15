@@ -106,6 +106,24 @@ public class DdragonScraper {
             e.printStackTrace();
         }
     }
+    @Async
+    @PostConstruct
+    public void mapsInit() { // Used for lower init time
+        try {
+            this.ddragonConnector.maps();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void mapsCron() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.maps();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
