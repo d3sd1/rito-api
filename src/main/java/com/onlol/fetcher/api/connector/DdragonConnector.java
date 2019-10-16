@@ -347,7 +347,7 @@ public class DdragonConnector {
             dbChampion.setKeyName(champion.getId().toLowerCase());
 
             /* Save champion tags */
-            ArrayList<ChampionTag> championTags = new ArrayList<>();
+            List<ChampionTag> championTags = new ArrayList<>();
             for (String tag : champion.getTags()) {
                 ChampionTag championTag = this.championTagRepository.findByKeyName(tag);
                 if (championTag == null) {
@@ -357,8 +357,7 @@ public class DdragonConnector {
                 }
                 championTags.add(championTag);
             }
-            //TODO esto peta... se mete a la db? xd
-            //dbChampion.setChampionTags(championTags);
+            dbChampion.setChampionTags(championTags);
 
             dbChampion = this.championRepository.save(dbChampion);
             champions.add(dbChampion);
