@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MatchConnector {
@@ -415,11 +416,15 @@ public class MatchConnector {
 
         /* Fill participants */
         for (SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
-            Summoner summoner = this.summonerRepository.findBySummonerId(sampleParticipantIdentity.getPlayer().getSummonerId());
-            if(summoner == null) {
+            Optional<Summoner> opsummoner = this.summonerRepository.findById(sampleParticipantIdentity.getPlayer().getSummonerId());
+            Summoner summoner;
+            if(opsummoner.isEmpty()) {
                 summoner = new Summoner();
                 summoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
                 summoner = this.summonerRepository.save(summoner);
+            }
+            else {
+                summoner = opsummoner.get();
             }
             MatchGameParticipant matchGameParticipant = this.matchGameParticipantRepository.
                     findBySummonerAndMatchGame(summoner, matchGame);

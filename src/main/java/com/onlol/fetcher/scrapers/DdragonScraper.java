@@ -185,6 +185,25 @@ public class DdragonScraper {
         }
     }
 
+
+    @Async
+    @PostConstruct
+    public void itemsInit() { // Used for lower init time
+        try {
+            this.ddragonConnector.items();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @Async
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void itemsCron() { // Used for retrieving all data
+        try {
+            this.ddragonConnector.itemsHistorical();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
     //TODO: Recuperar estado lol
     // GET /lol/status/v3/shard-data
 
@@ -193,8 +212,9 @@ public class DdragonScraper {
     // y para la version actual cuando este inicializando.
     // se han de recuperar siempre para todos los idiomas.
     /*
-    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/item.json
+    ONGOING -> PTE. que en lugar de usar arrays se usen LinkedHashMap<T,N> http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/item.json
     http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/summoner.json
     http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/profileicon.json
+    save champion texts
      */
 }

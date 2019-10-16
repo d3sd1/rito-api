@@ -13,6 +13,7 @@ public class V4 {
     public static final String DDRAGON_MAPS = "http://static.developer.riotgames.com/docs/lol/maps.json";
     public static final String DDRAGON_MODES = "http://static.developer.riotgames.com/docs/lol/gameModes.json";
     public static final String DDRAGON_TYPES = "http://static.developer.riotgames.com/docs/lol/gameTypes.json";
+    public static final String DDRAGON_ITEMS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/item.json";
     public static final String DDRAGON_CHAMPIONS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/champion.json";
     public static final String DDRAGON_LANGUAGES = "https://ddragon.leagueoflegends.com/cdn/languages.json";
     public static final String DDRAGON_REALM = "https://ddragon.leagueoflegends.com/realms/{{REGION}}.json";

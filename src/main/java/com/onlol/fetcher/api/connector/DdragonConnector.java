@@ -6,10 +6,7 @@ import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.model.Queue;
 import com.onlol.fetcher.api.repository.*;
-import com.onlol.fetcher.api.sampleModel.SampleChampion;
-import com.onlol.fetcher.api.sampleModel.SampleChampionRotation;
-import com.onlol.fetcher.api.sampleModel.SampleDdragon;
-import com.onlol.fetcher.api.sampleModel.SampleRealm;
+import com.onlol.fetcher.api.sampleModel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -23,6 +20,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+//TODO: añadir logging en consola / mail auto / db para ver que pasa
+//TODO: que se mande mail cuando todo pete
 //TODO: ideas
 /*
 - Añadir a web lol: cambios respecto al último parche del campeón en stats de forma automática en el visor del campeón
@@ -80,6 +79,24 @@ public class DdragonConnector {
 
     @Autowired
     private RealmRepository realmRepository;
+
+    @Autowired
+    private GameItemRepository gameItemRepository;
+
+    @Autowired
+    private GameItemTagRepository gameItemTagRepository;
+
+    @Autowired
+    private GameItemMapRepository gameItemMapRepository;
+
+    @Autowired
+    private GameItemStatRepository gameItemStatRepository;
+
+    @Autowired
+    private GameItemStatModifierRepository gameItemStatModifierRepository;
+
+    @Autowired
+    private GameItemLanguageRepository gameItemLanguageRepository;
 
     public ArrayList<Version> versions() {
         RestTemplate restTemplate = new RestTemplate();
@@ -179,7 +196,7 @@ public class DdragonConnector {
             SampleRealm sampleRealm = resp.getBody();
 
             Realm realm = this.realmRepository.findByRegion(region);
-            if(realm == null) {
+            if (realm == null) {
                 realm = new Realm();
                 realm.setRegion(region);
             }
@@ -382,5 +399,158 @@ public class DdragonConnector {
 
 
         return championRotations;
+    }
+
+    public ArrayList<GameItem> items() {
+        return this.items(this.versionRepository.findTopByOrderByIdDesc(), this.languageRepository.findByKeyName("en_US"));
+    }
+
+    public ArrayList<GameItem> itemsHistorical() {
+        ArrayList<GameItem> gameItems = new ArrayList<GameItem>();
+        for (Version version : this.versionRepository.findAll()) {
+            for (Language lang : this.languageRepository.findAll()) {
+                gameItems.addAll(this.items(version, lang));
+            }
+        }
+        return gameItems;
+    }
+
+    public ArrayList<GameItem> items(Version version, Language lang) {
+        RestTemplate restTemplate = new RestTemplate();
+        ArrayList<GameItem> gameItems = new ArrayList<>();
+        ResponseEntity<SampleItemSet> resp = restTemplate.exchange(
+                V4.DDRAGON_ITEMS
+                        .replace("{{VERSION}}", version.getVersion())
+                        .replace("{{LANGUAGE}}", lang.getKeyName()), // we don't care about lang here
+                HttpMethod.GET, null,
+                new ParameterizedTypeReference<>() {
+                });
+        SampleItemSet sampleItemSet = resp.getBody();
+
+        for (Map.Entry<Integer, SampleItem> entry : sampleItemSet.getData().entrySet()) {
+            Integer gameItemId = entry.getKey();
+            GameItem gameItem = this.gameItemRepository.findByVersionAndItemId(version, gameItemId);
+            if (gameItem == null) {
+                gameItem = new GameItem();
+                gameItem.setItemId(gameItemId);
+                gameItem.setVersion(version);
+                gameItem = this.gameItemRepository.save(gameItem);
+            }
+
+            SampleItem sampleItem = entry.getValue();
+            System.out.println("ITEM: " + sampleItem);
+
+            /* Transforms into information */
+            ArrayList<GameItem> parentItems = new ArrayList<>();
+            if (sampleItem.getInto() != null) {
+                for (Integer parentItemId : sampleItem.getInto()) {
+                    GameItem parentGameItem = this.gameItemRepository.findByVersionAndItemId(version, parentItemId);
+                    if (parentGameItem == null) {
+                        parentGameItem = new GameItem();
+                        parentGameItem.setItemId(parentItemId);
+                        parentGameItem.setVersion(version);
+                        parentGameItem = this.gameItemRepository.save(parentGameItem);
+                        parentItems.add(parentGameItem);
+                    }
+                }
+            }
+            gameItem.setTransformsInto(parentItems);
+
+            /* Game image information */
+            gameItem.setImgFull(sampleItem.getImage().getFull());
+            gameItem.setImgGroup(sampleItem.getImage().getGroup());
+            gameItem.setImgH(sampleItem.getImage().getH());
+            gameItem.setImgSprite(sampleItem.getImage().getSprite());
+            gameItem.setImgW(sampleItem.getImage().getW());
+            gameItem.setImgX(sampleItem.getImage().getX());
+            gameItem.setImgY(sampleItem.getImage().getY());
+
+            /* Gold information */
+            gameItem.setBaseGold(sampleItem.getGold().getBase());
+            gameItem.setSellGold(sampleItem.getGold().getSell());
+            gameItem.setTotalGold(sampleItem.getGold().getTotal());
+            gameItem.setPurchasable(sampleItem.getGold().isPurchasable());
+
+            /* Game item tags */
+            ArrayList<GameItemTag> gameItemTags = new ArrayList<>();
+            for (String tag : sampleItem.getTags()) {
+                GameItemTag gameItemTag = this.gameItemTagRepository.findByKeyName(tag);
+                if (gameItemTag == null) {
+                    gameItemTag = new GameItemTag();
+                    gameItemTag.setKeyName(tag);
+                    gameItemTag = this.gameItemTagRepository.save(gameItemTag);
+                    gameItemTags.add(gameItemTag);
+                }
+            }
+            gameItem.setGameItemTags(gameItemTags);
+
+            /* Game item maps */
+            ArrayList<GameItemMap> gameItemMaps = new ArrayList<>();
+            for (Map.Entry<Integer, Boolean> mapEntry : sampleItem.getMaps().entrySet()) {
+                Integer mapId = mapEntry.getKey();
+                boolean allowed = mapEntry.getValue();
+                GameMap gameMap = this.gameMapRepository.findTopByMapId(mapId);
+                if (gameMap == null) {
+                    gameMap = new GameMap();
+                    gameMap.setMapId(mapId);
+                    gameMap.setNotes("*INTERNAL* - Added by item collector.");
+                    this.gameMapRepository.save(gameMap);
+                }
+                GameItemMap gameItemMap = this.gameItemMapRepository.findByGameItemAndGameMap(gameItem, gameMap);
+                if (gameItemMap == null) {
+                    gameItemMap = new GameItemMap();
+                    gameItemMap.setGameItem(gameItem);
+                    gameItemMap.setGameMap(gameMap);
+                    gameItemMap = this.gameItemMapRepository.save(gameItemMap);
+                }
+                gameItemMap.setAllowed(allowed);
+                this.gameItemMapRepository.save(gameItemMap);
+                gameItemMaps.add(gameItemMap);
+            }
+            gameItem.setGameItemMaps(gameItemMaps);
+
+            /* Game item stats */
+            ArrayList<GameItemStatModifier> gameItemStatModifiers = new ArrayList<>();
+            for (Map.Entry<String, Double> statEntry : sampleItem.getStats().entrySet()) {
+                String statName = statEntry.getKey();
+                Double statModifier = statEntry.getValue();
+                GameItemStat gameItemStat = this.gameItemStatRepository.findByKeyName(statName);
+                if (gameItemStat == null) {
+                    gameItemStat = new GameItemStat();
+                    gameItemStat.setKeyName(statName);
+                    gameItemStat = this.gameItemStatRepository.save(gameItemStat);
+                }
+                GameItemStatModifier gameItemStatModifier = this.gameItemStatModifierRepository.
+                        findByGameItemAndGameItemStat(gameItem, gameItemStat);
+                if (gameItemStatModifier == null) {
+                    gameItemStatModifier = new GameItemStatModifier();
+                }
+                gameItemStatModifier.setGameItem(gameItem);
+                gameItemStatModifier.setGameItemStat(gameItemStat);
+                this.gameItemStatModifierRepository.save(gameItemStatModifier);
+                gameItemStatModifiers.add(gameItemStatModifier);
+            }
+            gameItem.setGameItemStatModifiers(gameItemStatModifiers);
+
+            gameItem = this.gameItemRepository.save(gameItem);
+            gameItems.add(gameItem);
+
+            /* Game item languages */
+            GameItemLanguage gameItemLanguage = this.gameItemLanguageRepository.
+                    findByGameItemAndLanguage(gameItem, lang);
+            if (gameItemLanguage == null) {
+                gameItemLanguage = new GameItemLanguage();
+                gameItemLanguage.setGameItem(gameItem);
+                gameItemLanguage.setLanguage(lang);
+                gameItemLanguage.setName(sampleItem.getName());
+                gameItemLanguage.setDescription(sampleItem.getDescription());
+                gameItemLanguage.setPlaintext(sampleItem.getPlaintext());
+                gameItemLanguage.setColloq(sampleItem.getColloq());
+                this.gameItemLanguageRepository.save(gameItemLanguage);
+            }
+        }
+        //TODO: falta champ texts en varios idiomas
+        //TODO: que empiece con los rankings y no con summoner manual
+        return gameItems;
     }
 }
