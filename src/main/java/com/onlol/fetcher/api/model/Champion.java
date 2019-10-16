@@ -3,6 +3,7 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -13,6 +14,9 @@ public class Champion {
 
     @Column(nullable = false, unique = false)
     private String keyName;
+
+    @OneToMany
+    private List<ChampionTag> championTags;
 
     public Integer getChampId() {
         return champId;
@@ -30,11 +34,20 @@ public class Champion {
         this.keyName = keyName;
     }
 
+    public List<ChampionTag> getChampionTags() {
+        return championTags;
+    }
+
+    public void setChampionTags(List<ChampionTag> championTags) {
+        this.championTags = championTags;
+    }
+
     @Override
     public String toString() {
         return "Champion{" +
                 "champId=" + champId +
                 ", keyName='" + keyName + '\'' +
+                ", championTags=" + championTags +
                 '}';
     }
 }

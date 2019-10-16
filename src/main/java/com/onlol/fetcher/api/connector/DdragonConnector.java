@@ -1,21 +1,24 @@
 package com.onlol.fetcher.api.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiKeyManager;
+import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.model.Queue;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.*;
+import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,7 +37,6 @@ import java.util.*;
 - streams de usuarios en el perfil
 -
  */
-//TODO: que los connector usen una clase padre comun para el api key y las llamadas al REST
 @Service
 public class DdragonConnector {
 
@@ -55,9 +57,6 @@ public class DdragonConnector {
 
     @Autowired
     private ApiKeyManager apiKeyManager;
-
-    @Autowired
-    private PlatformRepository platformRepository;
 
     @Autowired
     private SeasonRepository seasonRepository;
@@ -98,19 +97,40 @@ public class DdragonConnector {
     @Autowired
     private GameItemLanguageRepository gameItemLanguageRepository;
 
+    @Autowired
+    private ApiConnector apiConnector;
+
+    @Autowired
+    private ObjectMapper jacksonMapper;
+
+    @Autowired
+    private LogService logger;
+
+    @Autowired
+    private ChampionLanguageRepository championLanguageRepository;
+
+    @Autowired
+    private ChampionTagRepository championTagRepository;
+
     public ArrayList<Version> versions() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
-                V4.DDRAGON_VERSIONS,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<ArrayList<String>>() {
-                });
-        ArrayList<String> stringVersions = resp.getBody();
+        ArrayList<String> stringVersions = null;
+        try {
+            stringVersions = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_VERSIONS),
+                    new TypeReference<ArrayList<String>>() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve versions: " + e.getMessage());
+        }
+
         Collections.reverse(stringVersions);
         ArrayList<Version> versions = new ArrayList<>();
 
         for (String stringVersion : stringVersions) {
             Version dbVersion = this.versionRepository.findByVersion(stringVersion);
+            if (stringVersion.contains("lolpatch")) { // unwanted patches
+                continue;
+            }
             if (dbVersion != null) {
                 versions.add(dbVersion);
                 continue;
@@ -125,13 +145,16 @@ public class DdragonConnector {
 
 
     public ArrayList<Season> seasons() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<Season>> resp = restTemplate.exchange(
-                V4.DDRAGON_SEASONS,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        ArrayList<Season> seasons = resp.getBody();
+
+        ArrayList<Season> seasons = null;
+        try {
+            seasons = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_SEASONS),
+                    new TypeReference<ArrayList<Season>>() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve seasons: " + e.getMessage());
+        }
 
         for (Season season : seasons) {
             this.seasonRepository.save(season);
@@ -140,13 +163,15 @@ public class DdragonConnector {
     }
 
     public ArrayList<Queue> queues() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<Queue>> resp = restTemplate.exchange(
-                V4.DDRAGON_QUEUES,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        ArrayList<Queue> queues = resp.getBody();
+        ArrayList<Queue> queues = null;
+        try {
+            queues = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_SEASONS),
+                    new TypeReference() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve queues: " + e.getMessage());
+        }
 
         for (Queue queue : queues) {
             this.queueRepository.save(queue);
@@ -155,13 +180,15 @@ public class DdragonConnector {
     }
 
     public ArrayList<GameMap> maps() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<GameMap>> resp = restTemplate.exchange(
-                V4.DDRAGON_MAPS,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        ArrayList<GameMap> maps = resp.getBody();
+        ArrayList<GameMap> maps = null;
+        try {
+            maps = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_MAPS),
+                    new TypeReference() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve maps: " + e.getMessage());
+        }
 
         for (GameMap map : maps) {
             this.gameMapRepository.save(map);
@@ -170,13 +197,16 @@ public class DdragonConnector {
     }
 
     public ArrayList<GameType> gameTypes() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<GameType>> resp = restTemplate.exchange(
-                V4.DDRAGON_TYPES,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        ArrayList<GameType> gameTypes = resp.getBody();
+
+        ArrayList<GameType> gameTypes = null;
+        try {
+            gameTypes = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_TYPES),
+                    new TypeReference() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve game types: " + e.getMessage());
+        }
 
         for (GameType gameType : gameTypes) {
             this.gameTypeRepository.save(gameType);
@@ -185,15 +215,19 @@ public class DdragonConnector {
     }
 
     public ArrayList<Realm> realms() {
-        RestTemplate restTemplate = new RestTemplate();
+
         ArrayList<Realm> realms = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
-            ResponseEntity<SampleRealm> resp = restTemplate.exchange(
-                    V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion()),
-                    HttpMethod.GET, null,
-                    new ParameterizedTypeReference<>() {
-                    });
-            SampleRealm sampleRealm = resp.getBody();
+
+            SampleRealm sampleRealm = null;
+            try {
+                sampleRealm = this.jacksonMapper.readValue(
+                        V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion()),
+                        new TypeReference() {
+                        });
+            } catch (IOException e) {
+                this.logger.error("Could not retrieve realms: " + e.getMessage());
+            }
 
             Realm realm = this.realmRepository.findByRegion(region);
             if (realm == null) {
@@ -225,13 +259,15 @@ public class DdragonConnector {
     }
 
     public ArrayList<GameMode> gameModes() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<GameMode>> resp = restTemplate.exchange(
-                V4.DDRAGON_MODES,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        ArrayList<GameMode> modes = resp.getBody();
+        ArrayList<GameMode> modes = null;
+        try {
+            modes = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_MODES),
+                    new TypeReference() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve realms: " + e.getMessage());
+        }
 
         for (GameMode mode : modes) {
             this.gameModeRepository.save(mode);
@@ -240,16 +276,17 @@ public class DdragonConnector {
     }
 
     public ArrayList<Language> languages() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<String>> resp = restTemplate.exchange(
-                V4.DDRAGON_LANGUAGES,
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<ArrayList<String>>() {
-                });
-        ArrayList<String> stringLanguages = resp.getBody();
+        ArrayList<String> stringLanguages = null;
+        try {
+            stringLanguages = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_LANGUAGES),
+                    new TypeReference<ArrayList<String>>() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve languages: " + e.getMessage());
+        }
 
         ArrayList<Language> languages = new ArrayList<>();
-
         for (String stringLanguage : stringLanguages) {
             Language dbLanguage = this.languageRepository.findByKeyName(stringLanguage);
             if (dbLanguage != null) {
@@ -266,21 +303,36 @@ public class DdragonConnector {
 
     public ArrayList<Champion> champions() {
         Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
-        return this.champions(usedVersion, this.languageRepository.findByKeyName("en_US"));
+        return this.champions(usedVersion,
+                this.languageRepository.findByKeyName("en_US"),
+                this.regionRepository.findByServiceRegion("euw"));
     }
 
-    public ArrayList<Champion> champions(Version version, Language lang) { // Retrieves selected patch champion data
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<SampleDdragon<LinkedHashMap<String, SampleChampion>>> resp = restTemplate.exchange(
-                V4.DDRAGON_CHAMPIONS
-                        .replace("{{VERSION}}", version.getVersion())
-                        .replace("{{LANGUAGE}}", lang.getKeyName()), // we don't care about lang here
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<SampleDdragon<LinkedHashMap<String, SampleChampion>>>() {
-                });
-        ArrayList<Champion> champions = new ArrayList<>();
-        LinkedHashMap<String, SampleChampion> sampleChampions = resp.getBody().getData();
+    public ArrayList<Champion> champions(Version version, Language lang, Region region) { // Retrieves selected patch champion data
 
+        SampleDdragon<LinkedHashMap<String, SampleChampion>> ddragonData = null;
+        try {
+            String json = this.apiConnector.get(V4.DDRAGON_CHAMPIONS
+                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{LANGUAGE}}", lang.getKeyName())
+                    .replace("{{HOST}}", region.getHostName()));
+            if (json != null) {
+                ddragonData = this.jacksonMapper.readValue(
+                        json,
+                        new TypeReference<SampleDdragon<LinkedHashMap<String, SampleChampion>>>() {
+                        });
+            }
+        } catch (Exception e) {
+            this.logger.error("Could not retrieve game champion: " + e.getMessage());
+        }
+
+        if (ddragonData == null) {
+            return null;
+        }
+        LinkedHashMap<String, SampleChampion> sampleChampions = ddragonData.getData();
+
+
+        ArrayList<Champion> champions = new ArrayList<>();
         for (Map.Entry<String, SampleChampion> entry : sampleChampions.entrySet()) {
             SampleChampion champion = entry.getValue();
 
@@ -293,6 +345,20 @@ public class DdragonConnector {
 
             dbChampion.setChampId(Integer.parseInt(champion.getKey()));
             dbChampion.setKeyName(champion.getId().toLowerCase());
+
+            /* Save champion tags */
+            ArrayList<ChampionTag> championTags = new ArrayList<>();
+            for (String tag : champion.getTags()) {
+                ChampionTag championTag = this.championTagRepository.findByKeyName(tag);
+                if (championTag == null) {
+                    championTag = new ChampionTag();
+                    championTag.setKeyName(tag);
+                    this.championTagRepository.save(championTag);
+                }
+                championTags.add(championTag);
+            }
+            //TODO esto peta... se mete a la db? xd
+            //dbChampion.setChampionTags(championTags);
 
             dbChampion = this.championRepository.save(dbChampion);
             champions.add(dbChampion);
@@ -326,54 +392,69 @@ public class DdragonConnector {
                 this.championStatsRepository.save(dbChampionStats);
             }
             /* Save champion texts */
-            //TODO: guardar champ texts
+            ChampionLanguage championLanguage = this.championLanguageRepository.findByChampionAndLanguage(dbChampion, lang);
+            if (championLanguage == null) {
+                championLanguage = new ChampionLanguage();
+                championLanguage.setChampion(dbChampion);
+                championLanguage.setLanguage(lang);
+                championLanguage.setBlurb(champion.getBlurb());
+                championLanguage.setName(champion.getName());
+                championLanguage.setTitle(champion.getTitle());
+
+                championLanguage.setPartype(champion.getPartype());
+            }
+            this.championLanguageRepository.save(championLanguage);
         }
         return champions;
     }
 
 
-    public ArrayList<ArrayList<Champion>> championsHistorical() { // Retrieves all patches champ data
-        ArrayList<ArrayList<Champion>> champions = new ArrayList<>();
+    public ArrayList<Champion> championsHistorical() { // Retrieves all patches champ data
+        ArrayList<Champion> champions = new ArrayList<>();
         List<Version> versions = this.versionRepository.findAll();
+        Collections.reverse(versions);
         for (Version version : versions) {
-            for (Language lang : this.languageRepository.findAll()) {
-                champions.add(this.champions(version, lang));
+            for (Region region : this.regionRepository.findAll()) {
+                for (Language lang : this.languageRepository.findAll()) {
+                    List<Champion> champ = this.champions(version, lang, region);
+                    if (champ != null) {
+                        champions.addAll(champ);
+                    }
+                }
             }
         }
         return champions;
     }
 
     public ArrayList<ChampionRotation> championRotation() {
-        RestTemplate restTemplate = new RestTemplate();
         ArrayList<ChampionRotation> championRotations = new ArrayList<>();
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new ArrayList<>();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-        for (Platform platform : this.platformRepository.findAll()) {
-            ResponseEntity<SampleChampionRotation> resp = restTemplate.exchange(
-                    V3.CHAMPION_ROTATION.replace("{{PLATFORM}}", platform.getKeyName()),
-                    HttpMethod.GET, new HttpEntity(headers),
-                    new ParameterizedTypeReference<>() {
-                    });
-            SampleChampionRotation champRotation = resp.getBody();
+        for (Region region : this.regionRepository.findAll()) {
+            SampleChampionRotation champRotation = null;
+            try {
+                champRotation = this.jacksonMapper.readValue(
+                        V3.CHAMPION_ROTATION.
+                                replace("{{HOST}}", region.getHostName()),
+                        new TypeReference() {
+                        });
+            } catch (IOException e) {
+                this.logger.error("Could not retrieve champion rotation: " + e.getMessage());
+            }
+
             for (Integer champId : champRotation.getFreeChampionIds()) {
                 Champion champion = this.championRepository.findByChampId(champId);
                 ChampionRotation championRotation =
-                        this.championRotationRepository.findByRotationDateAndPlatformAndChampionAndForNewPlayers(
-                                dateFormat.format(new Date()), platform, champion, false
+                        this.championRotationRepository.findByRotationDateAndRegionAndChampionAndForNewPlayers(
+                                dateFormat.format(new Date()), region, champion, false
                         );
 
                 if (championRotation == null) {
                     championRotation = new ChampionRotation();
                     championRotation.setChampion(champion);
                     championRotation.setForNewPlayers(false);
-                    championRotation.setPlatform(platform);
+                    championRotation.setRegion(region);
                     championRotation.setRotationDate(dateFormat.format(new Date()));
                     championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
                     this.championRotationRepository.save(championRotation);
@@ -384,15 +465,15 @@ public class DdragonConnector {
             for (Integer champId : champRotation.getFreeChampionIdsForNewPlayers()) {
                 Champion champion = this.championRepository.findByChampId(champId);
                 ChampionRotation championRotation =
-                        this.championRotationRepository.findByRotationDateAndPlatformAndChampionAndForNewPlayers(
-                                dateFormat.format(new Date()), platform, champion, true
+                        this.championRotationRepository.findByRotationDateAndRegionAndChampionAndForNewPlayers(
+                                dateFormat.format(new Date()), region, champion, true
                         );
 
                 if (championRotation == null) {
                     championRotation = new ChampionRotation();
                     championRotation.setChampion(champion);
                     championRotation.setForNewPlayers(true);
-                    championRotation.setPlatform(platform);
+                    championRotation.setRegion(region);
                     championRotation.setRotationDate(dateFormat.format(new Date()));
                     championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
                     this.championRotationRepository.save(championRotation);
@@ -420,16 +501,18 @@ public class DdragonConnector {
     }
 
     public ArrayList<GameItem> items(Version version, Language lang) {
-        RestTemplate restTemplate = new RestTemplate();
         ArrayList<GameItem> gameItems = new ArrayList<>();
-        ResponseEntity<SampleItemSet> resp = restTemplate.exchange(
-                V4.DDRAGON_ITEMS
-                        .replace("{{VERSION}}", version.getVersion())
-                        .replace("{{LANGUAGE}}", lang.getKeyName()), // we don't care about lang here
-                HttpMethod.GET, null,
-                new ParameterizedTypeReference<>() {
-                });
-        SampleItemSet sampleItemSet = resp.getBody();
+        SampleItemSet sampleItemSet = null;
+        try {
+            sampleItemSet = this.jacksonMapper.readValue(
+                    V4.DDRAGON_ITEMS
+                            .replace("{{VERSION}}", version.getVersion())
+                            .replace("{{LANGUAGE}}", lang.getKeyName()),
+                    new TypeReference() {
+                    });
+        } catch (IOException e) {
+            this.logger.error("Could not retrieve items: " + e.getMessage());
+        }
 
         for (Map.Entry<Integer, SampleItem> entry : sampleItemSet.getData().entrySet()) {
             Integer gameItemId = entry.getKey();
@@ -442,7 +525,6 @@ public class DdragonConnector {
             }
 
             SampleItem sampleItem = entry.getValue();
-            System.out.println("ITEM: " + sampleItem);
 
             /* Transforms into information */
             ArrayList<GameItem> parentItems = new ArrayList<>();
@@ -454,8 +536,8 @@ public class DdragonConnector {
                         parentGameItem.setItemId(parentItemId);
                         parentGameItem.setVersion(version);
                         parentGameItem = this.gameItemRepository.save(parentGameItem);
-                        parentItems.add(parentGameItem);
                     }
+                    parentItems.add(parentGameItem);
                 }
             }
             gameItem.setTransformsInto(parentItems);
@@ -483,8 +565,8 @@ public class DdragonConnector {
                     gameItemTag = new GameItemTag();
                     gameItemTag.setKeyName(tag);
                     gameItemTag = this.gameItemTagRepository.save(gameItemTag);
-                    gameItemTags.add(gameItemTag);
                 }
+                gameItemTags.add(gameItemTag);
             }
             gameItem.setGameItemTags(gameItemTags);
 
@@ -553,7 +635,7 @@ public class DdragonConnector {
                 this.gameItemLanguageRepository.save(gameItemLanguage);
             }
         }
-        //TODO: que empiece con los rankings y no con summoner manual
+        //TODO: que empiece con los rankings y no con summoner manual NOVA desdi por migracion
         return gameItems;
     }
 }

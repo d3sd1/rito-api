@@ -4,6 +4,7 @@ import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.model.MatchGame;
 import com.onlol.fetcher.api.repository.MatchGameRepository;
 import com.onlol.fetcher.api.sampleModel.SampleMatchGame;
+import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Async;
@@ -25,7 +26,7 @@ public class MatchesScraper {
     private MatchConnector matchConnector;
 
     @PostConstruct
-    @DependsOn("entityManagerFactory")
+    @RequiresInitialSetup
     @Async
     public void clearOrphanGames() {
         System.out.println("Limpiando partidas huérfanas...");
@@ -37,6 +38,7 @@ public class MatchesScraper {
     }
 
     @Async
+    @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
     public void getMatches() {
         System.out.println("Retrieving matches...");

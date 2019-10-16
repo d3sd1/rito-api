@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,7 +16,7 @@ public class ChampionRotation {
     private String rotationDate;
 
     @OneToOne
-    private Platform platform;
+    private Region region;
 
     @OneToOne
     private Champion champion;
@@ -44,12 +43,12 @@ public class ChampionRotation {
         this.rotationDate = rotationDate;
     }
 
-    public Platform getPlatform() {
-        return platform;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setPlatform(Platform platform) {
-        this.platform = platform;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public Champion getChampion() {
@@ -81,7 +80,7 @@ public class ChampionRotation {
         return "ChampionRotation{" +
                 "id=" + id +
                 ", rotationDate=" + rotationDate +
-                ", platform=" + platform +
+                ", region=" + region +
                 ", champion=" + champion +
                 ", forNewPlayers=" + forNewPlayers +
                 ", maxNewPlayerLevel=" + maxNewPlayerLevel +

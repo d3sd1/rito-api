@@ -4,6 +4,7 @@ import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.repository.SummonerRepository;
+import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -27,6 +28,7 @@ public class LeaguesScraper {
     private SummonerRepository summonerRepository;
 
     @Async
+    @RequiresInitialSetup
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
 

@@ -1,10 +1,16 @@
 package com.onlol.fetcher.api.sampleModel;
 
+import java.util.Arrays;
+
 public class SampleChampion {
     private String id;
     private String key;
     private String version;
     private String name;
+    private String title;
+    private String blurb;
+    private String partype;
+    private String[] tags;
     private SampleChampionInformation info;
     private SampleChampionStats stats;
 
@@ -56,13 +62,49 @@ public class SampleChampion {
         this.stats = stats;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBlurb() {
+        return blurb;
+    }
+
+    public void setBlurb(String blurb) {
+        this.blurb = blurb;
+    }
+
+    public String getPartype() {
+        return partype;
+    }
+
+    public void setPartype(String partype) {
+        this.partype = partype;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
     @Override
     public String toString() {
         return "SampleChampion{" +
                 "id='" + id + '\'' +
-                ", key=" + key +
+                ", key='" + key + '\'' +
                 ", version='" + version + '\'' +
                 ", name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", blurb='" + blurb + '\'' +
+                ", partype='" + partype + '\'' +
+                ", tags=" + Arrays.toString(tags) +
                 ", info=" + info +
                 ", stats=" + stats +
                 '}';

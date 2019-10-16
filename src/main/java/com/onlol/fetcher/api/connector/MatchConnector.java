@@ -58,7 +58,7 @@ public class MatchConnector {
     private RoleRepository roleRepository;
 
     @Autowired
-    private PlatformRepository platformRepository;
+    private RegionRepository regionRepository;
 
     @Autowired
     private MatchGameRepository matchGameRepository;
@@ -136,8 +136,8 @@ public class MatchConnector {
                 matchList.setMatch(matchGame);
 
                 /* Get platform constant */
-                Platform platform = this.platformRepository.findByKeyName(sampleMatchList.getPlatformId());
-                matchList.setPlatform(platform);
+                Region region = this.regionRepository.findByServicePlatform(sampleMatchList.getPlatformId());
+                matchList.setRegion(region);
 
 
                 /* Get queue */
@@ -194,7 +194,7 @@ public class MatchConnector {
                     matchList.setChamp(champion);
                 } else {
                     // Actualizar campeones ya que falta alguno en la DB y volver al mismo proceso
-                    this.ddragonConnector.champions();
+                    //TODO decomentar esto this.ddragonConnector.champions();
                     this.matchListByAccount(encryptedAccountId, beginIndex);
                 }
                 matchList.setLane(lane);
@@ -267,8 +267,8 @@ public class MatchConnector {
 
 
         /* Get platform constant */
-        Platform platform = this.platformRepository.findByKeyName(sampleMatchGame.getPlatformId());
-        matchGame.setPlatform(platform);
+        Region region = this.regionRepository.findByServicePlatform(sampleMatchGame.getPlatformId());
+        matchGame.setRegion(region);
 
 
         /* Get queue */

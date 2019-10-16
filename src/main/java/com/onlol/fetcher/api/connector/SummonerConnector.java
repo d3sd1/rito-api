@@ -1,13 +1,14 @@
 package com.onlol.fetcher.api.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.model.ApiKey;
-import com.onlol.fetcher.api.model.Summoner;
-import com.onlol.fetcher.api.model.SummonerChampionMastery;
-import com.onlol.fetcher.api.model.SummonerNameHistorical;
+import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.SampleSummonerChampionMastery;
+import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -17,10 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class SummonerConnector {
@@ -43,39 +44,41 @@ public class SummonerConnector {
     @Autowired
     private ChampionRepository championRepository;
 
-    public Summoner byName(String name) {
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new Summoner();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
+    @Autowired
+    private ApiConnector apiConnector;
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Summoner> resp = restTemplate.exchange(
-                V4.SUMMONERS_BY_NAME.replace("{{SUMMONER_NAME}}", name),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<Summoner>() {
-                });
+    @Autowired
+    private RegionRepository regionRepository;
 
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.byName(name);
+    @Autowired
+    private LogService logger;
+
+    @Autowired
+    private ObjectMapper jacksonMapper;
+
+    public Summoner byName(String name, String regionName) {
+        Region region = this.regionRepository.findByServiceRegion(regionName);
+        if (region == null) {
+            this.logger.error("Region not found on summonerByName: " + regionName);
+            return null;
         }
-        Summoner summoner = resp.getBody();
-        if(summoner != null) {
+        Summoner summoner = null;
+        try {
+            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.SUMMONERS_BY_NAME
+                            .replace("{{SUMMONER_NAME}}", name)
+                            .replace("{{HOST}}", region.getHostName()),
+                    true
+            ), new TypeReference(){});
+        } catch (IOException e) {
+            this.logger.error("No se ha podido retornar al invocador " + name);
+        }
+
+        if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
             // Update historical name if needed
-            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
                 summonerNameHistorical.setName(summoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
@@ -113,11 +116,11 @@ public class SummonerConnector {
                 return this.byPuuid(puuid);
         }
         Summoner summoner = resp.getBody();
-        if(summoner != null) {
+        if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
             // Update historical name if needed
-            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
                 summonerNameHistorical.setName(summoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
@@ -155,11 +158,11 @@ public class SummonerConnector {
                 return this.byAccount(summonerAccount);
         }
         Summoner summoner = resp.getBody();
-        if(summoner != null) {
+        if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
             // Update historical name if needed
-            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
                 summonerNameHistorical.setName(summoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
@@ -199,11 +202,11 @@ public class SummonerConnector {
                 return this.bySummonerId(id);
         }
         Summoner summoner = resp.getBody();
-        if(summoner != null) {
+        if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
             // Update historical name if needed
-            if(this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
                 summonerNameHistorical.setName(summoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
@@ -213,7 +216,7 @@ public class SummonerConnector {
         return summoner;
     }
 
-    public ArrayList<SummonerChampionMastery> championMastery(String summonerId) {
+    public ArrayList<SummonerChampionMastery> championMastery(Summoner summoner) {
 
         ApiKey apiKey = this.apiKeyManager.getKey();
         if (apiKey == null) {
@@ -224,7 +227,9 @@ public class SummonerConnector {
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ArrayList<SampleSummonerChampionMastery>> resp = restTemplate.exchange(
-                V4.SUMMONER_CHAMPION_MASTERY.replace("{{SUMMONER_ID}}", summonerId),
+                V4.SUMMONER_CHAMPION_MASTERY
+                        .replace("{{SUMMONER_ID}}", summoner.getId())
+                        .replace("{{HOST}}", summoner.getRegion().getHostName()),
                 HttpMethod.GET, new HttpEntity(headers),
                 new ParameterizedTypeReference<ArrayList<SampleSummonerChampionMastery>>() {
                 });
@@ -239,18 +244,14 @@ public class SummonerConnector {
                 apiKey.setBanned(true);
                 apiKey.setValid(true);
                 this.apiKeyRepository.save(apiKey);
-                return this.championMastery(summonerId);
+                return this.championMastery(summoner);
         }
 
         ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = resp.getBody();
         ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
-        for(SampleSummonerChampionMastery sampleSummonerChampionMastery:sampleSummonerChampionMasteries) {
-            Summoner summoner = this.summonerRepository.findById(sampleSummonerChampionMastery.getSummonerId()).get();
-            if(summoner == null) {
-                continue;
-            }
+        for (SampleSummonerChampionMastery sampleSummonerChampionMastery : sampleSummonerChampionMasteries) {
             SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
-            if(summonerChampionMastery == null) {
+            if (summonerChampionMastery == null) {
                 summonerChampionMastery = new SummonerChampionMastery();
             }
             summonerChampionMastery.setSummoner(summoner);

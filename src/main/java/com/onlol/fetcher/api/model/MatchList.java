@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,7 +26,7 @@ public class MatchList {
     private Champion champ; // champion int
 
     @OneToOne
-    private Platform platform; // platformId string
+    private Region region; // platformId string
 
     @OneToOne
     private Season season; // season int
@@ -81,12 +80,12 @@ public class MatchList {
         this.champ = champ;
     }
 
-    public Platform getPlatform() {
-        return platform;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setPlatform(Platform platform) {
-        this.platform = platform;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public Season getSeason() {
@@ -129,7 +128,7 @@ public class MatchList {
                 ", match=" + match +
                 ", summoner=" + summoner +
                 ", champ=" + champ +
-                ", platform=" + platform +
+                ", region=" + region +
                 ", season=" + season +
                 ", queue=" + queue +
                 ", role=" + role +

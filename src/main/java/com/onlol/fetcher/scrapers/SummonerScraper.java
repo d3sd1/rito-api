@@ -4,6 +4,8 @@ import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.repository.SummonerRepository;
+import com.onlol.fetcher.firstrun.RequiresInitialSetup;
+import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -27,16 +29,20 @@ public class SummonerScraper {
     @Autowired
     private SummonerRepository summonerRepository;
 
+    @Autowired
+    private LogService logger;
+
     @Async
+    @RequiresInitialSetup
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
         Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
         if(summoner == null) {
-            System.out.println("No summoners to update...");
+            this.logger.info("No summoners to update.");
             return;
         }
         if(!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
-            System.out.println(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
+            this.logger.info(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
 
             try {
                 TimeUnit.SECONDS.sleep(30);
@@ -46,14 +52,15 @@ public class SummonerScraper {
 
             return;
         }
-        System.out.println("Updating summoner " + summoner.getName());
+        this.logger.info("Updating summoner " + summoner.getName());
         summoner = this.summonerConnector.bySummonerId(summoner.getId());
-        System.out.println("Retrieving games of summoner " + summoner.getName());
-        this.matchConnector.matchListByAccount(summoner.getAccountId());
-        System.out.println("Retrieving summoner champion mastery...");
-        this.summonerConnector.championMastery(summoner.getId());
 
-        //TODO: utilizar tosdas las regiones
+        this.logger.info("Retrieving games of summoner " + summoner.getName());
+        this.matchConnector.matchListByAccount(summoner.getAccountId());
+
+        this.logger.info("Retrieving summoner champion mastery...");
+        this.summonerConnector.championMastery(summoner);
+
         //TODO: recuperar ligas del invocador
         // /lol/league/v4/entries/by-summoner/{encryptedSummonerId}
     }

@@ -3,25 +3,20 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GameItemTag {
+public class RunLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
-    private String keyName;
-
-    public String getKeyName() {
-        return keyName;
-    }
-
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
-    }
+    @Column(nullable = false, unique = false)
+    private LocalDateTime runTime = LocalDateTime.now();
 
     public Integer getId() {
         return id;
@@ -31,11 +26,19 @@ public class GameItemTag {
         this.id = id;
     }
 
+    public LocalDateTime getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(LocalDateTime runTime) {
+        this.runTime = runTime;
+    }
+
     @Override
     public String toString() {
-        return "GameItemTag{" +
+        return "RunLog{" +
                 "id=" + id +
-                ", keyName='" + keyName + '\'' +
+                ", runTime=" + runTime +
                 '}';
     }
 }

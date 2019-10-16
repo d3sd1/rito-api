@@ -11,7 +11,7 @@ public class SampleItem {
     private Integer[] into;
     private SampleItemImage image;
     private SampleItemGold gold;
-    private String[] tags; // LINKED TO TAGS. CREATE NEW TABLE HERE
+    private String[] tags;
     private LinkedHashMap<Integer, Boolean> maps;
     private LinkedHashMap<String, Double> stats;
 

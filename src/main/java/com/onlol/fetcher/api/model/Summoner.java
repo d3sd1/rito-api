@@ -35,6 +35,9 @@ public class Summoner {
     @Column(nullable = false, unique = false)
     private LocalDateTime lastTimeUpdated = LocalDateTime.now();
 
+    @OneToOne
+    private Region region;
+
     public String getId() {
         return id;
     }
@@ -99,6 +102,14 @@ public class Summoner {
         this.lastTimeUpdated = lastTimeUpdated;
     }
 
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
     @Override
     public String toString() {
         return "Summoner{" +
@@ -110,6 +121,7 @@ public class Summoner {
                 ", revisionDate=" + revisionDate +
                 ", summonerLevel=" + summonerLevel +
                 ", lastTimeUpdated=" + lastTimeUpdated +
+                ", region=" + region +
                 '}';
     }
 }

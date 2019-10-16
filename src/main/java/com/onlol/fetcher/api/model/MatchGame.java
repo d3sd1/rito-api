@@ -32,7 +32,7 @@ public class MatchGame {
     private String gameVersion; // major.minor version
 
     @OneToOne
-    private Platform platform;
+    private Region region;
 
     @OneToOne
     private GameMap gameMap;
@@ -103,12 +103,12 @@ public class MatchGame {
         this.gameVersion = gameVersion;
     }
 
-    public Platform getPlatform() {
-        return platform;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setPlatform(Platform platform) {
-        this.platform = platform;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public Long getGameDuration() {
@@ -185,7 +185,7 @@ public class MatchGame {
                 ", season=" + season +
                 ", queue=" + queue +
                 ", gameVersion='" + gameVersion + '\'' +
-                ", platform=" + platform +
+                ", region=" + region +
                 ", gameMap=" + gameMap +
                 ", gameMode=" + gameMode +
                 ", gameType=" + gameType +

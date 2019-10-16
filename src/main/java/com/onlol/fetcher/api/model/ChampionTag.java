@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GameItemTag {
+public class ChampionTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
@@ -33,7 +33,7 @@ public class GameItemTag {
 
     @Override
     public String toString() {
-        return "GameItemTag{" +
+        return "ChampionTag{" +
                 "id=" + id +
                 ", keyName='" + keyName + '\'' +
                 '}';
