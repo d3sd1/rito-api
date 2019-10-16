@@ -266,15 +266,15 @@ public class DdragonConnector {
 
     public ArrayList<Champion> champions() {
         Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
-        return this.champions(usedVersion);
+        return this.champions(usedVersion, this.languageRepository.findByKeyName("en_US"));
     }
 
-    public ArrayList<Champion> champions(Version version) { // Retrieves selected patch champion data
+    public ArrayList<Champion> champions(Version version, Language lang) { // Retrieves selected patch champion data
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SampleDdragon<LinkedHashMap<String, SampleChampion>>> resp = restTemplate.exchange(
                 V4.DDRAGON_CHAMPIONS
                         .replace("{{VERSION}}", version.getVersion())
-                        .replace("{{LANGUAGE}}", "en_US"), // we don't care about lang here
+                        .replace("{{LANGUAGE}}", lang.getKeyName()), // we don't care about lang here
                 HttpMethod.GET, null,
                 new ParameterizedTypeReference<SampleDdragon<LinkedHashMap<String, SampleChampion>>>() {
                 });
@@ -325,6 +325,8 @@ public class DdragonConnector {
                 dbChampionStats.setAttackDamagePerLevel(champion.getStats().getAttackspeedperlevel());
                 this.championStatsRepository.save(dbChampionStats);
             }
+            /* Save champion texts */
+            //TODO: guardar champ texts
         }
         return champions;
     }
@@ -334,7 +336,9 @@ public class DdragonConnector {
         ArrayList<ArrayList<Champion>> champions = new ArrayList<>();
         List<Version> versions = this.versionRepository.findAll();
         for (Version version : versions) {
-            champions.add(this.champions(version));
+            for (Language lang : this.languageRepository.findAll()) {
+                champions.add(this.champions(version, lang));
+            }
         }
         return champions;
     }
@@ -490,7 +494,7 @@ public class DdragonConnector {
                 Integer mapId = mapEntry.getKey();
                 boolean allowed = mapEntry.getValue();
                 GameMap gameMap = this.gameMapRepository.findTopByMapId(mapId);
-                if (gameMap == null) {
+                if (gameMap == null && mapId != null) {
                     gameMap = new GameMap();
                     gameMap.setMapId(mapId);
                     gameMap.setNotes("*INTERNAL* - Added by item collector.");
@@ -549,7 +553,6 @@ public class DdragonConnector {
                 this.gameItemLanguageRepository.save(gameItemLanguage);
             }
         }
-        //TODO: falta champ texts en varios idiomas
         //TODO: que empiece con los rankings y no con summoner manual
         return gameItems;
     }

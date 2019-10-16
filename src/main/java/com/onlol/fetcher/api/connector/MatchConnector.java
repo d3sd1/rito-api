@@ -135,14 +135,8 @@ public class MatchConnector {
 
                 matchList.setMatch(matchGame);
 
-                /* Get platform */
+                /* Get platform constant */
                 Platform platform = this.platformRepository.findByKeyName(sampleMatchList.getPlatformId());
-                if (platform == null) {
-                    Platform dbPlatform = new Platform();
-                    dbPlatform.setKeyName(sampleMatchList.getPlatformId());
-                    this.platformRepository.save(dbPlatform);
-                    platform = dbPlatform;
-                }
                 matchList.setPlatform(platform);
 
 
@@ -272,14 +266,8 @@ public class MatchConnector {
         matchGame.setGameVersion(sampleMatchGame.getGameVersion());
 
 
-        /* Get platform */
+        /* Get platform constant */
         Platform platform = this.platformRepository.findByKeyName(sampleMatchGame.getPlatformId());
-        if (platform == null) {
-            Platform dbPlatform = new Platform();
-            dbPlatform.setKeyName(sampleMatchGame.getPlatformId());
-            this.platformRepository.save(dbPlatform);
-            platform = dbPlatform;
-        }
         matchGame.setPlatform(platform);
 
 
