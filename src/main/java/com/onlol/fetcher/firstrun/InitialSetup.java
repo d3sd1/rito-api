@@ -128,5 +128,3 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.ddragonConnector.gameTypes();
     }
 }
-
-//TODO: decomentar esto cuando el endpoint quite la trailing comma
