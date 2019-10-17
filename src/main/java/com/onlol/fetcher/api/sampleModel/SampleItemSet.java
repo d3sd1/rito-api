@@ -5,11 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class SampleItemSet {
-    private String type;
-    private String version;
-    private LinkedHashMap<Integer, SampleItem> data;
-    private SampleItemGroup[] groups;
-    private SampleItemTree[] tree;
+    private String type = "";
+    private String version = "";
+    private LinkedHashMap<Integer, SampleItem> data = new LinkedHashMap<>();
+    private SampleItemGroup[] groups = new SampleItemGroup[]{};
+    private SampleItemTree[] tree = new SampleItemTree[]{};
 
     public String getType() {
         return type;

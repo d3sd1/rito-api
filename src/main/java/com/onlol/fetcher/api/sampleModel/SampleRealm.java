@@ -1,15 +1,15 @@
 package com.onlol.fetcher.api.sampleModel;
 
 public class SampleRealm {
-    private SampleN n;
-    private String v;
-    private String l;
-    private String cdn;
-    private String dd;
-    private String lg;
-    private String css;
-    private Integer profileiconmax;
-    private String store;
+    private SampleN n = new SampleN();
+    private String v = "";
+    private String l = "";
+    private String cdn = "";
+    private String dd = "";
+    private String lg = "";
+    private String css = "";
+    private Integer profileiconmax = 0;
+    private String store = "";
 
     public SampleN getN() {
         return n;

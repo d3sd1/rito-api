@@ -1,11 +1,12 @@
 package com.onlol.fetcher.api.sampleModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SampleChampionRotation {
-    private List<Integer> freeChampionIdsForNewPlayers;
-    private List<Integer> freeChampionIds;
-    private Integer maxNewPlayerLevel;
+    private List<Integer> freeChampionIdsForNewPlayers = new ArrayList<>();
+    private List<Integer> freeChampionIds = new ArrayList<>();
+    private Integer maxNewPlayerLevel = 0;
 
     public List<Integer> getFreeChampionIdsForNewPlayers() {
         return freeChampionIdsForNewPlayers;

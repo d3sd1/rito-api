@@ -166,8 +166,8 @@ public class DdragonConnector {
         ArrayList<Queue> queues = null;
         try {
             queues = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_SEASONS),
-                    new TypeReference() {
+                    this.apiConnector.get(V4.DDRAGON_QUEUES),
+                    new TypeReference<ArrayList<Queue>>() {
                     });
         } catch (IOException e) {
             this.logger.error("Could not retrieve queues: " + e.getMessage());
@@ -184,7 +184,7 @@ public class DdragonConnector {
         try {
             maps = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_MAPS),
-                    new TypeReference() {
+                    new TypeReference<ArrayList<GameMap>>() {
                     });
         } catch (IOException e) {
             this.logger.error("Could not retrieve maps: " + e.getMessage());
@@ -202,7 +202,7 @@ public class DdragonConnector {
         try {
             gameTypes = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_TYPES),
-                    new TypeReference() {
+                    new TypeReference<ArrayList<GameType>>() {
                     });
         } catch (IOException e) {
             this.logger.error("Could not retrieve game types: " + e.getMessage());
@@ -221,10 +221,15 @@ public class DdragonConnector {
 
             SampleRealm sampleRealm = null;
             try {
-                sampleRealm = this.jacksonMapper.readValue(
-                        V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion()),
-                        new TypeReference() {
-                        });
+                String json = this.apiConnector.get(V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion()));
+                if (json != null) {
+                    sampleRealm = this.jacksonMapper.readValue(
+                            json,
+                            new TypeReference<SampleRealm>() {
+                            });
+                } else {
+                    sampleRealm = new SampleRealm();
+                }
             } catch (IOException e) {
                 this.logger.error("Could not retrieve realms: " + e.getMessage());
             }
@@ -263,7 +268,7 @@ public class DdragonConnector {
         try {
             modes = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_MODES),
-                    new TypeReference() {
+                    new TypeReference<ArrayList<GameMode>>() {
                     });
         } catch (IOException e) {
             this.logger.error("Could not retrieve realms: " + e.getMessage());
@@ -304,18 +309,15 @@ public class DdragonConnector {
     public ArrayList<Champion> champions() {
         Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
         return this.champions(usedVersion,
-                this.languageRepository.findByKeyName("en_US"),
-                this.regionRepository.findByServiceRegion("euw"));
+                this.languageRepository.findByKeyName("en_US"));
     }
 
-    public ArrayList<Champion> champions(Version version, Language lang, Region region) { // Retrieves selected patch champion data
-
+    public ArrayList<Champion> champions(Version version, Language lang) { // Retrieves selected patch champion data
         SampleDdragon<LinkedHashMap<String, SampleChampion>> ddragonData = null;
         try {
             String json = this.apiConnector.get(V4.DDRAGON_CHAMPIONS
                     .replace("{{VERSION}}", version.getVersion())
-                    .replace("{{LANGUAGE}}", lang.getKeyName())
-                    .replace("{{HOST}}", region.getHostName()));
+                    .replace("{{LANGUAGE}}", lang.getKeyName()));
             if (json != null) {
                 ddragonData = this.jacksonMapper.readValue(
                         json,
@@ -391,7 +393,8 @@ public class DdragonConnector {
                 this.championStatsRepository.save(dbChampionStats);
             }
             /* Save champion texts */
-            ChampionLanguage championLanguage = this.championLanguageRepository.findByChampionAndLanguage(dbChampion, lang);
+            ChampionLanguage championLanguage = this.championLanguageRepository.
+                    findByChampionAndLanguageAndVersion(dbChampion, lang, version);
             if (championLanguage == null) {
                 championLanguage = new ChampionLanguage();
                 championLanguage.setChampion(dbChampion);
@@ -399,6 +402,7 @@ public class DdragonConnector {
                 championLanguage.setBlurb(champion.getBlurb());
                 championLanguage.setName(champion.getName());
                 championLanguage.setTitle(champion.getTitle());
+                championLanguage.setVersion(version);
 
                 championLanguage.setPartype(champion.getPartype());
             }
@@ -413,13 +417,12 @@ public class DdragonConnector {
         List<Version> versions = this.versionRepository.findAll();
         Collections.reverse(versions);
         for (Version version : versions) {
-            for (Region region : this.regionRepository.findAll()) {
-                for (Language lang : this.languageRepository.findAll()) {
-                    List<Champion> champ = this.champions(version, lang, region);
-                    if (champ != null) {
-                        champions.addAll(champ);
-                    }
+            for (Language lang : this.languageRepository.findAll()) {
+                List<Champion> champ = this.champions(version, lang);
+                if (champ != null) {
+                    champions.addAll(champ);
                 }
+
             }
         }
         return champions;
@@ -433,12 +436,16 @@ public class DdragonConnector {
         for (Region region : this.regionRepository.findAll()) {
             SampleChampionRotation champRotation = null;
             try {
-                champRotation = this.jacksonMapper.readValue(
-                        V3.CHAMPION_ROTATION.
-                                replace("{{HOST}}", region.getHostName()),
-                        new TypeReference() {
-                        });
-            } catch (IOException e) {
+                String json = this.apiConnector.get(V3.CHAMPION_ROTATION.
+                        replace("{{HOST}}", region.getHostName()), true);
+                if (json != null) {
+                    champRotation = this.jacksonMapper.readValue(json, new TypeReference<SampleChampionRotation>() {
+                    });
+                } else {
+                    champRotation = new SampleChampionRotation();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
                 this.logger.error("Could not retrieve champion rotation: " + e.getMessage());
             }
 
@@ -503,13 +510,18 @@ public class DdragonConnector {
         ArrayList<GameItem> gameItems = new ArrayList<>();
         SampleItemSet sampleItemSet = null;
         try {
-            sampleItemSet = this.jacksonMapper.readValue(
-                    V4.DDRAGON_ITEMS
-                            .replace("{{VERSION}}", version.getVersion())
-                            .replace("{{LANGUAGE}}", lang.getKeyName()),
-                    new TypeReference() {
-                    });
+            String json = this.apiConnector.get(V4.DDRAGON_ITEMS
+                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{LANGUAGE}}", lang.getKeyName()));
+            if (json != null) {
+                sampleItemSet = this.jacksonMapper.readValue(json,
+                        new TypeReference<SampleItemSet>() {
+                        });
+            } else {
+                sampleItemSet = new SampleItemSet();
+            }
         } catch (IOException e) {
+            e.printStackTrace();
             this.logger.error("Could not retrieve items: " + e.getMessage());
         }
 

@@ -8,6 +8,7 @@ import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /*
@@ -29,8 +30,11 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     @Autowired
     private LogService logger;
 
+    @Autowired
+    private Environment env;
+
     /* Execute after app is fully loaded and setup */
-    public void onApplicationEvent(ApplicationStartedEvent contextRefreshedEvent ) {
+    public void onApplicationEvent(ApplicationStartedEvent contextRefreshedEvent) {
         this.runLogger();
     }
 
@@ -46,15 +50,15 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
 
     private void runFirstTime() {
-        this.logger.info("Retriving lastest versions...");
+        this.logger.info("Retriving latest versions...");
         this.gameVersionsInit();
         this.logger.info("Retriving languages...");
         this.gameLanguagesInit();
         this.logger.info("Retriving seasons...");
         this.seasonsInit();
-        this.logger.info("Retriving all game champions (w/ all languages on all regions)...");
+        this.logger.info("Retriving base champions ...");
         this.gameChampionsInit();
-        this.logger.info("Retriving lastest champion rotation...");
+        this.logger.info("Retriving latest champion rotation...");
         this.championRotationInit();
         this.logger.info("Retriving queue types...");
         this.queuesInit();
@@ -81,7 +85,11 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
 
     private void gameChampionsInit() {
-        this.ddragonConnector.championsHistorical();
+        if (this.env.getActiveProfiles()[0].equalsIgnoreCase("dev")) {
+            this.ddragonConnector.champions();
+        } else {
+            this.ddragonConnector.championsHistorical();
+        }
     }
 
     private void championRotationInit() {
@@ -105,7 +113,11 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
 
     private void itemsInit() {
-        this.ddragonConnector.itemsHistorical();
+        if (this.env.getActiveProfiles()[0].equalsIgnoreCase("dev")) {
+            this.ddragonConnector.items();
+        } else {
+            this.ddragonConnector.itemsHistorical();
+        }
     }
 
     private void realmsInit() {

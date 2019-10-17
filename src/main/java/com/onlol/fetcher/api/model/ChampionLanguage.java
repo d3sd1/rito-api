@@ -18,6 +18,8 @@ public class ChampionLanguage {
     @OneToOne
     private Language language;
 
+    @OneToOne
+    private Version version;
 
     @Column(nullable = true, unique = false)
     private String partype;
@@ -87,12 +89,21 @@ public class ChampionLanguage {
         this.partype = partype;
     }
 
+    public Version getVersion() {
+        return version;
+    }
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "ChampionLanguage{" +
                 "id=" + id +
                 ", champion=" + champion +
                 ", language=" + language +
+                ", version=" + version +
                 ", partype='" + partype + '\'' +
                 ", blurb='" + blurb + '\'' +
                 ", title='" + title + '\'' +

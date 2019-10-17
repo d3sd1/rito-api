@@ -65,7 +65,6 @@ public class ApiConnector {
                     HttpMethod.GET, requestEntity,
                     String.class);
         } catch (HttpClientErrorException e) {
-
             switch (e.getStatusCode().value()) {
                 case 401:
                     if (needsApiKey) {
@@ -84,10 +83,19 @@ public class ApiConnector {
                         this.apiKeyRepository.save(apiKey);
                     }
                     return this.get(url, needsApiKey);
+                case 503:
+                    e.printStackTrace();
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
+                    this.logService.warning("Api seems to be down on endpoint " + url);
+                    return this.get(url, needsApiKey);
 
             }
         }
-        return resp == null ? null:resp.getBody();
+        return resp == null ? null : resp.getBody();
     }
 
 }

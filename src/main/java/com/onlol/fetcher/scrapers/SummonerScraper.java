@@ -1,5 +1,6 @@
 package com.onlol.fetcher.scrapers;
 
+import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.Summoner;
@@ -28,6 +29,9 @@ public class SummonerScraper {
 
     @Autowired
     private SummonerRepository summonerRepository;
+
+    @Autowired
+    private LeaguesConnector leaguesConnector;
 
     @Autowired
     private LogService logger;
@@ -61,8 +65,8 @@ public class SummonerScraper {
         this.logger.info("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner);
 
-        //TODO: recuperar ligas del invocador
-        // /lol/league/v4/entries/by-summoner/{encryptedSummonerId}
+        this.logger.info("Retrieving summoner leagues...");
+        this.leaguesConnector.summonerLeagues(summoner);
     }
 
 

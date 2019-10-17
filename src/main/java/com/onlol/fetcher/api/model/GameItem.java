@@ -19,7 +19,7 @@ public class GameItem {
     @OneToOne
     private Version version;
 
-    @OneToMany
+    @ManyToMany
     private List<GameItem> transformsInto; // parent items build with this one
 
     // IMG DATA
@@ -57,13 +57,13 @@ public class GameItem {
     @Column(nullable = false, unique = false)
     private Boolean purchasable = false;
 
-    @OneToMany
+    @ManyToMany
     private List<GameItemTag> gameItemTags;
 
-    @OneToMany
+    @ManyToMany
     private List<GameItemMap> gameItemMaps;
 
-    @OneToMany
+    @ManyToMany
     private List<GameItemStatModifier> gameItemStatModifiers;
 
     public Long getId() {
