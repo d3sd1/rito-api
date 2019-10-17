@@ -142,4 +142,3 @@ public class DdragonScraper {
     save champion texts
      */
 }
-//TODO: async init
