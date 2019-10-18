@@ -18,7 +18,7 @@ public class SummonerLeague {
     private Summoner summoner;
 
     @OneToOne
-    private Queue queue;
+    private QueueType queueType;
 
     @OneToOne
     private LeagueTier leagueTier;
@@ -30,25 +30,25 @@ public class SummonerLeague {
     private LeagueMiniSeries leagueMiniSeries;
 
     @Column(nullable = false, unique = false)
-    private boolean hotStreak;
+    private boolean hotStreak = false;
 
     @Column(nullable = false, unique = false)
-    private Integer wins;
+    private Integer wins = 0;
 
     @Column(nullable = false, unique = false)
-    private Integer losses;
+    private Integer losses = 0;
 
     @Column(nullable = false, unique = false)
-    private boolean veteran;
+    private boolean veteran = false;
 
     @Column(nullable = false, unique = false)
-    private boolean inactive;
+    private boolean inactive = false;
 
     @Column(nullable = false, unique = false)
-    private boolean freshBlood;
+    private boolean freshBlood = false;
 
     @Column(nullable = false, unique = false)
-    private Short leaguePoints;
+    private Short leaguePoints = 0;
 
     public Long getId() {
         return id;
@@ -56,14 +56,6 @@ public class SummonerLeague {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Queue getQueue() {
-        return queue;
-    }
-
-    public void setQueue(Queue queue) {
-        this.queue = queue;
     }
 
     public LeagueTier getLeagueTier() {
@@ -154,17 +146,24 @@ public class SummonerLeague {
         this.leaguePoints = leaguePoints;
     }
 
+    public QueueType getQueueType() {
+        return queueType;
+    }
+
+    public void setQueueType(QueueType queueType) {
+        this.queueType = queueType;
+    }
+
     @Override
     public String toString() {
         return "SummonerLeague{" +
                 "id=" + id +
-                ", queue=" + queue +
+                ", summoner=" + summoner +
+                ", queueType=" + queueType +
                 ", leagueTier=" + leagueTier +
                 ", leagueRank=" + leagueRank +
                 ", leagueMiniSeries=" + leagueMiniSeries +
-                ", summoner=" + summoner +
                 ", hotStreak=" + hotStreak +
-                ", wins=" + wins +
                 ", wins=" + wins +
                 ", losses=" + losses +
                 ", veteran=" + veteran +

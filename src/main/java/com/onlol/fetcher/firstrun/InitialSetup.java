@@ -1,6 +1,7 @@
 package com.onlol.fetcher.firstrun;
 
 import com.onlol.fetcher.api.connector.DdragonConnector;
+import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.RunLog;
 import com.onlol.fetcher.api.repository.RunLogRepository;
@@ -25,7 +26,7 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     private RunLogRepository runLogRepository;
 
     @Autowired
-    private SummonerConnector summonerConnector;
+    private LeaguesConnector leaguesConnector;
 
     @Autowired
     private LogService logger;
@@ -72,12 +73,19 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.realmsInit();
         this.logger.info("Retriving game types...");
         this.gameTypesInit();
-        this.logger.info("Retriving league leaders...");
-        this.gameTypesInit(); // TODO: recuperar aqui a los top de cada region para empezar a scrapear
+        this.logger.info("Retriving league challenger leaders...");
+        this.challengerLadderInit();
+        this.logger.info("Retriving league master leaders...");
+        //this.masterLadderInit();
+        this.logger.info("Retriving league grandmaster leaders...");
+        //this.grandMasterLadderInit();
     }
 
     private void gameVersionsInit() {
         this.ddragonConnector.versions();
+    }
+    private void challengerLadderInit() {
+        this.leaguesConnector.challengerLadderGlobal();
     }
 
     private void gameLanguagesInit() {

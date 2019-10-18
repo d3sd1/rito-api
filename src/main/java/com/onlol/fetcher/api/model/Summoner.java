@@ -14,7 +14,7 @@ public class Summoner {
     @Column(nullable = false, unique = true)
     private String id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String accountId;
 
     @Column(nullable = true, unique = true)

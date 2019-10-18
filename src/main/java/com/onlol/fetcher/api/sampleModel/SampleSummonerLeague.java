@@ -3,7 +3,7 @@ package com.onlol.fetcher.api.sampleModel;
 import java.util.Arrays;
 
 public class SampleSummonerLeague {
-    private String queueType;
+    private String queueType; // present only sometimes
     private String summonerName;
     private boolean hotStreak;
     private SampleSummonerLeagueSeries miniSeries;
@@ -16,7 +16,7 @@ public class SampleSummonerLeague {
     private boolean freshBlood;
     private String tier;
     private String summonerId;
-    private Integer leaguePoints;
+    private Short leaguePoints;
 
     public String getQueueType() {
         return queueType;
@@ -122,17 +122,17 @@ public class SampleSummonerLeague {
         this.summonerId = summonerId;
     }
 
-    public Integer getLeaguePoints() {
+    public Short getLeaguePoints() {
         return leaguePoints;
     }
 
-    public void setLeaguePoints(Integer leaguePoints) {
+    public void setLeaguePoints(Short leaguePoints) {
         this.leaguePoints = leaguePoints;
     }
 
     @Override
     public String toString() {
-        return "SampleSummonerLeagues{" +
+        return "SampleSummonerLeague{" +
                 "queueType='" + queueType + '\'' +
                 ", summonerName='" + summonerName + '\'' +
                 ", hotStreak=" + hotStreak +
