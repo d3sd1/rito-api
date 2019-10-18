@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SummonerLeagueRepository extends JpaRepository<SummonerLeague, Long> {
-    SummonerLeague findBySummonerAndQueue(Summoner summoner, Queue queue);
     SummonerLeague findBySummonerAndQueueType(Summoner summoner, QueueType queueType);
 }

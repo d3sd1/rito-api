@@ -646,7 +646,6 @@ public class DdragonConnector {
                 this.gameItemLanguageRepository.save(gameItemLanguage);
             }
         }
-        //TODO: que empiece con los rankings y no con summoner manual NOVA desdi por migracion
         return gameItems;
     }
 }

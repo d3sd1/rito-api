@@ -100,8 +100,7 @@ public class DdragonScraper {
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameTypesQueue() { // Used for retrieving all data
         try {
-            //TODO: decomentar esto cuando el endpoint quite la trailing comma
-            //this.ddragonConnector.gameTypes();
+            this.ddragonConnector.gameTypes();
         } catch(Exception e) {
             e.printStackTrace();
         }

@@ -57,16 +57,16 @@ public class SummonerScraper {
             return;
         }
         this.logger.info("Updating summoner " + summoner.getName());
-        summoner = this.summonerConnector.bySummonerId(summoner.getId());
-
+        summoner = this.summonerConnector.bySummonerId(summoner);
+/*
         this.logger.info("Retrieving games of summoner " + summoner.getName());
-        this.matchConnector.matchListByAccount(summoner.getAccountId());
+        this.matchConnector.matchListByAccount(summoner);
 
         this.logger.info("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner);
 
         this.logger.info("Retrieving summoner leagues...");
-        this.leaguesConnector.summonerLeagues(summoner);
+        this.leaguesConnector.summonerLeagues(summoner);*/
     }
 
 

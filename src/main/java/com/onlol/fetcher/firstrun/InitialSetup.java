@@ -75,10 +75,10 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.gameTypesInit();
         this.logger.info("Retriving league challenger leaders...");
         this.challengerLadderInit();
-        this.logger.info("Retriving league master leaders...");
-        //this.masterLadderInit();
-        this.logger.info("Retriving league grandmaster leaders...");
-        //this.grandMasterLadderInit();
+        this.logger.info("Retriving league grandmaster ladders...");
+        this.grandMasterLadderInit();
+        this.logger.info("Retriving league master ladders...");
+        this.masterLadderInit();
     }
 
     private void gameVersionsInit() {
@@ -134,5 +134,11 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
 
     private void gameTypesInit() {
         this.ddragonConnector.gameTypes();
+    }
+    private void masterLadderInit() {
+        this.leaguesConnector.masterLadderGlobal();
+    }
+    private void grandMasterLadderInit() {
+        this.leaguesConnector.grandMasterLadderGlobal();
     }
 }

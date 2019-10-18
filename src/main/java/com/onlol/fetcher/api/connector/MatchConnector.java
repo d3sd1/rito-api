@@ -1,10 +1,14 @@
 package com.onlol.fetcher.api.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.*;
+import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -81,48 +86,41 @@ public class MatchConnector {
     @Autowired
     private MatchGameParticipantRepository matchGameParticipantRepository;
 
-    public List<MatchList> matchListByAccount(String encryptedAccountId) { // WRAPPER
-        return this.matchListByAccount(encryptedAccountId, 0L);
+    @Autowired
+    private ObjectMapper jacksonMapper;
+
+    @Autowired
+    private ApiConnector apiConnector;
+
+    @Autowired
+    private LogService logger;
+
+    public List<MatchList> matchListByAccount(Summoner summoner) { // WRAPPER
+        return this.matchListByAccount(summoner, 0L);
     }
 
-    public List<MatchList> matchListByAccount(String encryptedAccountId, Long beginIndex) {
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
+    public List<MatchList> matchListByAccount(Summoner summoner, Long beginIndex) {
+        SampleMatchLists sampleMatchLists;
+        try {
+            sampleMatchLists = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.MATCHLIST_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
+                            .replace("{{HOST}}", summoner.getRegion().getHostName())
+                            .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
+                    true
+            ), new TypeReference<SampleMatchLists>() {
+            });
+        } catch (IOException e) {
+            sampleMatchLists = null;
+            this.logger.error("No se ha podido retornar las partidas del invocador " + summoner.getName());
+        }
+        if (sampleMatchLists == null) {
             return new ArrayList<>();
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<SampleMatchLists> resp = restTemplate.exchange(
-                V4.MATCHLIST_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", encryptedAccountId)
-                        .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<SampleMatchLists>() {
-                });
-
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.matchListByAccount(encryptedAccountId);
-        }
-
-        // Parse to match current model
-        SampleMatchLists sampleMatchLists = resp.getBody();
 
         List<MatchList> matchLists = new ArrayList<>();
 
-        Summoner summoner = this.summonerRepository.findByAccountId(encryptedAccountId);
-
         for (SampleMatchList sampleMatchList : sampleMatchLists.getMatches()) {
-            MatchList matchList = this.matchListRepository.findByMatchGameIdAndSummonerAccountId(sampleMatchList.getGameId(), encryptedAccountId);
+            MatchList matchList = this.matchListRepository.findByMatchGameIdAndSummonerAccountId(sampleMatchList.getGameId(), summoner.getAccountId());
             if (matchList == null) {
                 matchList = new MatchList();
 
@@ -193,9 +191,8 @@ public class MatchConnector {
                 if (champion != null) {
                     matchList.setChamp(champion);
                 } else {
-                    // Actualizar campeones ya que falta alguno en la DB y volver al mismo proceso
-                    //TODO decomentar esto this.ddragonConnector.champions();
-                    this.matchListByAccount(encryptedAccountId, beginIndex);
+                    this.ddragonConnector.champions();
+                    this.matchListByAccount(summoner, beginIndex);
                 }
                 matchList.setLane(lane);
 
@@ -207,52 +204,31 @@ public class MatchConnector {
         }
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
         if (sampleMatchLists.getEndIndex() < sampleMatchLists.getTotalGames()) {
-            this.matchListByAccount(encryptedAccountId, sampleMatchLists.getEndIndex() + 1);
+            this.matchListByAccount(summoner, sampleMatchLists.getEndIndex() + 1);
         }
         return matchLists;
     }
 
 
     // MÁS SOFISTICADO
-    public MatchGame match(Long gameId) {
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new MatchGame();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
-
-        MatchGame matchGame = new MatchGame();
-        SampleMatchGame sampleMatchGame = new SampleMatchGame();
+    public MatchGame match(Long gameId, Region region) {
+        MatchGame matchGame;
+        SampleMatchGame sampleMatchGame;
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<SampleMatchGame> resp = restTemplate.exchange(
-                    V4.MATCHES.replace("{{GAME_ID}}", gameId.toString()),
-                    HttpMethod.GET, new HttpEntity(headers),
-                    new ParameterizedTypeReference<SampleMatchGame>() {
-                    });
-            sampleMatchGame = resp.getBody();
-        } catch (final HttpClientErrorException e) {
-            switch (e.getStatusCode().value()) {
-                case 401:
-                    apiKey.setBanned(true);
-                    apiKey.setValid(false);
-                    this.apiKeyRepository.save(apiKey);
-                    return matchGame;
-                case 404:
-                    matchGame.setGameId(gameId);
-                    matchGame.setRetrieved(true);
-                    matchGame.setRetrieving(false);
-                    matchGame.setExpired(true);
-                    this.matchGameRepository.save(matchGame);
-                    return matchGame;
-                case 429:
-                    apiKey.setBanned(true);
-                    apiKey.setValid(true);
-                    this.apiKeyRepository.save(apiKey);
-                    return this.match(gameId);
-            }
+            sampleMatchGame = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.MATCHES.replace("{{GAME_ID}}", gameId.toString())
+                            .replace("{{HOST}}", region.getHostName()),
+                    true
+            ), new TypeReference<SampleMatchLists>() {
+            });
+        } catch (IOException e) {
+            sampleMatchGame = null;
+            this.logger.error("No se ha podido recuperar el match " + gameId.toString());
+        }
+
+        if (sampleMatchGame == null) {
+            return new MatchGame();
         }
 
         matchGame = this.matchGameRepository.findByGameId(sampleMatchGame.getGameId());
@@ -261,13 +237,16 @@ public class MatchConnector {
             matchGame = new MatchGame();
         }
         matchGame.setGameId(sampleMatchGame.getGameId());
-        matchGame.setGameCreation(new Timestamp(sampleMatchGame.getGameCreation()).toLocalDateTime());
+        matchGame.setGameCreation(new
+
+                Timestamp(sampleMatchGame.getGameCreation()).
+
+                toLocalDateTime());
         matchGame.setGameDuration(sampleMatchGame.getGameDuration());
         matchGame.setGameVersion(sampleMatchGame.getGameVersion());
 
 
         /* Get platform constant */
-        Region region = this.regionRepository.findByServicePlatform(sampleMatchGame.getPlatformId());
         matchGame.setRegion(region);
 
 
@@ -336,7 +315,8 @@ public class MatchConnector {
         this.matchGameRepository.save(matchGame);
 
         /* Add summoners to update */
-        for (SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
+        for (
+                SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
 
             sampleParticipantIdentity.getPlayer().getSummonerId();
             Summoner dbSummoner = this.summonerRepository.findByAccountId(sampleParticipantIdentity.getPlayer().getAccountId());
@@ -344,6 +324,7 @@ public class MatchConnector {
                 dbSummoner = new Summoner();
                 dbSummoner.setAccountId(sampleParticipantIdentity.getPlayer().getAccountId());
                 dbSummoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
+                dbSummoner.setRegion(region);
                 dbSummoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
                 dbSummoner.setName(sampleParticipantIdentity.getPlayer().getSummonerName());
                 this.summonerRepository.save(dbSummoner);
@@ -352,7 +333,8 @@ public class MatchConnector {
 
         /* Match game stats */
 
-        for (SampleTeamStats sampleTeamStats : sampleMatchGame.getTeams()) {
+        for (
+                SampleTeamStats sampleTeamStats : sampleMatchGame.getTeams()) {
             MatchGameTeam matchGameTeam = this.matchGameTeamRepository.findByTeamId(sampleTeamStats.getTeamId());
             if (matchGameTeam == null) {
                 matchGameTeam = new MatchGameTeam();
@@ -403,20 +385,21 @@ public class MatchConnector {
         }
 
         /* Fill participants */
-        for (SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
+        for (
+                SampleParticipantIdentity sampleParticipantIdentity : sampleMatchGame.getParticipantIdentities()) {
             Optional<Summoner> opsummoner = this.summonerRepository.findById(sampleParticipantIdentity.getPlayer().getSummonerId());
             Summoner summoner;
-            if(opsummoner.isEmpty()) {
+            if (opsummoner.isEmpty()) {
                 summoner = new Summoner();
+                summoner.setRegion(region);
                 summoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
                 summoner = this.summonerRepository.save(summoner);
-            }
-            else {
+            } else {
                 summoner = opsummoner.get();
             }
             MatchGameParticipant matchGameParticipant = this.matchGameParticipantRepository.
                     findBySummonerAndMatchGame(summoner, matchGame);
-            if(matchGameParticipant == null) {
+            if (matchGameParticipant == null) {
                 matchGameParticipant = new MatchGameParticipant();
                 matchGameParticipant.setSummoner(summoner);
                 matchGameParticipant.setMatchGame(matchGame);
@@ -426,9 +409,6 @@ public class MatchConnector {
 
             this.matchGameParticipantRepository.save(matchGameParticipant);
         }
-
-
-        System.out.println("PARTTIDA: " + sampleMatchGame);
         return null;
     }
 }

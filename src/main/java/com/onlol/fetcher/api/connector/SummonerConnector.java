@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class SummonerConnector {
@@ -62,17 +63,50 @@ public class SummonerConnector {
             this.logger.error("Region not found on summonerByName: " + regionName);
             return null;
         }
-        Summoner summoner = null;
+        Summoner retrievedSummoner = null;
         try {
-            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
+            retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
                             .replace("{{SUMMONER_NAME}}", name)
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference(){});
+            ), new TypeReference() {
+            });
         } catch (IOException e) {
             this.logger.error("No se ha podido retornar al invocador " + name);
         }
+        Summoner summoner = new Summoner();
+        if (retrievedSummoner != null) {
+            Optional<Summoner> opSummoner = this.summonerRepository.findById(retrievedSummoner.getId());
+            if (opSummoner.isPresent()) {
+                summoner = opSummoner.get();
+                summoner.setLastTimeUpdated(LocalDateTime.now());
+                summoner = this.summonerRepository.save(summoner);
+                // Update historical name if needed
+                if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+                    SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
+                    summonerNameHistorical.setName(summoner.getName());
+                    summonerNameHistorical.setSummoner(summoner);
+                    this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+                }
+            }
+        }
+        return summoner;
+    }
+
+    public Summoner byPuuid(Summoner summoner) {
+        try {
+            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.SUMMONERS_BY_PUUID.replace("{{SUMMONER_PUUID}}", summoner.getPuuid())
+                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                    true
+            ), new TypeReference<Summoner>() {
+            });
+        } catch (IOException e) {
+            summoner = null;
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar invocador (byPuuid) " + e.getMessage());
+        }
 
         if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
@@ -88,76 +122,20 @@ public class SummonerConnector {
         return summoner;
     }
 
-    public Summoner byPuuid(String puuid) {
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new Summoner();
+    public Summoner byAccount(Summoner summoner) {
+        try {
+            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.SUMMONERS_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
+                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                    true
+            ), new TypeReference<Summoner>() {
+            });
+        } catch (IOException e) {
+            summoner = null;
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar invocador (byAccount) " + e.getMessage());
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Summoner> resp = restTemplate.exchange(
-                V4.SUMMONERS_BY_PUUID.replace("{{SUMMONER_PUUID}}", puuid),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<Summoner>() {
-                });
-
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.byPuuid(puuid);
-        }
-        Summoner summoner = resp.getBody();
-        if (summoner != null) {
-            summoner.setLastTimeUpdated(LocalDateTime.now());
-            summoner = this.summonerRepository.save(summoner);
-            // Update historical name if needed
-            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
-                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                summonerNameHistorical.setName(summoner.getName());
-                summonerNameHistorical.setSummoner(summoner);
-                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-            }
-        }
-        return summoner;
-    }
-
-    public Summoner byAccount(String summonerAccount) {
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new Summoner();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Summoner> resp = restTemplate.exchange(
-                V4.SUMMONERS_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", summonerAccount),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<Summoner>() {
-                });
-
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.byAccount(summonerAccount);
-        }
-        Summoner summoner = resp.getBody();
         if (summoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
@@ -173,42 +151,29 @@ public class SummonerConnector {
     }
 
 
-    public Summoner bySummonerId(String id) {
-
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new Summoner();
+    public Summoner bySummonerId(Summoner summoner) {
+        Summoner retrievedSummoner = null;
+        try {
+            retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.SUMMONERS_BY_ID
+                            .replace("{{HOST}}", summoner.getRegion().getHostName())
+                            .replace("{{SUMMONER_ID}}", summoner.getId()),
+                    true
+            ), new TypeReference<Summoner>() {
+            });
+        } catch (IOException e) {
+            retrievedSummoner = null;
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Summoner> resp = restTemplate.exchange(
-                V4.SUMMONERS_BY_ID.replace("{{SUMMONER_ID}}", String.join(",", id)),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<Summoner>() {
-                });
-
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.bySummonerId(id);
-        }
-        Summoner summoner = resp.getBody();
-        if (summoner != null) {
+        if (retrievedSummoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
             summoner = this.summonerRepository.save(summoner);
             // Update historical name if needed
-            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
+            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(retrievedSummoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                summonerNameHistorical.setName(summoner.getName());
+                summonerNameHistorical.setName(retrievedSummoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
                 this.summonerNameHistoricalRepository.save(summonerNameHistorical);
             }
@@ -217,37 +182,22 @@ public class SummonerConnector {
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(Summoner summoner) {
-
-        ApiKey apiKey = this.apiKeyManager.getKey();
-        if (apiKey == null) {
-            return new ArrayList<>();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", apiKey.getApiKey());
-
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ArrayList<SampleSummonerChampionMastery>> resp = restTemplate.exchange(
-                V4.SUMMONER_CHAMPION_MASTERY
-                        .replace("{{SUMMONER_ID}}", summoner.getId())
-                        .replace("{{HOST}}", summoner.getRegion().getHostName()),
-                HttpMethod.GET, new HttpEntity(headers),
-                new ParameterizedTypeReference<ArrayList<SampleSummonerChampionMastery>>() {
-                });
-
-        switch (resp.getStatusCode().value()) {
-            case 401:
-                apiKey.setBanned(true);
-                apiKey.setValid(false);
-                this.apiKeyRepository.save(apiKey);
-                break;
-            case 429:
-                apiKey.setBanned(true);
-                apiKey.setValid(true);
-                this.apiKeyRepository.save(apiKey);
-                return this.championMastery(summoner);
+        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries;
+        try {
+            sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.SUMMONER_CHAMPION_MASTERY
+                            .replace("{{SUMMONER_ID}}", summoner.getId())
+                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                    true
+            ), new TypeReference<Summoner>() {
+            });
+        } catch (IOException e) {
+            sampleSummonerChampionMasteries = new ArrayList<>();
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
         }
 
-        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = resp.getBody();
+
         ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
         for (SampleSummonerChampionMastery sampleSummonerChampionMastery : sampleSummonerChampionMasteries) {
             SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
@@ -268,3 +218,11 @@ public class SummonerConnector {
         return summonerChampionMasteries;
     }
 }
+
+//TODO: coger league ID y utilizar este endpoint para recuperar todos los summoner
+/*
+GET /lol/league/v4/leagues/{leagueId}Get league with given ID, including inactive entries.
+recuperar todos los summoner de la liga y añadirlos para actualizar
+TODO: best effort. scrappear todos los queue tier division una vez por dia y en el initial setup??
+GET /lol/league/v4/entries/{queue}/{tier}/{division}
+ */

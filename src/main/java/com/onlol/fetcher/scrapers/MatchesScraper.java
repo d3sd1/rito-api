@@ -5,6 +5,7 @@ import com.onlol.fetcher.api.model.MatchGame;
 import com.onlol.fetcher.api.repository.MatchGameRepository;
 import com.onlol.fetcher.api.sampleModel.SampleMatchGame;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
+import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Async;
@@ -25,8 +26,12 @@ public class MatchesScraper {
     @Autowired
     private MatchConnector matchConnector;
 
+    @Autowired
+    private LogService logger;
+
     @PostConstruct
     @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
     @Async
     public void clearOrphanGames() {
         System.out.println("Limpiando partidas huérfanas...");
@@ -41,17 +46,17 @@ public class MatchesScraper {
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
     public void getMatches() {
-        System.out.println("Retrieving matches...");
+        /*this.logger.info("Retrieving matches..."); TODO: que esto funcione
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
         if(matchGame == null) {
-            System.out.println("No matches to update...");
+            this.logger.info("No matches to update...");
             return;
         }
         matchGame.setRetrieving(true);
         this.matchGameRepository.save(matchGame);
-        System.out.println("Updating match: " + matchGame.getGameId());
+        this.logger.info("Updating match: " + matchGame.getGameId());
 
-        MatchGame sampleMatchGame = this.matchConnector.match(matchGame.getGameId());
+        MatchGame sampleMatchGame = this.matchConnector.match(matchGame, region);*/
         //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}
     }
 }
