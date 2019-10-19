@@ -19,8 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 //TODO: añadir logging en consola / mail auto / db para ver que pasa
@@ -54,7 +56,7 @@ public class DdragonConnector {
     private ChampionRotationRepository championRotationRepository;
 
     @Autowired
-    private ApiKeyManager apiKeyManager;
+    private RegionShardServiceRepository regionShardServiceRepository;
 
     @Autowired
     private SeasonRepository seasonRepository;
@@ -73,6 +75,9 @@ public class DdragonConnector {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private RegionShardRepository regionShardRepository;
 
     @Autowired
     private RealmRepository realmRepository;
@@ -109,6 +114,15 @@ public class DdragonConnector {
 
     @Autowired
     private ChampionTagRepository championTagRepository;
+
+    @Autowired
+    private RegionShardTranslationRepository regionShardTranslationRepository;
+
+    @Autowired
+    private RegionShardMessageRepository regionShardMessageRepository;
+
+    @Autowired
+    private RegionShardIncidentRepository regionShardIncidentRepository;
 
     public ArrayList<Version> versions() {
         ArrayList<String> stringVersions = null;
@@ -645,5 +659,103 @@ public class DdragonConnector {
             }
         }
         return gameItems;
+    }
+
+    public ArrayList<RegionShard> lolStatus() {
+        // Since API doesn't allows to check by version,
+        // we store it, but only w/ last version (current).
+        ArrayList<RegionShard> regionShards = new ArrayList<>();
+        Version version = this.versionRepository.findTopByOrderByIdDesc();
+        for (Region region : this.regionRepository.findAll()) {
+            this.lolStatus(region, version);
+
+        }
+        return regionShards;
+    }
+
+    public RegionShard lolStatus(Region region, Version version) {
+        SampleRegionShard sampleRegionShard = null;
+        try {
+            sampleRegionShard = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V3.SHARD_DATA
+                            .replace("{{HOST}}", region.getHostName()),
+                    true
+            ), new TypeReference<SampleRegionShard>() {
+            });
+        } catch (IOException e) {
+            sampleRegionShard = null;
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar el shard de la región " + e.getMessage());
+        }
+        RegionShard regionShard = this.regionShardRepository.findByRegionAndVersion(region, version);
+        if (regionShard == null) {
+            regionShard = new RegionShard();
+            regionShard.setRegion(region);
+            regionShard.setVersion(version);
+            this.regionShardRepository.save(regionShard);
+        }
+        regionShard.setHostName(sampleRegionShard.getHostname());
+        ArrayList<Language> languages = new ArrayList<>();
+        for (String locale : sampleRegionShard.getLocales()) {
+            Language language = this.languageRepository.findByKeyName(locale);
+            if (language == null) {
+                language = new Language();
+                language.setKeyName(locale);
+                this.languageRepository.save(language);
+            }
+            languages.add(language);
+        }
+        regionShard.setLanguages(languages);
+        regionShard.setName(sampleRegionShard.getName());
+        regionShard.setRegionTag(sampleRegionShard.getRegion_tag());
+        ArrayList<RegionShardService> shardServices = new ArrayList();
+        for (SampleRegionShardService sampleRegionShardService : sampleRegionShard.getServices()) {
+            RegionShardService regionShardService = new RegionShardService();
+            regionShardService.setName(sampleRegionShardService.getName());
+            regionShardService.setOnline(sampleRegionShardService.getStatus().equalsIgnoreCase("online"));
+
+            // Incidents
+            ArrayList<RegionShardIncident> regionShardIncidents = new ArrayList<>();
+            for (SampleRegionShardIncident sampleRegionShardIncident : sampleRegionShardService.getIncidents()) {
+                RegionShardIncident regionShardIncident = new RegionShardIncident();
+                regionShardIncident.setActive(sampleRegionShardIncident.isActive());
+                regionShardIncident.setCreatedAt(LocalDateTime.parse(sampleRegionShardIncident.getCreated_at().replaceAll("Z", "")));
+
+                ArrayList<RegionShardMessage> regionShardMessages = new ArrayList<>();
+                for(SampleRegionShardMessage sampleRegionShardMessage:sampleRegionShardIncident.getUpdates()) {
+                    RegionShardMessage regionShardMessage = new RegionShardMessage();
+                    regionShardMessage.setAuthor(sampleRegionShardMessage.getAuthor());
+                    regionShardMessage.setContent(sampleRegionShardMessage.getContent());
+                    regionShardMessage.setCreatedAt(LocalDateTime.parse(sampleRegionShardMessage.getCreated_at().replaceAll("Z", "")));
+                    regionShardMessage.setSeverity(sampleRegionShardMessage.getSeverity());
+                    ArrayList<RegionShardTranslation> regionShardTranslations = new ArrayList<>();
+                    for(SampleRegionShardTranslation sampleRegionShardTranslation:sampleRegionShardMessage.getTranslations()) {
+                        RegionShardTranslation regionShardTranslation = new RegionShardTranslation();
+                        regionShardTranslation.setContent(sampleRegionShardTranslation.getContent());
+
+                        Language language = this.languageRepository.findByKeyName(sampleRegionShardTranslation.getLocale());
+                        if(language == null) {
+                            language = new Language();
+                            language.setKeyName(sampleRegionShardTranslation.getLocale());
+                            this.languageRepository.save(language);
+                        }
+                        regionShardTranslation.setLanguage(language);
+                        regionShardTranslation.setUpdateAt(LocalDateTime.parse(sampleRegionShardMessage.getUpdated_at().replaceAll("Z", "")));
+                        this.regionShardTranslationRepository.save(regionShardTranslation);
+                    }
+                    regionShardMessage.setTranslations(regionShardTranslations);
+                    regionShardMessage.setUpdatedAt(LocalDateTime.parse(sampleRegionShardMessage.getUpdated_at().replaceAll("Z", "")));
+                    this.regionShardMessageRepository.save(regionShardMessage);
+                }
+                regionShardIncident.setUpdates(regionShardMessages);
+                this.regionShardIncidentRepository.save(regionShardIncident);
+                regionShardIncidents.add(regionShardIncident);
+            }
+            regionShardService.setIncidents(regionShardIncidents);
+            this.regionShardServiceRepository.save(regionShardService);
+        }
+        regionShard.setRegionShardServices(shardServices);
+        this.regionShardRepository.save(regionShard);
+        return regionShard;
     }
 }

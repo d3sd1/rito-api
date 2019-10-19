@@ -128,8 +128,18 @@ public class DdragonScraper {
             e.printStackTrace();
         }
     }
-    //TODO: Recuperar estado lol
-    // GET /lol/status/v3/shard-data
+
+
+    @Async
+    @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void lolStatus() {
+        try {
+            this.ddragonConnector.lolStatus();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     //TODO: scrappear las siguientes URL (tener en cuenta los idiomas y las verisones. se han de iterar
     // para todas las versiones solo cuando la app no este inicializando
@@ -138,6 +148,5 @@ public class DdragonScraper {
     /*
     http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/summoner.json
     http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/profileicon.json
-    save champion texts
      */
 }

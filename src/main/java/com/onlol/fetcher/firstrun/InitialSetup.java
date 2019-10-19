@@ -79,6 +79,8 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.grandMasterLadderInit();
         this.logger.info("Retriving league master ladders...");
         this.masterLadderInit();
+        this.logger.info("Retriving LoL status...");
+        this.lolStatusInit();
     }
 
     private void gameVersionsInit() {
@@ -140,5 +142,8 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
     private void grandMasterLadderInit() {
         this.leaguesConnector.grandMasterLadderGlobal();
+    }
+    private void lolStatusInit() {
+        this.ddragonConnector.lolStatus();
     }
 }
