@@ -214,7 +214,6 @@ public class MatchConnector {
     }
 
 
-    // MÁS SOFISTICADO
     public MatchGame match(Long gameId, Region region) {
         MatchGame matchGame;
         SampleMatchGame sampleMatchGame;
@@ -226,12 +225,20 @@ public class MatchConnector {
                     true
             ), new TypeReference<SampleMatchLists>() {
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             sampleMatchGame = null;
             this.logger.error("No se ha podido recuperar el match " + gameId.toString());
         }
 
-        if (sampleMatchGame == null) {
+        if (sampleMatchGame == null) { // Game does not exists so... Update if (if pos) on the db
+            matchGame = this.matchGameRepository.findByGameId(gameId);
+            if (matchGame != null) {
+                matchGame.setGameId(gameId);
+                matchGame.setRetrieved(true);
+                matchGame.setRetrieving(false);
+                matchGame.setExpired(true);
+                this.matchGameRepository.save(matchGame);
+            }
             return new MatchGame();
         }
 

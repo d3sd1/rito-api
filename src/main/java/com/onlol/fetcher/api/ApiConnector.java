@@ -76,14 +76,9 @@ public class ApiConnector {
                 case 403:
                     this.logService.debug("Forbidden URL: " + url);
                     break;
-/* TODO: aqui hacer cosetes
                 case 404:
-                    matchGame.setGameId(gameId);
-                    matchGame.setRetrieved(true);
-                    matchGame.setRetrieving(false);
-                    matchGame.setExpired(true);
-                    this.matchGameRepository.save(matchGame);
-                    return matchGame;*/
+                    this.logService.info("Unknown url: " + url);
+                    return null;
                 case 429:
                     if (needsApiKey) {
                         apiKey.setBanned(true);
