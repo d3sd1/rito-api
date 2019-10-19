@@ -10,16 +10,8 @@ import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.*;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -101,8 +93,6 @@ public class MatchConnector {
 
     public List<MatchList> matchListByAccount(Summoner summoner, Long beginIndex) {
         SampleMatchLists sampleMatchLists;
-        System.out.println(V4.MATCHLIST_BY_ACCOUNT);
-        System.out.println(summoner);
         try {
             sampleMatchLists = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
@@ -132,6 +122,7 @@ public class MatchConnector {
                 if (matchGame == null) {
                     matchGame = new MatchGame();
                     matchGame.setGameId(sampleMatchList.getGameId());
+                    matchGame.setRegion(summoner.getRegion());
                     this.matchGameRepository.save(matchGame);
                 }
 
@@ -214,26 +205,24 @@ public class MatchConnector {
     }
 
 
-    public MatchGame match(Long gameId, Region region) {
-        MatchGame matchGame;
+    public MatchGame match(MatchGame matchGame) {
         SampleMatchGame sampleMatchGame;
 
         try {
             sampleMatchGame = this.jacksonMapper.readValue(this.apiConnector.get(
-                    V4.MATCHES.replace("{{GAME_ID}}", gameId.toString())
-                            .replace("{{HOST}}", region.getHostName()),
+                    V4.MATCHES.replace("{{GAME_ID}}", matchGame.getGameId().toString())
+                            .replace("{{HOST}}", matchGame.getRegion().getHostName()),
                     true
             ), new TypeReference<SampleMatchLists>() {
             });
         } catch (Exception e) {
             sampleMatchGame = null;
-            this.logger.error("No se ha podido recuperar el match " + gameId.toString());
+            this.logger.error("No se ha podido recuperar el match " + matchGame.getGameId().toString());
         }
 
         if (sampleMatchGame == null) { // Game does not exists so... Update if (if pos) on the db
-            matchGame = this.matchGameRepository.findByGameId(gameId);
+            matchGame = this.matchGameRepository.findByGameId(matchGame.getGameId());
             if (matchGame != null) {
-                matchGame.setGameId(gameId);
                 matchGame.setRetrieved(true);
                 matchGame.setRetrieving(false);
                 matchGame.setExpired(true);
@@ -242,11 +231,6 @@ public class MatchConnector {
             return new MatchGame();
         }
 
-        matchGame = this.matchGameRepository.findByGameId(sampleMatchGame.getGameId());
-
-        if (matchGame == null) {
-            matchGame = new MatchGame();
-        }
         matchGame.setGameId(sampleMatchGame.getGameId());
         matchGame.setGameCreation(new
 
@@ -255,10 +239,6 @@ public class MatchConnector {
                 toLocalDateTime());
         matchGame.setGameDuration(sampleMatchGame.getGameDuration());
         matchGame.setGameVersion(sampleMatchGame.getGameVersion());
-
-
-        /* Get platform constant */
-        matchGame.setRegion(region);
 
 
         /* Get queue */
@@ -335,7 +315,7 @@ public class MatchConnector {
                 dbSummoner = new Summoner();
                 dbSummoner.setAccountId(sampleParticipantIdentity.getPlayer().getAccountId());
                 dbSummoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
-                dbSummoner.setRegion(region);
+                dbSummoner.setRegion(matchGame.getRegion());
                 dbSummoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
                 dbSummoner.setName(sampleParticipantIdentity.getPlayer().getSummonerName());
                 this.summonerRepository.save(dbSummoner);
@@ -402,7 +382,7 @@ public class MatchConnector {
             Summoner summoner;
             if (opsummoner.isEmpty()) {
                 summoner = new Summoner();
-                summoner.setRegion(region);
+                summoner.setRegion(matchGame.getRegion());
                 summoner.setId(sampleParticipantIdentity.getPlayer().getSummonerId());
                 summoner = this.summonerRepository.save(summoner);
             } else {

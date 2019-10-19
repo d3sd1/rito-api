@@ -3,11 +3,9 @@ package com.onlol.fetcher.scrapers;
 import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.model.MatchGame;
 import com.onlol.fetcher.api.repository.MatchGameRepository;
-import com.onlol.fetcher.api.sampleModel.SampleMatchGame;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,7 +44,7 @@ public class MatchesScraper {
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 10000)
     public void getMatches() {
-        /*this.logger.info("Retrieving matches..."); TODO: que esto funcione
+        this.logger.info("Retrieving matches...");
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
         if(matchGame == null) {
             this.logger.info("No matches to update...");
@@ -56,7 +54,8 @@ public class MatchesScraper {
         this.matchGameRepository.save(matchGame);
         this.logger.info("Updating match: " + matchGame.getGameId());
 
-        MatchGame sampleMatchGame = this.matchConnector.match(matchGame, region);*/
+        MatchGame sampleMatchGame = this.matchConnector.match(matchGame);
+
         //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}
     }
 }
