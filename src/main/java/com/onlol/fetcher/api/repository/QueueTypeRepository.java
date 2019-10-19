@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface QueueTypeRepository extends JpaRepository<QueueType, Integer> {
-
+    QueueType findByKeyName(String keyName);
 }

@@ -12,17 +12,20 @@ public class LeagueMiniSeries {
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
-    private String progress;
+    @OneToOne
+    private Summoner summoner;
 
     @Column(nullable = false, unique = true)
-    private Short target;
+    private String progress = "";
 
     @Column(nullable = false, unique = true)
-    private Integer wins;
+    private Short target = 0;
 
     @Column(nullable = false, unique = true)
-    private Integer losses;
+    private Integer wins = 0;
+
+    @Column(nullable = false, unique = true)
+    private Integer losses = 0;
 
     public Integer getId() {
         return id;
@@ -64,10 +67,19 @@ public class LeagueMiniSeries {
         this.losses = losses;
     }
 
+    public Summoner getSummoner() {
+        return summoner;
+    }
+
+    public void setSummoner(Summoner summoner) {
+        this.summoner = summoner;
+    }
+
     @Override
     public String toString() {
         return "LeagueMiniSeries{" +
                 "id=" + id +
+                ", summoner=" + summoner +
                 ", progress='" + progress + '\'' +
                 ", target=" + target +
                 ", wins=" + wins +

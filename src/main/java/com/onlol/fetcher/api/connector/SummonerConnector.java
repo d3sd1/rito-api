@@ -169,14 +169,21 @@ public class SummonerConnector {
 
         if (retrievedSummoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
-            summoner = this.summonerRepository.save(summoner);
+            summoner.setName(retrievedSummoner.getName());
+            summoner.setAccountId(retrievedSummoner.getAccountId());
+            summoner.setProfileIconId(retrievedSummoner.getProfileIconId());
+            summoner.setPuuid(retrievedSummoner.getPuuid());
+            summoner.setRevisionDate(retrievedSummoner.getRevisionDate());
+            summoner.setSummonerLevel(retrievedSummoner.getSummonerLevel());
             // Update historical name if needed
             if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(retrievedSummoner.getName(), summoner) == null) {
                 SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
                 summonerNameHistorical.setName(retrievedSummoner.getName());
                 summonerNameHistorical.setSummoner(summoner);
+                summonerNameHistorical.setSummoner(summoner);
                 this.summonerNameHistoricalRepository.save(summonerNameHistorical);
             }
+            summoner = this.summonerRepository.save(summoner);
         }
         return summoner;
     }

@@ -64,6 +64,9 @@ public class LeaguesConnector {
     private QueueTypeRepository queueTypeRepository;
 
     @Autowired
+    private LeagueMiniSeriesRepository leagueMiniSeriesRepository;
+
+    @Autowired
     private LogService logger;
 
     @Autowired
@@ -88,14 +91,65 @@ public class LeaguesConnector {
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagues) {
-            /*Queue queue = this.queueRepository.findTopByQueueId(sampleSummonerLeague.getQueueType());
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueue(summoner, queue);
-            if (true) { // TODO
-                summonerLeague = new SummonerLeague();
+            QueueType queuetype = this.queueTypeRepository.findByKeyName(sampleSummonerLeague.getQueueType());
+            if(queuetype == null) {
+                queuetype = new QueueType();
+                queuetype.setKeyName(sampleSummonerLeague.getQueueType());
+                this.queueTypeRepository.save(queuetype);
             }
-            this.summonerLeagueRepository.save(summonerLeague);*/
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queuetype);
+            if (summonerLeague == null) {
+                summonerLeague = new SummonerLeague();
+                summonerLeague.setSummoner(summoner);
+                summonerLeague.setQueueType(queuetype);
+                this.summonerLeagueRepository.save(summonerLeague);
+            }
+            LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeague.getTier());
+            if(leagueTier == null) {
+                leagueTier = new LeagueTier();
+                leagueTier.setKeyName(sampleSummonerLeague.getTier());
+                this.leagueTierRepository.save(leagueTier);
+            }
+            summonerLeague.setLeagueTier(leagueTier);
+
+
+            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
+            if(leagueRank == null) {
+                leagueRank = new LeagueRank();
+                leagueRank.setKeyName(sampleSummonerLeague.getRank());
+                this.leagueRankRepository.save(leagueRank);
+            }
+            summonerLeague.setLeagueRank(leagueRank);
+
+
+            /* Check if player is playing miniseries */
+            LeagueMiniSeries leagueMiniSeries = null;
+            if(sampleSummonerLeague.getMiniSeries() != null) {
+                leagueMiniSeries = this.leagueMiniSeriesRepository.findBySummoner(summoner);
+                if(leagueMiniSeries == null) {
+                    leagueMiniSeries = new LeagueMiniSeries();
+                    leagueMiniSeries.setSummoner(summoner);
+                    this.leagueMiniSeriesRepository.save(leagueMiniSeries);
+                }
+
+                leagueMiniSeries.setWins(sampleSummonerLeague.getMiniSeries().getWins());
+                leagueMiniSeries.setLosses(sampleSummonerLeague.getMiniSeries().getLosses());
+                leagueMiniSeries.setProgress(sampleSummonerLeague.getMiniSeries().getProgress());
+                leagueMiniSeries.setTarget(sampleSummonerLeague.getMiniSeries().getTarget());
+                this.leagueMiniSeriesRepository.save(leagueMiniSeries);
+            }
+
+            summonerLeague.setLeagueMiniSeries(leagueMiniSeries);
+
+            summonerLeague.setHotStreak(sampleSummonerLeague.isHotStreak());
+            summonerLeague.setWins(sampleSummonerLeague.getWins());
+            summonerLeague.setLosses(sampleSummonerLeague.getLosses());
+            summonerLeague.setVeteran(sampleSummonerLeague.isVeteran());
+            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
+            summonerLeague.setFreshBlood(sampleSummonerLeague.isFreshBlood());
+            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
+            this.summonerLeagueRepository.save(summonerLeague);
         }
-        //TODO: completar ligas aqui.
         return summonerLeagues;
     }
 

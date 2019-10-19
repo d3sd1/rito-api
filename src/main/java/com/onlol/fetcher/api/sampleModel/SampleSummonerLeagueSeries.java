@@ -3,14 +3,14 @@ package com.onlol.fetcher.api.sampleModel;
 public class SampleSummonerLeagueSeries {
     private String progress;
     private Integer losses;
-    private Integer target;
+    private Short target;
     private Integer wins;
 
-    public Integer getTarget() {
+    public Short getTarget() {
         return target;
     }
 
-    public void setTarget(Integer target) {
+    public void setTarget(Short target) {
         this.target = target;
     }
 

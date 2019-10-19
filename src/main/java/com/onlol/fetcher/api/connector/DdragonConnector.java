@@ -32,8 +32,6 @@ import java.util.*;
 - notificador de
 - sincronizador de movil con web, para que puedan usar app web/móvil al mismo tiempo y ver los mismos datos. Manejan la app del móvil y pueden ver datos en pantalla
 - que avise de los errores por email en cualquier excepción
-- que los datos de inicio se saquen de las ligas.
-- scrappear constants y sacar de ahí to.do lo necesario (colas, regiones...) que no tienen endpoints. Y poner post construct después de inicio y además revisar cada día con el cron
 - streams de usuarios en el perfil
 -
  */

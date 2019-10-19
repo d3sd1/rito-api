@@ -64,9 +64,9 @@ public class SummonerScraper {
 
         this.logger.info("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner);
-
+*/
         this.logger.info("Retrieving summoner leagues...");
-        this.leaguesConnector.summonerLeagues(summoner);*/
+        this.leaguesConnector.summonerLeagues(summoner);
     }
 
 

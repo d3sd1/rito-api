@@ -101,15 +101,19 @@ public class MatchConnector {
 
     public List<MatchList> matchListByAccount(Summoner summoner, Long beginIndex) {
         SampleMatchLists sampleMatchLists;
+        System.out.println(V4.MATCHLIST_BY_ACCOUNT);
+        System.out.println(summoner);
         try {
             sampleMatchLists = this.jacksonMapper.readValue(this.apiConnector.get(
-                    V4.MATCHLIST_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
+                    V4.MATCHLIST_BY_ACCOUNT
+                            .replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
                             .replace("{{HOST}}", summoner.getRegion().getHostName())
                             .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
                     true
             ), new TypeReference<SampleMatchLists>() {
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             sampleMatchLists = null;
             this.logger.error("No se ha podido retornar las partidas del invocador " + summoner.getName());
         }
