@@ -19,30 +19,11 @@ public class GameItem {
     @OneToOne
     private Version version;
 
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private GameImage gameImage;
+
     @ManyToMany
     private List<GameItem> transformsInto; // parent items build with this one
-
-    // IMG DATA
-    @Column(nullable = false, unique = false)
-    private String imgFull = "";
-
-    @Column(nullable = false, unique = false)
-    private String imgSprite = "";
-
-    @Column(nullable = false, unique = false)
-    private String imgGroup = "";
-
-    @Column(nullable = false, unique = false)
-    private Integer imgX = 0;
-
-    @Column(nullable = false, unique = false)
-    private Integer imgY = 0;
-
-    @Column(nullable = false, unique = false)
-    private Integer imgW = 0;
-
-    @Column(nullable = false, unique = false)
-    private Integer imgH = 0;
 
     // GOLD DATA
     @Column(nullable = false, unique = false)
@@ -96,62 +77,6 @@ public class GameItem {
 
     public void setTransformsInto(List<GameItem> transformsInto) {
         this.transformsInto = transformsInto;
-    }
-
-    public String getImgFull() {
-        return imgFull;
-    }
-
-    public void setImgFull(String imgFull) {
-        this.imgFull = imgFull;
-    }
-
-    public String getImgSprite() {
-        return imgSprite;
-    }
-
-    public void setImgSprite(String imgSprite) {
-        this.imgSprite = imgSprite;
-    }
-
-    public String getImgGroup() {
-        return imgGroup;
-    }
-
-    public void setImgGroup(String imgGroup) {
-        this.imgGroup = imgGroup;
-    }
-
-    public Integer getImgX() {
-        return imgX;
-    }
-
-    public void setImgX(Integer imgX) {
-        this.imgX = imgX;
-    }
-
-    public Integer getImgY() {
-        return imgY;
-    }
-
-    public void setImgY(Integer imgY) {
-        this.imgY = imgY;
-    }
-
-    public Integer getImgW() {
-        return imgW;
-    }
-
-    public void setImgW(Integer imgW) {
-        this.imgW = imgW;
-    }
-
-    public Integer getImgH() {
-        return imgH;
-    }
-
-    public void setImgH(Integer imgH) {
-        this.imgH = imgH;
     }
 
     public Integer getBaseGold() {
@@ -208,5 +133,31 @@ public class GameItem {
 
     public void setGameItemStatModifiers(List<GameItemStatModifier> gameItemStatModifiers) {
         this.gameItemStatModifiers = gameItemStatModifiers;
+    }
+
+    public GameImage getGameImage() {
+        return gameImage;
+    }
+
+    public void setGameImage(GameImage gameImage) {
+        this.gameImage = gameImage;
+    }
+
+    @Override
+    public String toString() {
+        return "GameItem{" +
+                "id=" + id +
+                ", itemId=" + itemId +
+                ", version=" + version +
+                ", gameImage=" + gameImage +
+                ", transformsInto=" + transformsInto +
+                ", baseGold=" + baseGold +
+                ", totalGold=" + totalGold +
+                ", sellGold=" + sellGold +
+                ", purchasable=" + purchasable +
+                ", gameItemTags=" + gameItemTags +
+                ", gameItemMaps=" + gameItemMaps +
+                ", gameItemStatModifiers=" + gameItemStatModifiers +
+                '}';
     }
 }

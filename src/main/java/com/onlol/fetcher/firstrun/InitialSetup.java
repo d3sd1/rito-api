@@ -2,7 +2,6 @@ package com.onlol.fetcher.firstrun;
 
 import com.onlol.fetcher.api.connector.DdragonConnector;
 import com.onlol.fetcher.api.connector.LeaguesConnector;
-import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.api.model.RunLog;
 import com.onlol.fetcher.api.repository.RunLogRepository;
 import com.onlol.fetcher.logger.LogService;
@@ -55,6 +54,10 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.gameVersionsInit();
         this.logger.info("Retriving languages...");
         this.gameLanguagesInit();
+        this.logger.info("Retriving summoner spells...");
+        this.gameSummonerSpellsInit();
+        this.logger.info("Retriving summoner profile images...");
+        this.summonerProfileImagesInit();
         this.logger.info("Retriving seasons...");
         this.seasonsInit();
         this.logger.info("Retriving base champions ...");
@@ -145,5 +148,13 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
     private void lolStatusInit() {
         this.ddragonConnector.lolStatus();
+    }
+
+    private void gameSummonerSpellsInit() {
+        this.ddragonConnector.summonerSpells();
+    }
+
+    private void summonerProfileImagesInit() {
+        this.ddragonConnector.summonerProfileImagesHistorical();
     }
 }

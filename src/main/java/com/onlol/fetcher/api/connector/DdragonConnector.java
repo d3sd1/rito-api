@@ -2,24 +2,18 @@ package com.onlol.fetcher.api.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.model.Queue;
+import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.sampleModel.*;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -44,7 +38,13 @@ public class DdragonConnector {
     private VersionRepository versionRepository;
 
     @Autowired
+    private GameImageRepository gameImageRepository;
+
+    @Autowired
     private LanguageRepository languageRepository;
+
+    @Autowired
+    private SummonerProfileImageRepository summonerProfileImageRepository;
 
     @Autowired
     private ChampionRepository championRepository;
@@ -54,6 +54,9 @@ public class DdragonConnector {
 
     @Autowired
     private ChampionRotationRepository championRotationRepository;
+
+    @Autowired
+    private SummonerSpellRepository summonerSpellRepository;
 
     @Autowired
     private RegionShardServiceRepository regionShardServiceRepository;
@@ -114,6 +117,9 @@ public class DdragonConnector {
 
     @Autowired
     private ChampionTagRepository championTagRepository;
+
+    @Autowired
+    private SummonerSpellLanguageRepository summonerSpellLanguageRepository;
 
     @Autowired
     private RegionShardTranslationRepository regionShardTranslationRepository;
@@ -566,13 +572,18 @@ public class DdragonConnector {
             gameItem.setTransformsInto(parentItems);
 
             /* Game image information */
-            gameItem.setImgFull(sampleItem.getImage().getFull());
-            gameItem.setImgGroup(sampleItem.getImage().getGroup());
-            gameItem.setImgH(sampleItem.getImage().getH());
-            gameItem.setImgSprite(sampleItem.getImage().getSprite());
-            gameItem.setImgW(sampleItem.getImage().getW());
-            gameItem.setImgX(sampleItem.getImage().getX());
-            gameItem.setImgY(sampleItem.getImage().getY());
+            if (gameItem.getGameImage() == null) {
+                gameItem.setGameImage(new GameImage());
+            }
+            gameItem.getGameImage().setFullName(sampleItem.getImage().getFull());
+            gameItem.getGameImage().setGroupName(sampleItem.getImage().getGroup());
+            gameItem.getGameImage().setH(sampleItem.getImage().getH());
+            gameItem.getGameImage().setSprite(sampleItem.getImage().getSprite());
+            gameItem.getGameImage().setW(sampleItem.getImage().getW());
+            gameItem.getGameImage().setX(sampleItem.getImage().getX());
+            gameItem.getGameImage().setY(sampleItem.getImage().getY());
+
+            this.gameImageRepository.save(gameItem.getGameImage());
 
             /* Gold information */
             gameItem.setBaseGold(sampleItem.getGold().getBase());
@@ -640,7 +651,6 @@ public class DdragonConnector {
                 gameItemStatModifiers.add(gameItemStatModifier);
             }
             gameItem.setGameItemStatModifiers(gameItemStatModifiers);
-
             gameItem = this.gameItemRepository.save(gameItem);
             gameItems.add(gameItem);
 
@@ -722,19 +732,19 @@ public class DdragonConnector {
                 regionShardIncident.setCreatedAt(LocalDateTime.parse(sampleRegionShardIncident.getCreated_at().replaceAll("Z", "")));
 
                 ArrayList<RegionShardMessage> regionShardMessages = new ArrayList<>();
-                for(SampleRegionShardMessage sampleRegionShardMessage:sampleRegionShardIncident.getUpdates()) {
+                for (SampleRegionShardMessage sampleRegionShardMessage : sampleRegionShardIncident.getUpdates()) {
                     RegionShardMessage regionShardMessage = new RegionShardMessage();
                     regionShardMessage.setAuthor(sampleRegionShardMessage.getAuthor());
                     regionShardMessage.setContent(sampleRegionShardMessage.getContent());
                     regionShardMessage.setCreatedAt(LocalDateTime.parse(sampleRegionShardMessage.getCreated_at().replaceAll("Z", "")));
                     regionShardMessage.setSeverity(sampleRegionShardMessage.getSeverity());
                     ArrayList<RegionShardTranslation> regionShardTranslations = new ArrayList<>();
-                    for(SampleRegionShardTranslation sampleRegionShardTranslation:sampleRegionShardMessage.getTranslations()) {
+                    for (SampleRegionShardTranslation sampleRegionShardTranslation : sampleRegionShardMessage.getTranslations()) {
                         RegionShardTranslation regionShardTranslation = new RegionShardTranslation();
                         regionShardTranslation.setContent(sampleRegionShardTranslation.getContent());
 
                         Language language = this.languageRepository.findByKeyName(sampleRegionShardTranslation.getLocale());
-                        if(language == null) {
+                        if (language == null) {
                             language = new Language();
                             language.setKeyName(sampleRegionShardTranslation.getLocale());
                             this.languageRepository.save(language);
@@ -757,5 +767,180 @@ public class DdragonConnector {
         regionShard.setRegionShardServices(shardServices);
         this.regionShardRepository.save(regionShard);
         return regionShard;
+    }
+
+    public ArrayList<SummonerProfileImage> summonerProfileImages() { // only versions so... are the same.
+        return this.summonerProfileImagesHistorical();
+    }
+
+    public ArrayList<SummonerProfileImage> summonerProfileImagesHistorical() {
+        ArrayList<SummonerProfileImage> summonerProfileImages = new ArrayList<>();
+        for (Version version : this.versionRepository.findAll()) {
+            summonerProfileImages.addAll(this.summonerProfileImages(version));
+
+        }
+        return summonerProfileImages;
+    }
+
+    public ArrayList<SummonerProfileImage> summonerProfileImages(Version version) {
+        SampleDdragon<LinkedHashMap<Integer, SampleSummonerImage>> ddragonData = null;
+        ArrayList<SummonerProfileImage> summonerProfileImages = new ArrayList<>();
+        try {
+            String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_IMAGES
+                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{LANGUAGE}}", "en_US")); // lang not relevant...
+            if (json != null) {
+                ddragonData = this.jacksonMapper.readValue(
+                        json,
+                        new TypeReference<SampleDdragon<LinkedHashMap<Integer, SampleSummonerImage>>>() {
+                        });
+            }
+        } catch (Exception e) {
+            this.logger.error("Could not retrieve summoner profile images: " + e.getMessage());
+        }
+
+        if (ddragonData == null) {
+            return summonerProfileImages;
+        }
+
+
+        LinkedHashMap<Integer, SampleSummonerImage> sampleSummonerImages = ddragonData.getData();
+        for (Map.Entry<Integer, SampleSummonerImage> entry : sampleSummonerImages.entrySet()) {
+            SampleSummonerImage sampleSummonerImage = entry.getValue();
+            SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndVersion(sampleSummonerImage.getId(), version);
+            if (summonerProfileImage == null) {
+                summonerProfileImage = new SummonerProfileImage();
+                summonerProfileImage.setProfileImageId(sampleSummonerImage.getId());
+                summonerProfileImage.setVersion(version);
+                this.summonerProfileImageRepository.save(summonerProfileImage);
+            }
+            if (summonerProfileImage.getGameImage() == null) {
+                summonerProfileImage.setGameImage(new GameImage());
+                this.gameImageRepository.save(summonerProfileImage.getGameImage());
+            }
+            summonerProfileImage.getGameImage().setSprite(sampleSummonerImage.getImage().getSprite());
+            summonerProfileImage.getGameImage().setFullName(sampleSummonerImage.getImage().getFull());
+            summonerProfileImage.getGameImage().setGroupName(sampleSummonerImage.getImage().getGroup());
+            summonerProfileImage.getGameImage().setX(sampleSummonerImage.getImage().getX());
+            summonerProfileImage.getGameImage().setY(sampleSummonerImage.getImage().getY());
+            summonerProfileImage.getGameImage().setH(sampleSummonerImage.getImage().getH());
+            summonerProfileImage.getGameImage().setW(sampleSummonerImage.getImage().getW());
+
+            this.gameImageRepository.save(summonerProfileImage.getGameImage());
+            this.summonerProfileImageRepository.save(summonerProfileImage);
+        }
+
+        return summonerProfileImages;
+    }
+
+    public ArrayList<SummonerSpell> summonerSpells() {
+        ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
+        Version version = this.versionRepository.findTopByOrderByIdDesc();
+        for (Language language : this.languageRepository.findAll()) {
+            summonerSpells.addAll(this.summonerSpells(version, language));
+        }
+        return summonerSpells;
+    }
+
+    public ArrayList<SummonerSpell> summonerSpellsHistorical() {
+        ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
+        for (Version version : this.versionRepository.findAll()) {
+            for (Language language : this.languageRepository.findAll()) {
+                summonerSpells.addAll(this.summonerSpells(version, language));
+            }
+        }
+        return summonerSpells;
+    }
+
+    public ArrayList<SummonerSpell> summonerSpells(Version version, Language language) {
+        SampleDdragon<LinkedHashMap<String, SampleSummonerSpell>> ddragonData = null;
+        ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
+        try {
+            String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_SPELLS
+                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{LANGUAGE}}", language.getKeyName()));
+            if (json != null) {
+                ddragonData = this.jacksonMapper.readValue(
+                        json,
+                        new TypeReference<SampleDdragon<LinkedHashMap<String, SampleSummonerSpell>>>() {
+                        });
+            }
+        } catch (Exception e) {
+            this.logger.error("Could not retrieve summoner spells: " + e.getMessage());
+        }
+
+        if (ddragonData == null) {
+            return summonerSpells;
+        }
+        LinkedHashMap<String, SampleSummonerSpell> sampleSummonerSpells = ddragonData.getData();
+        for (Map.Entry<String, SampleSummonerSpell> entry : sampleSummonerSpells.entrySet()) {
+            String keyName = entry.getKey();
+            SampleSummonerSpell sampleSummonerSpell = entry.getValue();
+            SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndVersion(sampleSummonerSpell.getKey(), version);
+            if (summonerSpell == null) {
+                summonerSpell = new SummonerSpell();
+                summonerSpell.setId(sampleSummonerSpell.getKey());
+                summonerSpell.setKeyName(keyName);
+                summonerSpell.setVersion(version);
+                this.summonerSpellRepository.save(summonerSpell);
+            }
+            summonerSpell.setSummonerLevel(sampleSummonerSpell.getSummonerLevel());
+            summonerSpell.setMaxammo(sampleSummonerSpell.getMaxammo());
+            summonerSpell.setRangeBurn(sampleSummonerSpell.getRangeBurn());
+            if (summonerSpell.getGameImage() == null) {
+                summonerSpell.setGameImage(new GameImage());
+            }
+            summonerSpell.getGameImage().setGroupName(sampleSummonerSpell.getImage().getGroup());
+            summonerSpell.getGameImage().setFullName(sampleSummonerSpell.getImage().getFull());
+            summonerSpell.getGameImage().setSprite(sampleSummonerSpell.getImage().getSprite());
+            summonerSpell.getGameImage().setX(sampleSummonerSpell.getImage().getX());
+            summonerSpell.getGameImage().setY(sampleSummonerSpell.getImage().getY());
+            summonerSpell.getGameImage().setW(sampleSummonerSpell.getImage().getW());
+            summonerSpell.getGameImage().setH(sampleSummonerSpell.getImage().getH());
+            this.gameImageRepository.save(summonerSpell.getGameImage());
+
+            ArrayList<GameMode> gameModes = new ArrayList<>();
+            for (String mode : sampleSummonerSpell.getModes()) {
+                GameMode gameMode = this.gameModeRepository.findByGameMode(mode);
+                if (gameMode == null) {
+                    gameMode = new GameMode();
+                    gameMode.setGameMode(mode);
+                    this.gameModeRepository.save(gameMode);
+                    gameModes.add(gameMode);
+                }
+            }
+            summonerSpell.setGameModes(gameModes);
+
+
+/*
+TODO: meter summoner spells las siguinetes propiedades:
+cooldown
+cooldownBurn
+cost
+costBurn
+effect
+effectBurn
+vars
+range
+ */
+            this.summonerSpellRepository.save(summonerSpell);
+
+
+            SummonerSpellLanguage summonerSpellLanguage = this.summonerSpellLanguageRepository.findBySummonerSpellAndLanguage(summonerSpell, language);
+            if (summonerSpellLanguage == null) {
+                summonerSpellLanguage = new SummonerSpellLanguage();
+                summonerSpellLanguage.setLanguage(language);
+                summonerSpellLanguage.setSummonerSpell(summonerSpell);
+                this.summonerSpellLanguageRepository.save(summonerSpellLanguage);
+            }
+            summonerSpellLanguage.setDescription(sampleSummonerSpell.getDescription());
+            summonerSpellLanguage.setName(sampleSummonerSpell.getName());
+            summonerSpellLanguage.setTooltip(sampleSummonerSpell.getTooltip());
+            summonerSpellLanguage.setCostType(sampleSummonerSpell.getCostType());
+            summonerSpellLanguage.setResource(sampleSummonerSpell.getResource());
+            this.summonerSpellLanguageRepository.save(summonerSpellLanguage);
+            summonerSpells.add(summonerSpell);
+        }
+        return summonerSpells;
     }
 }

@@ -17,6 +17,8 @@ public class V4 {
     public static final String DDRAGON_CHAMPIONS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/champion.json";
     public static final String DDRAGON_LANGUAGES = "https://ddragon.leagueoflegends.com/cdn/languages.json";
     public static final String DDRAGON_REALM = "https://ddragon.leagueoflegends.com/realms/{{REGION}}.json";
+    public static final String DDRAGON_SUMMONER_SPELLS = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/summoner.json";
+    public static final String DDRAGON_SUMMONER_IMAGES = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/profileicon.json";
     public static final String SUMMONER_CHAMPION_MASTERY = "https://{{HOST}}/lol/champion-mastery/v4/champion-masteries/by-summoner/{{SUMMONER_ID}}";
     public static final String LEAGUES_BY_SUMMONER = "https://{{HOST}}/lol/league/v4/entries/by-summoner/{{SUMMONER_ID}}";
     public static final String LEAGUES_CHALLENGER = "https://{{HOST}}//lol/league/v4/challengerleagues/by-queue/{{QUEUE}}";

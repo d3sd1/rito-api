@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +14,7 @@ public class RunLog {
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = false, unique = false, columnDefinition = "text")
     private LocalDateTime runTime = LocalDateTime.now();
 
     public Integer getId() {

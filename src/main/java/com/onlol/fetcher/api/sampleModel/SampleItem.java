@@ -9,7 +9,7 @@ public class SampleItem {
     private String colloq;
     private String plaintext;
     private Integer[] into;
-    private SampleItemImage image;
+    private SampleImage image;
     private SampleItemGold gold;
     private String[] tags;
     private LinkedHashMap<Integer, Boolean> maps;
@@ -55,11 +55,11 @@ public class SampleItem {
         this.into = into;
     }
 
-    public SampleItemImage getImage() {
+    public SampleImage getImage() {
         return image;
     }
 
-    public void setImage(SampleItemImage image) {
+    public void setImage(SampleImage image) {
         this.image = image;
     }
 

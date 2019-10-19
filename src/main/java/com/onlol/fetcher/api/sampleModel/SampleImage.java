@@ -1,6 +1,6 @@
 package com.onlol.fetcher.api.sampleModel;
 
-public class SampleItemImage {
+public class SampleImage {
     private String full;
     private String sprite;
     private String group;

@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 @Component
 @EnableAsync
 public class DdragonScraper {
@@ -141,12 +139,25 @@ public class DdragonScraper {
         }
     }
 
-    //TODO: scrappear las siguientes URL (tener en cuenta los idiomas y las verisones. se han de iterar
-    // para todas las versiones solo cuando la app no este inicializando
-    // y para la version actual cuando este inicializando.
-    // se han de recuperar siempre para todos los idiomas.
-    /*
-    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/summoner.json
-    http://ddragon.leagueoflegends.com/cdn/9.20.1/data/en_US/profileicon.json
-     */
+    @Async
+    @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void summonerSpells() {
+        try {
+            this.ddragonConnector.summonerSpellsHistorical();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Async
+    @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void summonerProfileImages() {
+        try {
+            this.ddragonConnector.summonerProfileImagesHistorical();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
