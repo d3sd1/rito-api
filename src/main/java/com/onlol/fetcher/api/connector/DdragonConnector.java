@@ -19,8 +19,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
-//TODO: que se mande mail cuando todo pete
-/
+//TODO: que se mande mail cuando todo pete. Refactorizar codigo y añadir logger.
+
 @Service
 public class DdragonConnector {
 
