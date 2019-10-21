@@ -3,6 +3,8 @@ package com.onlol.fetcher.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class LogService {
     @Autowired
     private LogRepository logRepository;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     private Class<?> getCaller() {
         try {
@@ -29,6 +33,19 @@ public class LogService {
             e.printStackTrace();
             return this.getClass();
         }
+    }
+
+    void sendEmail(String type, String log) {
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("bugs@onlol.net");
+        msg.setTo("andreigarciacuadra@gmail.com");
+
+        msg.setSubject("[" + type + "] OnLOL Scraper");
+        msg.setText(log);
+
+        javaMailSender.send(msg);
+
     }
 
     public void debug(String msg) {
@@ -51,6 +68,7 @@ public class LogService {
         Log log = new Log();
         log.setLevel(LogLevel.WARNING);
         log.setText(msg);
+        this.sendEmail("WARNING", msg);
         this.logRepository.save(log);
     }
 
@@ -60,6 +78,7 @@ public class LogService {
         Log log = new Log();
         log.setLevel(LogLevel.ERROR);
         log.setText(msg);
+        this.sendEmail("ERROR", msg);
         this.logRepository.save(log);
     }
 

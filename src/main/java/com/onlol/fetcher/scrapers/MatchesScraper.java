@@ -54,6 +54,7 @@ public class MatchesScraper {
         this.matchGameRepository.save(matchGame);
         this.logger.info("Updating match: " + matchGame.getGameId());
 
+        matchGame = this.matchConnector.match(matchGame);
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame);
 
         //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}

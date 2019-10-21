@@ -423,5 +423,9 @@ public class LeaguesConnector {
         }
         return summonerLeagues;
     }
+
+    public void featuredGames() {
+
+    }
 }
 // TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

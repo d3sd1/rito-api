@@ -8,13 +8,13 @@ import com.onlol.fetcher.api.repository.SummonerRepository;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -35,6 +35,10 @@ public class SummonerScraper {
 
     @Autowired
     private LogService logger;
+
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Async
     @RequiresInitialSetup
