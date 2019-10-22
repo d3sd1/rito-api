@@ -30,6 +30,10 @@ public class ApiConnector {
         return this.get(url, false, Byte.decode("0"));
     }
 
+    public String get(String url, boolean needsApiKey) {
+        return this.get(url, needsApiKey, Byte.decode("0"));
+    }
+
     public String get(String url, boolean needsApiKey, byte attempts) {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = null;
@@ -82,7 +86,6 @@ public class ApiConnector {
         } catch (HttpServerErrorException e) {
             switch (e.getStatusCode().value()) {
                 case 503:
-                    e.printStackTrace();
                     try {
                         TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException ex) {
