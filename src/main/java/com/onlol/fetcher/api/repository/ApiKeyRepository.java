@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface ApiKeyRepository extends JpaRepository<ApiKey, String> {
     ApiKey findTopByBannedIsFalse();
 
-    ApiKey findTopByretryAfterOrderByRetryAfterAsc();
+    ApiKey findTopByBannedIsTrueOrderByRetryAfter();
 }

@@ -19,7 +19,7 @@ public class ApiKeyManager {
     public ApiKey getKey() {
         ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalse();
         if (apiKey == null) {
-            apiKey = this.apiKeyRepository.findTopByretryAfterOrderByRetryAfterAsc();
+            apiKey = this.apiKeyRepository.findTopByBannedIsTrueOrderByRetryAfter();
         }
         if (this.apiKeyRepository.findAll().isEmpty()) {
             this.logger.error("No api keys found...");
