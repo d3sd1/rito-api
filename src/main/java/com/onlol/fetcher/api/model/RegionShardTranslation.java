@@ -16,10 +16,10 @@ public class RegionShardTranslation {
     @OneToOne
     private Language language;
 
-    @Column(nullable = false, unique = true, columnDefinition = "text")
+    @Column(nullable = false, unique = false, columnDefinition = "text")
     private String content;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private LocalDateTime updateAt;
 
     public Integer getId() {
