@@ -155,6 +155,6 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
     }
 
     private void summonerProfileImagesInit() {
-        this.ddragonConnector.summonerProfileImagesHistorical();
+        this.ddragonConnector.summonerProfileImages();
     }
 }

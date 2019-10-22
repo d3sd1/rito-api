@@ -760,7 +760,7 @@ public class DdragonConnector {
     }
 
     public ArrayList<SummonerProfileImage> summonerProfileImages() { // only versions so... are the same.
-        return this.summonerProfileImagesHistorical();
+        return this.summonerProfileImages(this.versionRepository.findTopByOrderByIdDesc());
     }
 
     public ArrayList<SummonerProfileImage> summonerProfileImagesHistorical() {
