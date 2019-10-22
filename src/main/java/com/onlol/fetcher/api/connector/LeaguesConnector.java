@@ -3,12 +3,10 @@ package com.onlol.fetcher.api.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
-import com.onlol.fetcher.api.sampleModel.SampleSummonerLeague;
-import com.onlol.fetcher.api.sampleModel.SampleSummonerLeagueList;
+import com.onlol.fetcher.api.riotModel.*;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,16 +14,17 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class LeaguesConnector {
 
     @Autowired
-    private ApiKeyManager apiKeyManager;
+    private RegionRepository regionRepository;
 
     @Autowired
-    private ApiKeyRepository apiKeyRepository;
+    private MatchGameRepository matchGameRepository;
 
     @Autowired
     private SummonerRepository summonerRepository;
@@ -58,13 +57,13 @@ public class LeaguesConnector {
     private LeagueRankRepository leagueRankRepository;
 
     @Autowired
-    private RegionRepository regionRepository;
-
-    @Autowired
     private QueueTypeRepository queueTypeRepository;
 
     @Autowired
     private LeagueMiniSeriesRepository leagueMiniSeriesRepository;
+
+    @Autowired
+    private FeaturedGameIntervalRepository featuredGameIntervalRepository;
 
     @Autowired
     private LogService logger;
@@ -92,7 +91,7 @@ public class LeaguesConnector {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagues) {
             QueueType queuetype = this.queueTypeRepository.findByKeyName(sampleSummonerLeague.getQueueType());
-            if(queuetype == null) {
+            if (queuetype == null) {
                 queuetype = new QueueType();
                 queuetype.setKeyName(sampleSummonerLeague.getQueueType());
                 this.queueTypeRepository.save(queuetype);
@@ -105,7 +104,7 @@ public class LeaguesConnector {
                 this.summonerLeagueRepository.save(summonerLeague);
             }
             LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeague.getTier());
-            if(leagueTier == null) {
+            if (leagueTier == null) {
                 leagueTier = new LeagueTier();
                 leagueTier.setKeyName(sampleSummonerLeague.getTier());
                 this.leagueTierRepository.save(leagueTier);
@@ -114,7 +113,7 @@ public class LeaguesConnector {
 
 
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
-            if(leagueRank == null) {
+            if (leagueRank == null) {
                 leagueRank = new LeagueRank();
                 leagueRank.setKeyName(sampleSummonerLeague.getRank());
                 this.leagueRankRepository.save(leagueRank);
@@ -124,9 +123,9 @@ public class LeaguesConnector {
 
             /* Check if player is playing miniseries */
             LeagueMiniSeries leagueMiniSeries = null;
-            if(sampleSummonerLeague.getMiniSeries() != null) {
+            if (sampleSummonerLeague.getMiniSeries() != null) {
                 leagueMiniSeries = this.leagueMiniSeriesRepository.findBySummoner(summoner);
-                if(leagueMiniSeries == null) {
+                if (leagueMiniSeries == null) {
                     leagueMiniSeries = new LeagueMiniSeries();
                     leagueMiniSeries.setSummoner(summoner);
                     this.leagueMiniSeriesRepository.save(leagueMiniSeries);
@@ -230,7 +229,7 @@ public class LeaguesConnector {
             summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
-            if(leagueRank == null) {
+            if (leagueRank == null) {
                 leagueRank = new LeagueRank();
                 leagueRank.setKeyName(sampleSummonerLeague.getRank());
                 this.leagueRankRepository.save(leagueRank);
@@ -321,7 +320,7 @@ public class LeaguesConnector {
             summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
-            if(leagueRank == null) {
+            if (leagueRank == null) {
                 leagueRank = new LeagueRank();
                 leagueRank.setKeyName(sampleSummonerLeague.getRank());
                 this.leagueRankRepository.save(leagueRank);
@@ -413,7 +412,7 @@ public class LeaguesConnector {
             summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
-            if(leagueRank == null) {
+            if (leagueRank == null) {
                 leagueRank = new LeagueRank();
                 leagueRank.setKeyName(sampleSummonerLeague.getRank());
                 this.leagueRankRepository.save(leagueRank);
@@ -424,8 +423,64 @@ public class LeaguesConnector {
         return summonerLeagues;
     }
 
-    public void featuredGames() {
+    public List<FeaturedGameInterval> featuredGames() {
+        ArrayList<FeaturedGameInterval> featuredGameIntervals = new ArrayList<>();
+        for (Region region : this.regionRepository.findAll()) {
+            featuredGameIntervals.add(this.featuredGames(region));
+        }
+        return featuredGameIntervals;
+    }
 
+    public FeaturedGameInterval featuredGames(Region region) {
+        SampleFeaturedGames sampleFeaturedGames = null;
+        try {
+            sampleFeaturedGames = this.jacksonMapper.readValue(this.apiConnector.get(
+                    V4.FEATURED_GAMES
+                            .replace("{{HOST}}", region.getHostName()),
+                    true
+            ), new TypeReference<SampleFeaturedGames>() {
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.logger.error("No se ha podido retornar las partidas promocionadas " + e.getMessage());
+        }
+        FeaturedGameInterval featuredGameInterval = new FeaturedGameInterval();
+        featuredGameInterval.setClientRefreshInterval(sampleFeaturedGames.getClientRefreshInterval());
+
+        ArrayList<MatchGame> matchGames = new ArrayList<>();
+        for (SampleFeaturedGameInfo sampleFeaturedGameInfo : sampleFeaturedGames.getGameList()) {
+            sampleFeaturedGameInfo.getGameId();
+            MatchGame matchGame = this.matchGameRepository.findByGameId(sampleFeaturedGameInfo.getGameId());
+            if (matchGame == null) {
+                matchGame = new MatchGame();
+                matchGame.setGameId(sampleFeaturedGameInfo.getGameId());
+                matchGame.setRegion(region);
+                this.matchGameRepository.save(matchGame);
+            }
+            //TODO: completar esta clase
+            for (SampleBannedChampion sampleBannedChampion : sampleFeaturedGameInfo.getBannedChampions()) {
+                continue;
+            }
+/*
+            sampleFeaturedGameInfo.getGameLength()
+            sampleFeaturedGameInfo.getGameMode()
+            sampleFeaturedGameInfo.getGameQueueConfigId()
+            sampleFeaturedGameInfo.getGameStartTime()
+            sampleFeaturedGameInfo.getGameType()
+            sampleFeaturedGameInfo.getMapId()
+            sampleFeaturedGameInfo.getObservers()
+            sampleFeaturedGameInfo.getParticipants();*/
+
+
+            this.matchGameRepository.save(matchGame);
+            matchGames.add(matchGame);
+        }
+        featuredGameInterval.setMatchGames(matchGames);
+        featuredGameInterval.setRegion(region);
+        featuredGameInterval.setTimestamp(LocalDateTime.now());
+        this.featuredGameIntervalRepository.save(featuredGameInterval);
+
+        return featuredGameInterval;
     }
 }
 // TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

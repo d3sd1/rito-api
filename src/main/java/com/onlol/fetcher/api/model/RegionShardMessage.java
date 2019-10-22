@@ -1,7 +1,6 @@
 package com.onlol.fetcher.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.onlol.fetcher.api.sampleModel.SampleRegionShardTranslation;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

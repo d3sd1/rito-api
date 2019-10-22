@@ -62,6 +62,7 @@ public class SummonerScraper {
         }
         this.logger.info("Updating summoner " + summoner.getName());
         summoner = this.summonerConnector.bySummonerId(summoner);
+        System.exit(0); // debugging riot api
 /*
         this.logger.info("Retrieving games of summoner " + summoner.getName());
         this.matchConnector.matchListByAccount(summoner);

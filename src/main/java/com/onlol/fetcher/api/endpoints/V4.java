@@ -21,7 +21,8 @@ public class V4 {
     public static final String DDRAGON_SUMMONER_IMAGES = "http://ddragon.leagueoflegends.com/cdn/{{VERSION}}/data/{{LANGUAGE}}/profileicon.json";
     public static final String SUMMONER_CHAMPION_MASTERY = "https://{{HOST}}/lol/champion-mastery/v4/champion-masteries/by-summoner/{{SUMMONER_ID}}";
     public static final String LEAGUES_BY_SUMMONER = "https://{{HOST}}/lol/league/v4/entries/by-summoner/{{SUMMONER_ID}}";
-    public static final String LEAGUES_CHALLENGER = "https://{{HOST}}//lol/league/v4/challengerleagues/by-queue/{{QUEUE}}";
-    public static final String LEAGUES_GRANDMASTER = "https://{{HOST}}//lol/league/v4/grandmasterleagues/by-queue/{{QUEUE}}";
-    public static final String LEAGUES_MASTER = "https://{{HOST}}//lol/league/v4/masterleagues/by-queue/{{QUEUE}}";
+    public static final String LEAGUES_CHALLENGER = "https://{{HOST}}/lol/league/v4/challengerleagues/by-queue/{{QUEUE}}";
+    public static final String FEATURED_GAMES = "https://{{HOST}}/lol/spectator/v4/featured-games";
+    public static final String LEAGUES_GRANDMASTER = "https://{{HOST}}/lol/league/v4/grandmasterleagues/by-queue/{{QUEUE}}";
+    public static final String LEAGUES_MASTER = "https://{{HOST}}/lol/league/v4/masterleagues/by-queue/{{QUEUE}}";
 }

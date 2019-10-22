@@ -1,7 +1,9 @@
 package com.onlol.fetcher.scrapers;
 
 import com.onlol.fetcher.api.connector.LeaguesConnector;
-import com.onlol.fetcher.api.repository.SummonerRepository;
+import com.onlol.fetcher.api.model.FeaturedGameInterval;
+import com.onlol.fetcher.api.model.Region;
+import com.onlol.fetcher.api.repository.RegionRepository;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     private LogService logger;
 
     @Autowired
-    private SummonerRepository summonerRepository;
+    private RegionRepository regionRepository;
 
     @Async
     @RequiresInitialSetup
@@ -54,23 +56,22 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
     // Since featured games got refresh interval, let function handle it.
     public void getFeaturedGames() {
-        this.getFeaturedGames(0);
+        for (Region region : this.regionRepository.findAll()) {
+            this.getFeaturedGames(region, 0);
+        }
     }
 
-    public void getFeaturedGames(Integer delay) {
-        //TODO: reecuperar featured games
-        // GET /lol/spectator/v4/featured-games
-/*
+    public void getFeaturedGames(Region region, Integer delay) {
         new Thread(() -> {
             try {
                 Thread.sleep(delay);
-                List<FeaturedGame> featuredGames = this.leaguesConnector.featuredGames();
-            }
-            catch (Exception e){
+                FeaturedGameInterval featuredGameInterval = this.leaguesConnector.featuredGames(region);
+                this.getFeaturedGames(region, featuredGameInterval.getClientRefreshInterval());
+            } catch (Exception e) {
                 e.printStackTrace();
                 this.logger.warning("Could not sleep on featured games: " + e.getMessage());
             }
-        }).start();*/
+        }).start();
     }
 
 

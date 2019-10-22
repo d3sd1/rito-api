@@ -6,6 +6,9 @@ import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/*
+Esto se podría optimizar haciendo los rate limit por cada método en lugar de la app en general.
+ */
 @Service
 public class ApiKeyManager {
     @Autowired
@@ -13,10 +16,12 @@ public class ApiKeyManager {
     @Autowired
     private LogService logger;
 
-    //TODO: tener en cuenta rate limit y balancear carga entre las keys. Despues correr el programa un rato y validar datos.
     public ApiKey getKey() {
         ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalse();
-        if (apiKey == null) {
+        /*if(apiKey == null) {
+            apiKey = this.apiKeyRepository.findByRetryAfterOrderByRetryAfterDesc();
+        }*/
+        if (this.apiKeyRepository.findAll().isEmpty()) {
             this.logger.error("No api keys found...");
         }
         return apiKey;

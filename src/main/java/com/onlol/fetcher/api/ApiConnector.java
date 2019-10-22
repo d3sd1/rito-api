@@ -1,16 +1,9 @@
 package com.onlol.fetcher.api;
 
-import com.fasterxml.classmate.GenericType;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.ApiKey;
-import com.onlol.fetcher.api.model.Summoner;
-import com.onlol.fetcher.api.model.Version;
 import com.onlol.fetcher.api.repository.ApiKeyRepository;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,9 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -98,6 +88,7 @@ public class ApiConnector {
 
             }
         }
+        System.out.println(resp.getHeaders());
         return resp == null ? null : resp.getBody();
     }
 

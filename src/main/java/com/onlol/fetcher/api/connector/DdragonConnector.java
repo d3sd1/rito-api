@@ -8,7 +8,7 @@ import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.Queue;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
-import com.onlol.fetcher.api.sampleModel.*;
+import com.onlol.fetcher.api.riotModel.*;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
