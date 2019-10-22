@@ -29,7 +29,7 @@ public class RegionShardMessage {
     @Column(nullable = false, unique = false)
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = false, unique = false, columnDefinition = "text")
     private String content;
 
     public String getAuthor() {

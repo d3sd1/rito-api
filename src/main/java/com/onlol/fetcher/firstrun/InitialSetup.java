@@ -70,7 +70,7 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.mapsInit();
         this.logger.info("Retriving game modes...");
         this.gameModesInit();
-        this.logger.info("Retriving all game items (w/ all languages on all regions)...");
+        this.logger.info("Retriving all game items ...");
         this.itemsInit();
         this.logger.info("Retriving all regions realms...");
         this.realmsInit();
