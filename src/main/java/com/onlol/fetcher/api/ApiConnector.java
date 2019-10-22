@@ -88,7 +88,7 @@ public class ApiConnector {
 
             }
         }
-        System.out.println(resp.getHeaders());
+        //System.out.println(resp.getHeaders());
         return resp == null ? null : resp.getBody();
     }
 
