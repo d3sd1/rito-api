@@ -36,6 +36,7 @@ public class ApiConnector {
         return this.get(url, needsApiKey, Byte.decode("0"));
     }
 
+    //TODO: en lugar de retornar null, retornar excepcion?
     public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = null;

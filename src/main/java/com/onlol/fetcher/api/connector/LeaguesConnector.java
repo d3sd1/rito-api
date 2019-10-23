@@ -168,13 +168,16 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> challengerLadder(Region region, QueueType queueType) {
         SampleSummonerLeagueList sampleSummonerLeagueList = null;
         try {
-            sampleSummonerLeagueList = this.jacksonMapper.readValue(this.apiConnector.get(
+            String json = this.apiConnector.get(
                     V4.LEAGUES_CHALLENGER
                             .replace("{{QUEUE}}", queueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<SampleSummonerLeagueList>() {
-            });
+            );
+            if (json != null) {
+                sampleSummonerLeagueList = this.jacksonMapper.readValue(json, new TypeReference<SampleSummonerLeagueList>() {
+                });
+            }
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (IOException e) {
@@ -355,13 +358,16 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> grandMasterLadder(Region region, QueueType queueType) {
         SampleSummonerLeagueList sampleSummonerLeagueList = null;
         try {
-            sampleSummonerLeagueList = this.jacksonMapper.readValue(this.apiConnector.get(
+            String json = this.apiConnector.get(
                     V4.LEAGUES_GRANDMASTER
                             .replace("{{QUEUE}}", queueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<SampleSummonerLeagueList>() {
-            });
+            );
+            if (json != null) {
+                sampleSummonerLeagueList = this.jacksonMapper.readValue(json, new TypeReference<SampleSummonerLeagueList>() {
+                });
+            }
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (IOException e) {
