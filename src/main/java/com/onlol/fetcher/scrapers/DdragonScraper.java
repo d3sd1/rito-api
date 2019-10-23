@@ -1,16 +1,11 @@
 package com.onlol.fetcher.scrapers;
 
-import com.onlol.fetcher.api.connector.DdragonConnector;
-import com.onlol.fetcher.firstrun.RequiresInitialSetup;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 @Component
 @EnableAsync
 public class DdragonScraper {
-
+/*
     @Autowired
     private DdragonConnector ddragonConnector;
 
@@ -159,5 +154,5 @@ public class DdragonScraper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

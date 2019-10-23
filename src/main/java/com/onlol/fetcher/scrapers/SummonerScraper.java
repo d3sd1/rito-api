@@ -61,7 +61,7 @@ public class SummonerScraper {
             return;
         }
         this.logger.info("Updating summoner " + summoner.getName());
-        summoner = this.summonerConnector.bySummonerId(summoner);
+        summoner = this.summonerConnector.byName(summoner);
 
         this.logger.info("Retrieving games of summoner " + summoner.getName());
         this.matchConnector.matchListByAccount(summoner);

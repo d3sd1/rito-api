@@ -39,6 +39,7 @@ public class ApiConnector {
     //TODO: en lugar de retornar null, retornar excepcion?
     public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException {
         RestTemplate restTemplate = new RestTemplate();
+
         HttpEntity requestEntity = null;
         ApiKey apiKey = null;
         if (needsApiKey) {

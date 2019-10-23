@@ -1,18 +1,11 @@
 package com.onlol.fetcher.scrapers;
 
 import com.onlol.fetcher.api.connector.MatchConnector;
-import com.onlol.fetcher.api.model.MatchGame;
 import com.onlol.fetcher.api.repository.MatchGameRepository;
-import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
 
 @Component
 @EnableAsync
@@ -26,7 +19,7 @@ public class MatchesScraper {
 
     @Autowired
     private LogService logger;
-
+/*
     @PostConstruct
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
@@ -59,4 +52,6 @@ public class MatchesScraper {
 
         //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}
     }
+
+ */
 }

@@ -95,6 +95,11 @@ public class MatchConnector {
     public List<MatchList> matchListByAccount(Summoner summoner, Long beginIndex) {
         SampleMatchLists sampleMatchLists;
         try {
+            System.out.println(summoner);
+            System.out.println(V4.MATCHLIST_BY_ACCOUNT
+                    .replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
+                    .replace("{{HOST}}", summoner.getRegion().getHostName())
+                    .replace("{{BEGIN_INDEX}}", beginIndex.toString()));
             sampleMatchLists = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
                             .replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())

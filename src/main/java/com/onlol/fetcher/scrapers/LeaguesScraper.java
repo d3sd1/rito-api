@@ -1,22 +1,15 @@
 package com.onlol.fetcher.scrapers;
 
 import com.onlol.fetcher.api.connector.LeaguesConnector;
-import com.onlol.fetcher.api.model.FeaturedGameInterval;
-import com.onlol.fetcher.api.model.Region;
 import com.onlol.fetcher.api.repository.RegionRepository;
-import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @EnableAsync
-public class LeaguesScraper implements ApplicationListener<ApplicationStartedEvent> {
+public class LeaguesScraper /*implements ApplicationListener<ApplicationStartedEvent> */ {
 
     @Autowired
     private LeaguesConnector leaguesConnector;
@@ -26,7 +19,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
     @Autowired
     private RegionRepository regionRepository;
-
+/*
     @Async
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
@@ -66,7 +59,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
             try {
                 Thread.sleep(delay * 1000); // * 1000 since we have seconds
                 FeaturedGameInterval featuredGameInterval = this.leaguesConnector.featuredGames(region);
-                /* If endpoint down... Sleep 5min */
+                /* If endpoint down... Sleep 5min *
                 this.getFeaturedGames(region, featuredGameInterval.getClientRefreshInterval() == 0 ? 300 : featuredGameInterval.getClientRefreshInterval());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -74,6 +67,6 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
             }
         }).start();
     }
-
+*/
 
 }

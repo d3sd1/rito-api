@@ -6,7 +6,6 @@ import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.exceptions.DataNotfoundException;
-import com.onlol.fetcher.api.model.Region;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.model.SummonerChampionMastery;
 import com.onlol.fetcher.api.model.SummonerNameHistorical;
@@ -55,27 +54,21 @@ public class SummonerConnector {
     @Autowired
     private ObjectMapper jacksonMapper;
 
-    public Summoner byName(String name, String regionName) {
-        Region region = this.regionRepository.findByServiceRegion(regionName);
-        if (region == null) {
-            this.logger.error("Region not found on summonerByName: " + regionName);
-            return null;
-        }
+    public Summoner byName(Summoner summoner) {
         Summoner retrievedSummoner = null;
         try {
             retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
-                            .replace("{{SUMMONER_NAME}}", name)
-                            .replace("{{HOST}}", region.getHostName()),
+                            .replace("{{SUMMONER_NAME}}", summoner.getName().replaceAll(" ", "%20"))
+                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference() {
+            ), new TypeReference<Summoner>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner not found: " + name);
+            this.logger.warning("Summoner not found: " + summoner.getName());
         } catch (IOException e) {
-            this.logger.error("No se ha podido retornar al invocador " + name);
+            this.logger.error("No se ha podido retornar al invocador " + summoner.getName());
         }
-        Summoner summoner = new Summoner();
         if (retrievedSummoner != null) {
             Optional<Summoner> opSummoner = this.summonerRepository.findById(retrievedSummoner.getId());
             if (opSummoner.isPresent()) {
@@ -158,20 +151,29 @@ public class SummonerConnector {
     public Summoner bySummonerId(Summoner summoner) {
         Summoner retrievedSummoner = null;
         try {
-            retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
+            System.out.println("SUM ID URL " + V4.SUMMONERS_BY_ID
+                    .replace("{{HOST}}", summoner.getRegion().getHostName())
+                    .replace("{{SUMMONER_ID}}", summoner.getId()));
+            String json = this.apiConnector.get(
                     V4.SUMMONERS_BY_ID
                             .replace("{{HOST}}", summoner.getRegion().getHostName())
                             .replace("{{SUMMONER_ID}}", summoner.getId()),
                     true
-            ), new TypeReference<Summoner>() {
-            });
+            );
+            System.out.println("JSON; " + json);
+            if (json != null) {
+                retrievedSummoner = this.jacksonMapper.readValue(json, new TypeReference<Summoner>() {
+                });
+            }
         } catch (DataNotfoundException e) {
+            e.printStackTrace();
             this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             retrievedSummoner = null;
             e.printStackTrace();
-            this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
+            this.logger.error("No se ha podido retornar el invoador " + summoner.getName() + " con la excepción " + e.getMessage());
         }
+        System.out.println("RETRIEVED SUMMONER: " + retrievedSummoner);
 
         if (retrievedSummoner != null) {
             summoner.setLastTimeUpdated(LocalDateTime.now());
@@ -202,7 +204,7 @@ public class SummonerConnector {
                             .replace("{{SUMMONER_ID}}", summoner.getId())
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference<Summoner>() {
+            ), new TypeReference<SummonerChampionMastery>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner not found: " + summoner.getName());

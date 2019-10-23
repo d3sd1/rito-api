@@ -467,7 +467,7 @@ public class LeaguesConnector {
 
         ArrayList<MatchGame> matchGames = new ArrayList<>();
         for (SampleFeaturedGameInfo sampleFeaturedGameInfo : sampleFeaturedGames.getGameList()) {
-            sampleFeaturedGameInfo.getGameId();
+            System.out.println(sampleFeaturedGameInfo.getGameId());
             MatchGame matchGame = this.matchGameRepository.findByGameId(sampleFeaturedGameInfo.getGameId());
             if (matchGame == null) {
                 matchGame = new MatchGame();
