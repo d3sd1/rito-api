@@ -32,7 +32,7 @@ public class MatchesScraper {
     @Scheduled(cron = "0 1 1 * * ?")
     @Async
     public void clearOrphanGames() {
-        System.out.println("Limpiando partidas huérfanas...");
+        this.logger.info("Limpiando partidas huérfanas...");
         List<MatchGame> orphanGames = this.matchGameRepository.findAllByRetrievedIsFalseAndRetrievingIsTrue();
         for(MatchGame matchGame:orphanGames) {
             matchGame.setRetrieving(false);
