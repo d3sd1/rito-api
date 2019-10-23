@@ -19,7 +19,7 @@ import java.util.Map;
 public class GameItemsConnector {
 
     @Autowired
-    private VersionRepository versionRepository;
+    private GameVersionRepository gameVersionRepository;
 
     @Autowired
     private GameImageRepository gameImageRepository;
@@ -46,7 +46,7 @@ public class GameItemsConnector {
     private RegionShardServiceRepository regionShardServiceRepository;
 
     @Autowired
-    private SeasonRepository seasonRepository;
+    private GameSeasonRepository gameSeasonRepository;
 
     @Autowired
     private GameQueueRepository gameQueueRepository;
@@ -116,25 +116,25 @@ public class GameItemsConnector {
 
 
     public ArrayList<GameItem> items() {
-        return this.items(this.versionRepository.findTopByOrderByIdDesc(), this.languageRepository.findByKeyName("en_US"));
+        return this.items(this.gameVersionRepository.findTopByOrderByIdDesc(), this.languageRepository.findByKeyName("en_US"));
     }
 
     public ArrayList<GameItem> itemsHistorical() {
         ArrayList<GameItem> gameItems = new ArrayList<GameItem>();
-        for (Version version : this.versionRepository.findAll()) {
+        for (GameVersion gameVersion : this.gameVersionRepository.findAll()) {
             for (Language lang : this.languageRepository.findAll()) {
-                gameItems.addAll(this.items(version, lang));
+                gameItems.addAll(this.items(gameVersion, lang));
             }
         }
         return gameItems;
     }
 
-    public ArrayList<GameItem> items(Version version, Language lang) {
+    public ArrayList<GameItem> items(GameVersion gameVersion, Language lang) {
         ArrayList<GameItem> gameItems = new ArrayList<>();
         SampleItemSet sampleItemSet = null;
         try {
             String json = this.apiConnector.get(V4.DDRAGON_ITEMS
-                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{VERSION}}", gameVersion.getVersion())
                     .replace("{{LANGUAGE}}", lang.getKeyName()));
             if (json != null) {
                 sampleItemSet = this.jacksonMapper.readValue(json,
@@ -152,11 +152,11 @@ public class GameItemsConnector {
 
         for (Map.Entry<Integer, SampleItem> entry : sampleItemSet.getData().entrySet()) {
             Integer gameItemId = entry.getKey();
-            GameItem gameItem = this.gameItemRepository.findByVersionAndItemId(version, gameItemId);
+            GameItem gameItem = this.gameItemRepository.findByVersionAndItemId(gameVersion, gameItemId);
             if (gameItem == null) {
                 gameItem = new GameItem();
                 gameItem.setItemId(gameItemId);
-                gameItem.setVersion(version);
+                gameItem.setGameVersion(gameVersion);
                 gameItem = this.gameItemRepository.save(gameItem);
             }
 
@@ -166,11 +166,11 @@ public class GameItemsConnector {
             ArrayList<GameItem> parentItems = new ArrayList<>();
             if (sampleItem.getInto() != null) {
                 for (Integer parentItemId : sampleItem.getInto()) {
-                    GameItem parentGameItem = this.gameItemRepository.findByVersionAndItemId(version, parentItemId);
+                    GameItem parentGameItem = this.gameItemRepository.findByVersionAndItemId(gameVersion, parentItemId);
                     if (parentGameItem == null) {
                         parentGameItem = new GameItem();
                         parentGameItem.setItemId(parentItemId);
-                        parentGameItem.setVersion(version);
+                        parentGameItem.setGameVersion(gameVersion);
                         parentGameItem = this.gameItemRepository.save(parentGameItem);
                     }
                     parentItems.add(parentGameItem);

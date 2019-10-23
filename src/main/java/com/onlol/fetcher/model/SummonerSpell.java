@@ -16,7 +16,7 @@ public class SummonerSpell {
     private String keyName;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @Column(nullable = false, unique = false)
     private Short maxrank = 0;
@@ -52,12 +52,12 @@ public class SummonerSpell {
         this.keyName = keyName;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     public Short getMaxrank() {

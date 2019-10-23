@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Version {
+public class GameVersion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

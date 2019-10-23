@@ -8,7 +8,7 @@ import javax.persistence.Id;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Season {
+public class GameSeason {
     @Id
     @Column(nullable = false, unique = true)
     private Integer id;

@@ -16,7 +16,7 @@ public class SummonerProfileImage {
     private Integer profileImageId;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @OneToOne
     private GameImage gameImage;
@@ -29,12 +29,12 @@ public class SummonerProfileImage {
         this.id = id;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     public GameImage getGameImage() {
@@ -58,7 +58,7 @@ public class SummonerProfileImage {
         return "SummonerProfileImage{" +
                 "id=" + id +
                 ", profileImageId=" + profileImageId +
-                ", version=" + version +
+                ", version=" + gameVersion +
                 ", gameImage=" + gameImage +
                 '}';
     }

@@ -29,7 +29,7 @@ public class MatchList {
     private Region region; // platformId string
 
     @OneToOne
-    private Season season; // season int
+    private GameSeason gameSeason; // season int
 
     @OneToOne
     private GameQueue gameQueue; // season int
@@ -88,12 +88,12 @@ public class MatchList {
         this.region = region;
     }
 
-    public Season getSeason() {
-        return season;
+    public GameSeason getGameSeason() {
+        return gameSeason;
     }
 
-    public void setSeason(Season season) {
-        this.season = season;
+    public void setGameSeason(GameSeason gameSeason) {
+        this.gameSeason = gameSeason;
     }
 
     public GameQueue getGameQueue() {
@@ -129,7 +129,7 @@ public class MatchList {
                 ", summoner=" + summoner +
                 ", champ=" + champ +
                 ", region=" + region +
-                ", season=" + season +
+                ", season=" + gameSeason +
                 ", queue=" + gameQueue +
                 ", role=" + role +
                 ", timestamp=" + timestamp +

@@ -18,7 +18,7 @@ import java.util.Map;
 public class GameSummonerConnector {
 
     @Autowired
-    private VersionRepository versionRepository;
+    private GameVersionRepository gameVersionRepository;
 
     @Autowired
     private GameImageRepository gameImageRepository;
@@ -45,7 +45,7 @@ public class GameSummonerConnector {
     private RegionShardServiceRepository regionShardServiceRepository;
 
     @Autowired
-    private SeasonRepository seasonRepository;
+    private GameSeasonRepository gameSeasonRepository;
 
     @Autowired
     private GameQueueRepository gameQueueRepository;
@@ -115,29 +115,29 @@ public class GameSummonerConnector {
 
     public ArrayList<SummonerSpell> summonerSpells() {
         ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
-        Version version = this.versionRepository.findTopByOrderByIdDesc();
+        GameVersion gameVersion = this.gameVersionRepository.findTopByOrderByIdDesc();
         for (Language language : this.languageRepository.findAll()) {
-            summonerSpells.addAll(this.summonerSpells(version, language));
+            summonerSpells.addAll(this.summonerSpells(gameVersion, language));
         }
         return summonerSpells;
     }
 
     public ArrayList<SummonerSpell> summonerSpellsHistorical() {
         ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
-        for (Version version : this.versionRepository.findAll()) {
+        for (GameVersion gameVersion : this.gameVersionRepository.findAll()) {
             for (Language language : this.languageRepository.findAll()) {
-                summonerSpells.addAll(this.summonerSpells(version, language));
+                summonerSpells.addAll(this.summonerSpells(gameVersion, language));
             }
         }
         return summonerSpells;
     }
 
-    public ArrayList<SummonerSpell> summonerSpells(Version version, Language language) {
+    public ArrayList<SummonerSpell> summonerSpells(GameVersion gameVersion, Language language) {
         SampleDdragon<LinkedHashMap<String, SampleSummonerSpell>> ddragonData = null;
         ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
         try {
             String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_SPELLS
-                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{VERSION}}", gameVersion.getVersion())
                     .replace("{{LANGUAGE}}", language.getKeyName()));
             if (json != null) {
                 ddragonData = this.jacksonMapper.readValue(
@@ -156,12 +156,12 @@ public class GameSummonerConnector {
         for (Map.Entry<String, SampleSummonerSpell> entry : sampleSummonerSpells.entrySet()) {
             String keyName = entry.getKey();
             SampleSummonerSpell sampleSummonerSpell = entry.getValue();
-            SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndVersion(sampleSummonerSpell.getKey(), version);
+            SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndVersion(sampleSummonerSpell.getKey(), gameVersion);
             if (summonerSpell == null) {
                 summonerSpell = new SummonerSpell();
                 summonerSpell.setId(sampleSummonerSpell.getKey());
                 summonerSpell.setKeyName(keyName);
-                summonerSpell.setVersion(version);
+                summonerSpell.setGameVersion(gameVersion);
                 this.summonerSpellRepository.save(summonerSpell);
             }
             summonerSpell.setSummonerLevel(sampleSummonerSpell.getSummonerLevel());
@@ -224,12 +224,12 @@ range
         return summonerSpells;
     }
 
-    public ArrayList<SummonerProfileImage> summonerProfileImages(Version version) {
+    public ArrayList<SummonerProfileImage> summonerProfileImages(GameVersion gameVersion) {
         SampleDdragon<LinkedHashMap<Integer, SampleSummonerImage>> ddragonData = null;
         ArrayList<SummonerProfileImage> summonerProfileImages = new ArrayList<>();
         try {
             String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_IMAGES
-                    .replace("{{VERSION}}", version.getVersion())
+                    .replace("{{VERSION}}", gameVersion.getVersion())
                     .replace("{{LANGUAGE}}", "en_US")); // lang not relevant...
             if (json != null) {
                 ddragonData = this.jacksonMapper.readValue(
@@ -249,11 +249,11 @@ range
         LinkedHashMap<Integer, SampleSummonerImage> sampleSummonerImages = ddragonData.getData();
         for (Map.Entry<Integer, SampleSummonerImage> entry : sampleSummonerImages.entrySet()) {
             SampleSummonerImage sampleSummonerImage = entry.getValue();
-            SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndVersion(sampleSummonerImage.getId(), version);
+            SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndVersion(sampleSummonerImage.getId(), gameVersion);
             if (summonerProfileImage == null) {
                 summonerProfileImage = new SummonerProfileImage();
                 summonerProfileImage.setProfileImageId(sampleSummonerImage.getId());
-                summonerProfileImage.setVersion(version);
+                summonerProfileImage.setGameVersion(gameVersion);
                 this.summonerProfileImageRepository.save(summonerProfileImage);
             }
             if (summonerProfileImage.getGameImage() == null) {
@@ -276,13 +276,13 @@ range
     }
 
     public ArrayList<SummonerProfileImage> summonerProfileImages() { // only versions so... are the same.
-        return this.summonerProfileImages(this.versionRepository.findTopByOrderByIdDesc());
+        return this.summonerProfileImages(this.gameVersionRepository.findTopByOrderByIdDesc());
     }
 
     public ArrayList<SummonerProfileImage> summonerProfileImagesHistorical() {
         ArrayList<SummonerProfileImage> summonerProfileImages = new ArrayList<>();
-        for (Version version : this.versionRepository.findAll()) {
-            summonerProfileImages.addAll(this.summonerProfileImages(version));
+        for (GameVersion gameVersion : this.gameVersionRepository.findAll()) {
+            summonerProfileImages.addAll(this.summonerProfileImages(gameVersion));
 
         }
         return summonerProfileImages;

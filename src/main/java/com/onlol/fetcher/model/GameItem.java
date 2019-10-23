@@ -17,7 +17,7 @@ public class GameItem {
     private Integer itemId;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private GameImage gameImage;
@@ -63,12 +63,12 @@ public class GameItem {
         this.itemId = itemId;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     public List<GameItem> getTransformsInto() {
@@ -148,7 +148,7 @@ public class GameItem {
         return "GameItem{" +
                 "id=" + id +
                 ", itemId=" + itemId +
-                ", version=" + version +
+                ", version=" + gameVersion +
                 ", gameImage=" + gameImage +
                 ", transformsInto=" + transformsInto +
                 ", baseGold=" + baseGold +

@@ -14,7 +14,7 @@ public class RegionShard {
     private Integer id;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @OneToOne
     private Region region;
@@ -42,12 +42,12 @@ public class RegionShard {
         this.id = id;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     public Region getRegion() {
@@ -102,7 +102,7 @@ public class RegionShard {
     public String toString() {
         return "RegionShard{" +
                 "id=" + id +
-                ", version=" + version +
+                ", version=" + gameVersion +
                 ", region=" + region +
                 ", hostName='" + hostName + '\'' +
                 ", languages=" + languages +

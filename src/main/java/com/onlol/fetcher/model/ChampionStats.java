@@ -16,7 +16,7 @@ public class ChampionStats {
     private Champion champion;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @Column(nullable = false, unique = false)
     private float hp;
@@ -94,12 +94,12 @@ public class ChampionStats {
         this.champion = champion;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     public float getHp() {
@@ -267,7 +267,7 @@ public class ChampionStats {
         return "ChampionStats{" +
                 "id=" + id +
                 ", champion=" + champion +
-                ", version=" + version +
+                ", version=" + gameVersion +
                 ", hp=" + hp +
                 ", hpPerLevel=" + hpPerLevel +
                 ", mp=" + mp +

@@ -19,7 +19,7 @@ public class ChampionLanguage {
     private Language language;
 
     @OneToOne
-    private Version version;
+    private GameVersion gameVersion;
 
     @Column(nullable = true, unique = false)
     private String partype;
@@ -89,12 +89,12 @@ public class ChampionLanguage {
         this.partype = partype;
     }
 
-    public Version getVersion() {
-        return version;
+    public GameVersion getGameVersion() {
+        return gameVersion;
     }
 
-    public void setVersion(Version version) {
-        this.version = version;
+    public void setGameVersion(GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ChampionLanguage {
                 "id=" + id +
                 ", champion=" + champion +
                 ", language=" + language +
-                ", version=" + version +
+                ", version=" + gameVersion +
                 ", partype='" + partype + '\'' +
                 ", blurb='" + blurb + '\'' +
                 ", title='" + title + '\'' +

@@ -15,12 +15,12 @@ import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.Champion;
+import com.onlol.fetcher.model.GameVersion;
 import com.onlol.fetcher.model.Language;
 import com.onlol.fetcher.model.Region;
-import com.onlol.fetcher.model.Version;
+import com.onlol.fetcher.repository.GameVersionRepository;
 import com.onlol.fetcher.repository.LanguageRepository;
 import com.onlol.fetcher.repository.RegionRepository;
-import com.onlol.fetcher.repository.VersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 public class GameChampionConnector {
 
     @Autowired
-    private VersionRepository versionRepository;
+    private GameVersionRepository gameVersionRepository;
 
     @Autowired
     private LanguageRepository languageRepository;
@@ -54,17 +54,17 @@ public class GameChampionConnector {
     private ChampionFiller championFiller;
 
     public void champions() {
-        Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
-        this.champions(usedVersion,
+        GameVersion usedGameVersion = this.gameVersionRepository.findTopByOrderByIdDesc();
+        this.champions(usedGameVersion,
                 this.languageRepository.findByKeyName("en_US"));
     }
 
-    public void champions(Version version, Language lang) { // Retrieves selected patch champion data
+    public void champions(GameVersion gameVersion, Language lang) { // Retrieves selected patch champion data
         DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>> ddragonData;
         try {
             ddragonData = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_CHAMPIONS
-                            .replace("{{VERSION}}", version.getVersion())
+                            .replace("{{VERSION}}", gameVersion.getVersion())
                             .replace("{{LANGUAGE}}", lang.getKeyName())),
                     new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>>>() {
                     });
@@ -85,19 +85,19 @@ public class GameChampionConnector {
 
             Champion champion = this.championFiller.fillChampion(ddChampionDTO);
             if (champion != null) {
-                this.championFiller.fillChampionStats(ddChampionDTO, champion, version);
-                this.championFiller.fillChampionLanguage(ddChampionDTO, champion, lang, version);
+                this.championFiller.fillChampionStats(ddChampionDTO, champion, gameVersion);
+                this.championFiller.fillChampionLanguage(ddChampionDTO, champion, lang, gameVersion);
             }
         }
     }
 
 
     public void championsHistorical() { // Retrieves all patches champ data
-        List<Version> versions = this.versionRepository.findAll();
-        Collections.reverse(versions);
-        for (Version version : versions) {
+        List<GameVersion> gameVersions = this.gameVersionRepository.findAll();
+        Collections.reverse(gameVersions);
+        for (GameVersion gameVersion : gameVersions) {
             for (Language lang : this.languageRepository.findAll()) {
-                this.champions(version, lang);
+                this.champions(gameVersion, lang);
             }
         }
     }

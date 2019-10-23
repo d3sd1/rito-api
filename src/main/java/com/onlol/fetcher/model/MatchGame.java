@@ -23,7 +23,7 @@ public class MatchGame {
     private boolean expired = false; // if api returns 404
 
     @OneToOne
-    private Season season;
+    private GameSeason gameSeason;
 
     @OneToOne
     private GameQueue gameQueue;
@@ -79,12 +79,12 @@ public class MatchGame {
         this.retrieving = retrieving;
     }
 
-    public Season getSeason() {
-        return season;
+    public GameSeason getGameSeason() {
+        return gameSeason;
     }
 
-    public void setSeason(Season season) {
-        this.season = season;
+    public void setGameSeason(GameSeason gameSeason) {
+        this.gameSeason = gameSeason;
     }
 
     public GameQueue getGameQueue() {
@@ -182,7 +182,7 @@ public class MatchGame {
                 ", retrieved=" + retrieved +
                 ", retrieving=" + retrieving +
                 ", expired=" + expired +
-                ", season=" + season +
+                ", season=" + gameSeason +
                 ", queue=" + gameQueue +
                 ", gameVersion='" + gameVersion + '\'' +
                 ", region=" + region +

@@ -57,11 +57,11 @@ public class ChampionFiller {
     }
 
 
-    public ChampionLanguage fillChampionLanguage(DDChampionDTO championDTO, Champion champion, Language lang, Version version) {
+    public ChampionLanguage fillChampionLanguage(DDChampionDTO championDTO, Champion champion, Language lang, GameVersion gameVersion) {
 
         /* Save champion texts */
         ChampionLanguage championLanguage = this.championLanguageRepository.
-                findByChampionAndLanguageAndVersion(champion, lang, version);
+                findByChampionAndLanguageAndVersion(champion, lang, gameVersion);
         if (championLanguage != null) {
             return championLanguage;
         }
@@ -71,22 +71,22 @@ public class ChampionFiller {
         championLanguage.setBlurb(championDTO.getBlurb());
         championLanguage.setName(championDTO.getName());
         championLanguage.setTitle(championDTO.getTitle());
-        championLanguage.setVersion(version);
+        championLanguage.setGameVersion(gameVersion);
         championLanguage.setPartype(championDTO.getPartype());
 
         return this.championLanguageRepository.save(championLanguage);
     }
 
-    public ChampionStats fillChampionStats(DDChampionDTO championDTO, Champion champion, Version version) {
+    public ChampionStats fillChampionStats(DDChampionDTO championDTO, Champion champion, GameVersion gameVersion) {
 
         // Update champion stats for version
-        ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndVersion(champion, version);
+        ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndVersion(champion, gameVersion);
         if (dbChampionStats != null) {
             return dbChampionStats;
         }
         dbChampionStats = new ChampionStats();
         dbChampionStats.setChampion(champion);
-        dbChampionStats.setVersion(version);
+        dbChampionStats.setGameVersion(gameVersion);
         dbChampionStats.setHp(championDTO.getStats().getHp());
         dbChampionStats.setHpPerLevel(championDTO.getStats().getHpperlevel());
         dbChampionStats.setMp(championDTO.getStats().getMp());

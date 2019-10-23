@@ -17,34 +17,34 @@ public class Realm {
     private Region region;
 
     @OneToOne
-    private Version itemLastUpdate;
+    private GameVersion itemLastUpdate;
 
     @OneToOne
-    private Version runeLastUpdate;
+    private GameVersion runeLastUpdate;
 
     @OneToOne
-    private Version masteriesLastUpdate;
+    private GameVersion masteriesLastUpdate;
 
     @OneToOne
-    private Version summonerLastUpdate;
+    private GameVersion summonerLastUpdate;
 
     @OneToOne
-    private Version championLastUpdate;
+    private GameVersion championLastUpdate;
 
     @OneToOne
-    private Version profileIconLastUpdate;
+    private GameVersion profileIconLastUpdate;
 
     @OneToOne
-    private Version mapLastUpdate;
+    private GameVersion mapLastUpdate;
 
     @OneToOne
-    private Version languageLastUpdate;
+    private GameVersion languageLastUpdate;
 
     @OneToOne
-    private Version stickerLastUpdate;
+    private GameVersion stickerLastUpdate;
 
     @OneToOne
-    private Version patchLastUpdate;
+    private GameVersion patchLastUpdate;
 
     @OneToOne
     private Language defaultLanguage;
@@ -53,13 +53,13 @@ public class Realm {
     private String cdnUrl;
 
     @OneToOne
-    private Version dataDdragonLastUpdate;
+    private GameVersion dataDdragonLastUpdate;
 
     @OneToOne
-    private Version lg;
+    private GameVersion lg;
 
     @OneToOne
-    private Version cssLastUpdate;
+    private GameVersion cssLastUpdate;
 
     @Column(nullable = true, unique = false)
     private Integer profileIconMax;
@@ -67,83 +67,83 @@ public class Realm {
     @Column(nullable = true, unique = false)
     private String storeUrl;
 
-    public Version getItemLastUpdate() {
+    public GameVersion getItemLastUpdate() {
         return itemLastUpdate;
     }
 
-    public void setItemLastUpdate(Version itemLastUpdate) {
+    public void setItemLastUpdate(GameVersion itemLastUpdate) {
         this.itemLastUpdate = itemLastUpdate;
     }
 
-    public Version getRuneLastUpdate() {
+    public GameVersion getRuneLastUpdate() {
         return runeLastUpdate;
     }
 
-    public void setRuneLastUpdate(Version runeLastUpdate) {
+    public void setRuneLastUpdate(GameVersion runeLastUpdate) {
         this.runeLastUpdate = runeLastUpdate;
     }
 
-    public Version getMasteriesLastUpdate() {
+    public GameVersion getMasteriesLastUpdate() {
         return masteriesLastUpdate;
     }
 
-    public void setMasteriesLastUpdate(Version masteriesLastUpdate) {
+    public void setMasteriesLastUpdate(GameVersion masteriesLastUpdate) {
         this.masteriesLastUpdate = masteriesLastUpdate;
     }
 
-    public Version getSummonerLastUpdate() {
+    public GameVersion getSummonerLastUpdate() {
         return summonerLastUpdate;
     }
 
-    public void setSummonerLastUpdate(Version summonerLastUpdate) {
+    public void setSummonerLastUpdate(GameVersion summonerLastUpdate) {
         this.summonerLastUpdate = summonerLastUpdate;
     }
 
-    public Version getChampionLastUpdate() {
+    public GameVersion getChampionLastUpdate() {
         return championLastUpdate;
     }
 
-    public void setChampionLastUpdate(Version championLastUpdate) {
+    public void setChampionLastUpdate(GameVersion championLastUpdate) {
         this.championLastUpdate = championLastUpdate;
     }
 
-    public Version getProfileIconLastUpdate() {
+    public GameVersion getProfileIconLastUpdate() {
         return profileIconLastUpdate;
     }
 
-    public void setProfileIconLastUpdate(Version profileIconLastUpdate) {
+    public void setProfileIconLastUpdate(GameVersion profileIconLastUpdate) {
         this.profileIconLastUpdate = profileIconLastUpdate;
     }
 
-    public Version getMapLastUpdate() {
+    public GameVersion getMapLastUpdate() {
         return mapLastUpdate;
     }
 
-    public void setMapLastUpdate(Version mapLastUpdate) {
+    public void setMapLastUpdate(GameVersion mapLastUpdate) {
         this.mapLastUpdate = mapLastUpdate;
     }
 
-    public Version getLanguageLastUpdate() {
+    public GameVersion getLanguageLastUpdate() {
         return languageLastUpdate;
     }
 
-    public void setLanguageLastUpdate(Version languageLastUpdate) {
+    public void setLanguageLastUpdate(GameVersion languageLastUpdate) {
         this.languageLastUpdate = languageLastUpdate;
     }
 
-    public Version getStickerLastUpdate() {
+    public GameVersion getStickerLastUpdate() {
         return stickerLastUpdate;
     }
 
-    public void setStickerLastUpdate(Version stickerLastUpdate) {
+    public void setStickerLastUpdate(GameVersion stickerLastUpdate) {
         this.stickerLastUpdate = stickerLastUpdate;
     }
 
-    public Version getPatchLastUpdate() {
+    public GameVersion getPatchLastUpdate() {
         return patchLastUpdate;
     }
 
-    public void setPatchLastUpdate(Version patchLastUpdate) {
+    public void setPatchLastUpdate(GameVersion patchLastUpdate) {
         this.patchLastUpdate = patchLastUpdate;
     }
 
@@ -163,27 +163,27 @@ public class Realm {
         this.cdnUrl = cdnUrl;
     }
 
-    public Version getDataDdragonLastUpdate() {
+    public GameVersion getDataDdragonLastUpdate() {
         return dataDdragonLastUpdate;
     }
 
-    public void setDataDdragonLastUpdate(Version dataDdragonLastUpdate) {
+    public void setDataDdragonLastUpdate(GameVersion dataDdragonLastUpdate) {
         this.dataDdragonLastUpdate = dataDdragonLastUpdate;
     }
 
-    public Version getLg() {
+    public GameVersion getLg() {
         return lg;
     }
 
-    public void setLg(Version lg) {
+    public void setLg(GameVersion lg) {
         this.lg = lg;
     }
 
-    public Version getCssLastUpdate() {
+    public GameVersion getCssLastUpdate() {
         return cssLastUpdate;
     }
 
-    public void setCssLastUpdate(Version cssLastUpdate) {
+    public void setCssLastUpdate(GameVersion cssLastUpdate) {
         this.cssLastUpdate = cssLastUpdate;
     }
 

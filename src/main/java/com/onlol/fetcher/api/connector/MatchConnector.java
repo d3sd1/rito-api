@@ -41,7 +41,7 @@ public class MatchConnector {
     private GameTypeRepository gameTypeRepository;
 
     @Autowired
-    private SeasonRepository seasonRepository;
+    private GameSeasonRepository gameSeasonRepository;
 
     @Autowired
     private GameMapRepository gameMapRepository;
@@ -165,15 +165,15 @@ public class MatchConnector {
                 matchList.setRole(role);
 
                 /* Get season */
-                Season season = this.seasonRepository.findTopById(apiMatchReferenceDto.getSeason());
-                if (season == null) {
-                    Season dbSeason = new Season();
-                    dbSeason.setId(apiMatchReferenceDto.getSeason());
+                GameSeason gameSeason = this.gameSeasonRepository.findTopById(apiMatchReferenceDto.getSeason());
+                if (gameSeason == null) {
+                    GameSeason dbGameSeason = new GameSeason();
+                    dbGameSeason.setId(apiMatchReferenceDto.getSeason());
 
-                    this.seasonRepository.save(dbSeason);
-                    season = dbSeason;
+                    this.gameSeasonRepository.save(dbGameSeason);
+                    gameSeason = dbGameSeason;
                 }
-                matchList.setSeason(season);
+                matchList.setGameSeason(gameSeason);
 
                 /* Get lane */
                 Lane lane = this.laneRepository.findByKeyName(apiMatchReferenceDto.getLane());
@@ -264,15 +264,15 @@ public class MatchConnector {
 
 
         /* Get season */
-        Season season = this.seasonRepository.findTopById(apiMatchDTO.getSeasonId());
-        if (season == null) {
-            Season dbSeason = new Season();
-            dbSeason.setId(apiMatchDTO.getSeasonId());
+        GameSeason gameSeason = this.gameSeasonRepository.findTopById(apiMatchDTO.getSeasonId());
+        if (gameSeason == null) {
+            GameSeason dbGameSeason = new GameSeason();
+            dbGameSeason.setId(apiMatchDTO.getSeasonId());
 
-            this.seasonRepository.save(dbSeason);
-            season = dbSeason;
+            this.gameSeasonRepository.save(dbGameSeason);
+            gameSeason = dbGameSeason;
         }
-        matchGame.setSeason(season);
+        matchGame.setGameSeason(gameSeason);
 
 
         /* Get game map */
