@@ -1,18 +1,9 @@
 package com.onlol.fetcher.ddragon.filler;
 
-import com.onlol.fetcher.ddragon.model.DDGameMapDTO;
-import com.onlol.fetcher.ddragon.model.DDGameModeDTO;
-import com.onlol.fetcher.ddragon.model.DDGameTypeDTO;
-import com.onlol.fetcher.ddragon.model.DDQueueDTO;
+import com.onlol.fetcher.ddragon.model.*;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.GameMap;
-import com.onlol.fetcher.model.GameMode;
-import com.onlol.fetcher.model.GameQueue;
-import com.onlol.fetcher.model.GameType;
-import com.onlol.fetcher.repository.GameMapRepository;
-import com.onlol.fetcher.repository.GameModeRepository;
-import com.onlol.fetcher.repository.GameQueueRepository;
-import com.onlol.fetcher.repository.GameTypeRepository;
+import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +23,23 @@ public class GameDataFiller {
     private GameMapRepository gameMapRepository;
 
     @Autowired
+    private GameImageRepository gameImageRepository;
+
+    @Autowired
     private LogService logger;
+
+    public GameMode fillGameMode(String txtMode) {
+        return this.fillGameMode(txtMode);
+    }
 
     public GameMode fillGameMode(DDGameModeDTO mode) {
         GameMode gameMode = this.gameModeRepository.findByGameMode(mode.getGameMode());
         if (gameMode != null) {
+            if (gameMode.getDescription() == null) {
+
+                gameMode.setDescription(mode.getDescription());
+                return this.gameModeRepository.save(gameMode);
+            }
             return gameMode;
         }
         gameMode = new GameMode();
@@ -94,5 +97,21 @@ public class GameDataFiller {
         gameType.setGameType(ddGameTypeDTO.getGameType());
         gameType.setDescription(ddGameTypeDTO.getDescription());
         return this.gameTypeRepository.save(gameType);
+    }
+
+    // We can't hint images. They're cascade on DB so just ADD is needed.
+    public GameImage fillGameImage(DDImageDTO ddImageDTO) {
+        GameImage gameImage = new GameImage();
+        if (ddImageDTO == null) {
+            return gameImage;
+        }
+        gameImage.setGroupName(ddImageDTO.getGroup());
+        gameImage.setFullName(ddImageDTO.getFull());
+        gameImage.setSprite(ddImageDTO.getSprite());
+        gameImage.setX(ddImageDTO.getX());
+        gameImage.setY(ddImageDTO.getY());
+        gameImage.setW(ddImageDTO.getW());
+        gameImage.setH(ddImageDTO.getH());
+        return this.gameImageRepository.save(gameImage);
     }
 }
