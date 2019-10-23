@@ -64,9 +64,10 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     public void getFeaturedGames(Region region, Integer delay) {
         new Thread(() -> {
             try {
-                Thread.sleep(delay);
+                Thread.sleep(delay * 1000); // * 1000 since we have seconds
                 FeaturedGameInterval featuredGameInterval = this.leaguesConnector.featuredGames(region);
-                this.getFeaturedGames(region, featuredGameInterval.getClientRefreshInterval());
+                /* If endpoint down... Sleep 5min */
+                this.getFeaturedGames(region, featuredGameInterval.getClientRefreshInterval() == 0 ? 300 : featuredGameInterval.getClientRefreshInterval());
             } catch (Exception e) {
                 e.printStackTrace();
                 this.logger.warning("Could not sleep on featured games: " + e.getMessage());
