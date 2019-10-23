@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
+import com.onlol.fetcher.api.exceptions.MatchNotfoundException;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.riotModel.*;
@@ -171,7 +172,7 @@ public class MatchConnector {
 
                 /* Get lane */
                 Lane lane = this.laneRepository.findByKeyName(sampleMatchList.getLane());
-                if (lane == null) {
+                if (lane == null && sampleMatchList.getLane() != null) {
                     Lane dbLane = new Lane();
                     dbLane.setKeyName(sampleMatchList.getLane());
 
@@ -215,12 +216,8 @@ public class MatchConnector {
                     true
             ), new TypeReference<SampleMatchLists>() {
             });
-        } catch (Exception e) {
-            sampleMatchGame = null;
-            this.logger.error("No se ha podido recuperar el match " + matchGame.getGameId().toString());
-        }
-
-        if (sampleMatchGame == null) { // Game does not exists so... Update if (if pos) on the db
+        } catch (MatchNotfoundException e) {
+            this.logger.error("El match no existe..." + matchGame.getGameId().toString());
             matchGame = this.matchGameRepository.findByGameId(matchGame.getGameId());
             if (matchGame != null) {
                 matchGame.setRetrieved(true);
@@ -228,6 +225,14 @@ public class MatchConnector {
                 matchGame.setExpired(true);
                 this.matchGameRepository.save(matchGame);
             }
+            sampleMatchGame = null;
+        } catch (Exception e) {
+            sampleMatchGame = null;
+            this.logger.error("No se ha podido recuperar el match " + matchGame.getGameId().toString());
+        }
+
+        if (sampleMatchGame == null) { // Game does not exists so... Update if (if pos) on the db
+
             return new MatchGame();
         }
 

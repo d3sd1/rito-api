@@ -1,5 +1,6 @@
 package com.onlol.fetcher.api;
 
+import com.onlol.fetcher.api.exceptions.MatchNotfoundException;
 import com.onlol.fetcher.api.model.ApiKey;
 import com.onlol.fetcher.api.repository.ApiKeyRepository;
 import com.onlol.fetcher.logger.LogService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.TimeUnit;
@@ -26,15 +28,15 @@ public class ApiConnector {
     @Autowired
     private ApiKeyRepository apiKeyRepository;
 
-    public String get(String url) {
+    public String get(String url) throws MatchNotfoundException {
         return this.get(url, false, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey) {
+    public String get(String url, boolean needsApiKey) throws MatchNotfoundException {
         return this.get(url, needsApiKey, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey, byte attempts) {
+    public String get(String url, boolean needsApiKey, byte attempts) throws MatchNotfoundException {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = null;
         ApiKey apiKey = null;
@@ -73,7 +75,7 @@ public class ApiConnector {
                     break;
                 case 404:
                     this.logService.info("Unknown url: " + url);
-                    return null;
+                    throw new MatchNotfoundException();
                 case 429:
                     if (needsApiKey) {
                         apiKey.setBanned(true);
@@ -100,8 +102,21 @@ public class ApiConnector {
                     }
 
             }
+        } catch (ResourceAccessException e) {
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            // Prevent cycle. Retry only 3 times just in case.
+            if (attempts < 3) {
+                this.logService.warning("Api got temporal troubles resolving " + url + " with exception " + e.getMessage());
+                return this.get(url, needsApiKey, ++attempts);
+            } else {
+                return null;
+            }
         }
-        //System.out.println(resp.getHeaders());
+        //System.out.println(resp.getHeaders()); TODO: best effort - detectar limites y almacenarlos en db, almacenando llamadas y tipos de llamadas?
         return resp == null ? null : resp.getBody();
     }
 
