@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 public class GameSummonerFiller {
@@ -48,19 +50,14 @@ public class GameSummonerFiller {
             gameModes.add(this.gameDataFiller.fillGameMode(mode));
         }
         summonerSpell.setGameModes(gameModes);
-
-
-/*
-TODO: meter summoner spells las siguinetes propiedades:
-cooldown
-cooldownBurn
-cost
-costBurn
-effect
-effectBurn
-vars
-range
- */
+        summonerSpell.setCooldown(Arrays.asList(ddSummonerSpellDTO.getCooldown()));
+        summonerSpell.setCooldownBurn(ddSummonerSpellDTO.getCooldownBurn());
+        summonerSpell.setCostBurn(ddSummonerSpellDTO.getCostBurn());
+        summonerSpell.setEffectBurn(Arrays.asList(ddSummonerSpellDTO.getEffectBurn()));
+        summonerSpell.setRange(Arrays.asList(ddSummonerSpellDTO.getRange()));
+        summonerSpell.setEffect(Arrays.stream(ddSummonerSpellDTO.getEffect())
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList()));
         this.summonerSpellRepository.save(summonerSpell);
         return summonerSpell;
     }

@@ -15,7 +15,7 @@ public class DDSummonerSpellDTO {
     private Object datavalues = new Object(); // always empty :?
     private Integer[][] effect = new Integer[0][0];
     private Float[] effectBurn = new Float[0];
-    private DDummonerSpellVariableDTO[] vars = new DDummonerSpellVariableDTO[0];
+    private DDummonerSpellVariableDTO[] vars = new DDummonerSpellVariableDTO[0]; // DEPRECEATED
     private Integer key = 0;
     private Short summonerLevel = 0;
     private String[] modes = new String[0];
