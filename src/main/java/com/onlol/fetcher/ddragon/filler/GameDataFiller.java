@@ -29,14 +29,15 @@ public class GameDataFiller {
     private LogService logger;
 
     public GameMode fillGameMode(String txtMode) {
-        return this.fillGameMode(txtMode);
+        DDGameModeDTO ddGameModeDTO = new DDGameModeDTO();
+        ddGameModeDTO.setGameMode(txtMode);
+        return this.fillGameMode(ddGameModeDTO);
     }
 
     public GameMode fillGameMode(DDGameModeDTO mode) {
         GameMode gameMode = this.gameModeRepository.findByGameMode(mode.getGameMode());
         if (gameMode != null) {
-            if (gameMode.getDescription() == null) {
-
+            if (gameMode.getDescription().equals("")) {
                 gameMode.setDescription(mode.getDescription());
                 return this.gameModeRepository.save(gameMode);
             }
@@ -55,46 +56,50 @@ public class GameDataFiller {
         }
         gameQueue = new GameQueue();
         gameQueue.setQueueId(queueDTO.getQueueId());
-        gameQueue.setMap(this.fillGameMap(queueDTO.getMap()));
+        gameQueue.setMap(queueDTO.getMap());
         gameQueue.setNotes(queueDTO.getNotes());
         gameQueue.setDescription(queueDTO.getDescription());
         return this.gameQueueRepository.save(gameQueue);
     }
 
-    public GameMap fillGameMap(String mapName) {
+    public GameMap fillGameMap(Integer mapId) {
         DDGameMapDTO ddGameMapDTO = new DDGameMapDTO();
-        ddGameMapDTO.setMapName(mapName);
+        ddGameMapDTO.setMapId(mapId);
         return this.fillGameMap(ddGameMapDTO);
     }
 
     public GameMap fillGameMap(DDGameMapDTO ddGameMapDTO) {
-        GameMap gameMap = null;
+        GameMap gameMap;
         if (ddGameMapDTO.getMapId() != -1) {
-            gameMap = this.gameMapRepository.findByMapName(ddGameMapDTO.getMapName());
+            gameMap = this.gameMapRepository.findTopByMapId(ddGameMapDTO.getMapId());
         } else if (!ddGameMapDTO.getMapName().equals("")) {
             gameMap = this.gameMapRepository.findByMapName(ddGameMapDTO.getMapName());
         } else {
             this.logger.warning("Could not fullfit GameMap object... " + ddGameMapDTO);
             return new GameMap();
         }
-        if (gameMap != null) {
-            return gameMap;
+        if (gameMap == null) {
+            /* We also need override here... */
+            gameMap = new GameMap();
+            if (ddGameMapDTO.getMapId() != -1) {
+                gameMap.setMapId(ddGameMapDTO.getMapId());
+            } else {
+                gameMap.setMapId(null);
+            }
         }
-        gameMap = new GameMap();
-        gameMap.setMapId(ddGameMapDTO.getMapId());
         gameMap.setMapName(ddGameMapDTO.getMapName());
         gameMap.setNotes(ddGameMapDTO.getNotes());
         return this.gameMapRepository.save(gameMap);
     }
 
     public GameType fillGameType(DDGameTypeDTO ddGameTypeDTO) {
-        GameType gameType = this.gameTypeRepository.findByGametype(ddGameTypeDTO.getGameType());
+        GameType gameType = this.gameTypeRepository.findByGameType(ddGameTypeDTO.getGametype());
         if (gameType != null) {
             return gameType;
         }
 
         gameType = new GameType();
-        gameType.setGameType(ddGameTypeDTO.getGameType());
+        gameType.setGameType(ddGameTypeDTO.getGametype());
         gameType.setDescription(ddGameTypeDTO.getDescription());
         return this.gameTypeRepository.save(gameType);
     }

@@ -5,21 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
+import com.onlol.fetcher.api.filler.SummonerFiller;
+import com.onlol.fetcher.api.model.ApiSummonerDTO;
+import com.onlol.fetcher.exceptions.ApiBadRequestException;
+import com.onlol.fetcher.exceptions.ApiDownException;
+import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerChampionMastery;
-import com.onlol.fetcher.model.SummonerNameHistorical;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class SummonerConnector {
@@ -46,7 +42,7 @@ public class SummonerConnector {
     private ApiConnector apiConnector;
 
     @Autowired
-    private RegionRepository regionRepository;
+    private SummonerFiller summonerFiller;
 
     @Autowired
     private LogService logger;
@@ -54,39 +50,28 @@ public class SummonerConnector {
     @Autowired
     private ObjectMapper jacksonMapper;
 
-    public Summoner byName(Summoner summoner) {
-        Summoner retrievedSummoner = null;
+    public void byName(Summoner summoner) {
+        ApiSummonerDTO retrievedSummoner;
         try {
             retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
                             .replace("{{SUMMONER_NAME}}", summoner.getName().replaceAll(" ", "%20"))
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference<Summoner>() {
+            ), new TypeReference<ApiSummonerDTO>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (IOException e) {
-            this.logger.error("No se ha podido retornar al invocador " + summoner.getName());
+            this.logger.info("Data not found, got exception" + e.getMessage());
+            return;
+        } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            return;
+        } catch (Exception e) {
+            this.logger.error("Got generic exception" + e.getMessage());
+            return;
         }
-        if (retrievedSummoner != null) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(retrievedSummoner.getId());
-            if (opSummoner.isPresent()) {
-                summoner = opSummoner.get();
-                summoner.setLastTimeUpdated(LocalDateTime.now());
-                summoner = this.summonerRepository.save(summoner);
-                // Update historical name if needed
-                if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
-                    SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                    summonerNameHistorical.setName(summoner.getName());
-                    summonerNameHistorical.setSummoner(summoner);
-                    this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-                }
-            }
-        }
-        return summoner;
+        this.summonerFiller.fillSummoner(summonerFiller);
     }
-
+/*
     public Summoner byPuuid(Summoner summoner) {
         try {
             summoner = this.jacksonMapper.readValue(this.apiConnector.get(
@@ -97,7 +82,7 @@ public class SummonerConnector {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             summoner = null;
             e.printStackTrace();
             this.logger.error("No se ha podido retornar invocador (byPuuid) " + e.getMessage());
@@ -127,7 +112,7 @@ public class SummonerConnector {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             summoner = null;
             e.printStackTrace();
             this.logger.error("No se ha podido retornar invocador (byAccount) " + e.getMessage());
@@ -208,7 +193,7 @@ public class SummonerConnector {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             sampleSummonerChampionMasteries = new ArrayList<>();
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
@@ -222,9 +207,9 @@ public class SummonerConnector {
                 summonerChampionMastery = new SummonerChampionMastery();
             }
             summonerChampionMastery.setSummoner(summoner);
-            summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
+            //summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
             summonerChampionMastery.setChampionLevel(apiChampionMasteryDTO.getChampionLevel());
-            summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
+            //summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
             summonerChampionMastery.setChampionPointsSinceLastLevel(apiChampionMasteryDTO.getChampionPointsSinceLastLevel());
             summonerChampionMastery.setChampionPointsUntilNextLevel(apiChampionMasteryDTO.getChampionPointsUntilNextLevel());
             summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
@@ -234,6 +219,7 @@ public class SummonerConnector {
         }
         return summonerChampionMasteries;
     }
+    */
 }
 
 //TODO: coger league ID y utilizar este endpoint para recuperar todos los summoner

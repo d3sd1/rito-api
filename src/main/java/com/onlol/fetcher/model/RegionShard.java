@@ -32,7 +32,7 @@ public class RegionShard {
     private String regionTag;
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE)
-    private List<RegionShardService> regionShardServices;
+    private List<RegionShardService> regionShardServices; // Must be like this... Either we couldn't check the "online" attr
 
     public Integer getId() {
         return id;

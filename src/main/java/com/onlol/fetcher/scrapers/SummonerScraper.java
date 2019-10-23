@@ -5,7 +5,6 @@ import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,9 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @EnableAsync
@@ -44,7 +40,7 @@ public class SummonerScraper {
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
-        Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
+        /*Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
         if (summoner == null) {
             this.logger.info("No summoners to update.");
             return;
@@ -70,7 +66,7 @@ public class SummonerScraper {
         this.summonerConnector.championMastery(summoner);
 
         this.logger.info("Retrieving summoner leagues...");
-        this.leaguesConnector.summonerLeagues(summoner);
+        this.leaguesConnector.summonerLeagues(summoner);*/
     }
 
 

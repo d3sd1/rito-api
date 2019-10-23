@@ -15,8 +15,8 @@ public class GameQueue {
     @Column(nullable = false, unique = true)
     private Integer queueId;
 
-    @OneToOne
-    private GameMap map;
+    @Column(nullable = false, unique = false)
+    private String map;
 
     @Column(nullable = true, unique = false)
     private String description;
@@ -40,11 +40,11 @@ public class GameQueue {
         this.queueId = queueId;
     }
 
-    public GameMap getMap() {
+    public String getMap() {
         return map;
     }
 
-    public void setMap(GameMap map) {
+    public void setMap(String map) {
         this.map = map;
     }
 

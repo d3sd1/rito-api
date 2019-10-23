@@ -12,7 +12,6 @@ import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +83,7 @@ public class LeaguesConnector {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues not found: " + summoner.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             this.logger.error("No se ha podido retornar la liga del invocador " + summoner.getName());
         }
 
@@ -92,7 +91,7 @@ public class LeaguesConnector {
             return new ArrayList<>();
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
+        /*for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
             GameQueueType queuetype = this.gameQueueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
             if (queuetype == null) {
                 queuetype = new GameQueueType();
@@ -124,7 +123,7 @@ public class LeaguesConnector {
             summonerLeague.setLeagueRank(leagueRank);
 
 
-            /* Check if player is playing miniseries */
+            /* Check if player is playing miniseries *
             LeagueMiniSeries leagueMiniSeries = null;
             if (apiLeagueItemDTO.getMiniSeries() != null) {
                 leagueMiniSeries = this.leagueMiniSeriesRepository.findBySummoner(summoner);
@@ -151,7 +150,7 @@ public class LeaguesConnector {
             summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
             this.summonerLeagueRepository.save(summonerLeague);
-        }
+        }*/
         return summonerLeagues;
     }
 
@@ -180,7 +179,7 @@ public class LeaguesConnector {
             }
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
         }
@@ -221,7 +220,7 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
@@ -233,8 +232,8 @@ public class LeaguesConnector {
             summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
             summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
+            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
@@ -273,7 +272,7 @@ public class LeaguesConnector {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de masters " + e.getMessage());
         }
@@ -314,7 +313,7 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
@@ -326,8 +325,8 @@ public class LeaguesConnector {
             summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
             summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
+            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
@@ -370,7 +369,7 @@ public class LeaguesConnector {
             }
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de masters " + e.getMessage());
         }
@@ -411,7 +410,7 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
@@ -423,8 +422,8 @@ public class LeaguesConnector {
             summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
             summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
+            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {

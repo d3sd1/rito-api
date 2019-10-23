@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SummonerProfileImageRepository extends JpaRepository<SummonerProfileImage, Integer> {
-    SummonerProfileImage findByIdAndVersion(Integer id, GameVersion gameVersion);
+    SummonerProfileImage findByIdAndGameVersion(Integer id, GameVersion gameVersion);
 }

@@ -52,7 +52,7 @@ public class GameInfoFiller {
     }
 
     public RegionShard fillRegionShard(Region region, GameVersion gameVersion, ApiShardStatusDTO apiShardStatusDTO) {
-        RegionShard regionShard = this.regionShardRepository.findByRegionAndVersion(region, gameVersion);
+        RegionShard regionShard = this.regionShardRepository.findByRegionAndGameVersion(region, gameVersion);
         if (regionShard == null) {
             regionShard = new RegionShard();
             regionShard.setRegion(region);
@@ -124,7 +124,11 @@ public class GameInfoFiller {
         RegionShardTranslation regionShardTranslation = new RegionShardTranslation();
         regionShardTranslation.setContent(apiTranslationDTO.getContent());
         regionShardTranslation.setLanguage(this.fillLanguage(apiTranslationDTO.getLocale()));
-        regionShardTranslation.setUpdateAt(LocalDateTime.parse(apiTranslationDTO.getUpdated_at().replaceAll("Z", "")));
+        if (!apiTranslationDTO.getUpdated_at().equals("")) {
+            regionShardTranslation.setUpdateAt(LocalDateTime.parse(apiTranslationDTO.getUpdated_at().replaceAll("Z", "")));
+        } else {
+            regionShardTranslation.setUpdateAt(LocalDateTime.now());
+        }
         return this.regionShardTranslationRepository.save(regionShardTranslation);
     }
 

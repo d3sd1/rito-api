@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChampionStatsRepository extends JpaRepository<ChampionStats, Integer> {
-    ChampionStats findByChampionAndVersion(Champion champion, GameVersion gameVersion);
+    ChampionStats findByChampionAndGameVersion(Champion champion, GameVersion gameVersion);
 }

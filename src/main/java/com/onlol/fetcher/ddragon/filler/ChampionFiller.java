@@ -34,10 +34,10 @@ public class ChampionFiller {
         Champion dbChampion = this.championRepository.findByChampId(Integer.parseInt(championDTO.getKey()));
 
         if (dbChampion == null) {
-            return null;
+            dbChampion = new Champion();
+            dbChampion.setChampId(Integer.parseInt(championDTO.getKey()));
         }
 
-        dbChampion.setChampId(Integer.parseInt(championDTO.getKey()));
         dbChampion.setKeyName(championDTO.getId().toLowerCase());
 
         /* Save champion tags */
@@ -61,7 +61,7 @@ public class ChampionFiller {
 
         /* Save champion texts */
         ChampionLanguage championLanguage = this.championLanguageRepository.
-                findByChampionAndLanguageAndVersion(champion, lang, gameVersion);
+                findByChampionAndLanguageAndGameVersion(champion, lang, gameVersion);
         if (championLanguage != null) {
             return championLanguage;
         }
@@ -80,7 +80,7 @@ public class ChampionFiller {
     public ChampionStats fillChampionStats(DDChampionDTO championDTO, Champion champion, GameVersion gameVersion) {
 
         // Update champion stats for version
-        ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndVersion(champion, gameVersion);
+        ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndGameVersion(champion, gameVersion);
         if (dbChampionStats != null) {
             return dbChampionStats;
         }
@@ -122,7 +122,7 @@ public class ChampionFiller {
         }
         championRotation = new ChampionRotation();
         championRotation.setChampion(champion);
-        championRotation.setForNewPlayers(false);
+        championRotation.setForNewPlayers(forNewPlayers);
         championRotation.setRegion(region);
         championRotation.setRotationDate(Constants.DATE_FORMAT.format(new Date()));
         championRotation.setMaxNewPlayerLevel(maxNewPlayerLevel);

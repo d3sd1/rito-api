@@ -2,8 +2,10 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,33 +32,36 @@ public class SummonerSpell {
     @Column(nullable = false, unique = false)
     private Float rangeBurn = 0F;
 
-    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne
     private GameImage gameImage;
 
-    @ManyToMany(cascade = CascadeType.REMOVE)
-    private List<GameMode> gameModes;
+    /*
+        @Column(nullable = true, unique = false)
+        private List<GameMode> gameModes;
+     TODO: hacer funcionar esto
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Integer> cooldown;
 
-    @Column(nullable = false, unique = false)
-    private Float cooldownBurn = 0F;
+        @Column(nullable = true, unique = false)
+        private List<Integer> cooldown;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Integer> cost;
+        @Column(nullable = false, unique = false)
+        private Float cooldownBurn = 0F;
 
-    @Column(nullable = false, unique = false)
-    private Float costBurn = 0F;
+        @Column(nullable = true, unique = false)
+        private List<Integer> cost;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Integer> effect;
+        @Column(nullable = false, unique = false)
+        private Float costBurn = 0F;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Float> effectBurn;
+        @Column(nullable = true, unique = false)
+        private List<Integer> effect;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Integer> range;
+        @Column(nullable = true, unique = false)
+        private List<Float> effectBurn;
 
+        @Column(nullable = true, unique = false)
+        private List<Integer> range;
+    */
     public Integer getId() {
         return id;
     }
@@ -121,69 +126,6 @@ public class SummonerSpell {
         this.rangeBurn = rangeBurn;
     }
 
-    public List<GameMode> getGameModes() {
-        return gameModes;
-    }
-
-    public void setGameModes(List<GameMode> gameModes) {
-        this.gameModes = gameModes;
-    }
-
-    public List<Integer> getCooldown() {
-        return cooldown;
-    }
-
-    public void setCooldown(List<Integer> cooldown) {
-        this.cooldown = cooldown;
-    }
-
-    public Float getCooldownBurn() {
-        return cooldownBurn;
-    }
-
-    public void setCooldownBurn(Float cooldownBurn) {
-        this.cooldownBurn = cooldownBurn;
-    }
-
-    public List<Integer> getCost() {
-        return cost;
-    }
-
-    public void setCost(List<Integer> cost) {
-        this.cost = cost;
-    }
-
-    public Float getCostBurn() {
-        return costBurn;
-    }
-
-    public void setCostBurn(Float costBurn) {
-        this.costBurn = costBurn;
-    }
-
-    public List<Integer> getEffect() {
-        return effect;
-    }
-
-    public void setEffect(List<Integer> effect) {
-        this.effect = effect;
-    }
-
-    public List<Float> getEffectBurn() {
-        return effectBurn;
-    }
-
-    public void setEffectBurn(List<Float> effectBurn) {
-        this.effectBurn = effectBurn;
-    }
-
-    public List<Integer> getRange() {
-        return range;
-    }
-
-    public void setRange(List<Integer> range) {
-        this.range = range;
-    }
 
     @Override
     public String toString() {
@@ -196,14 +138,6 @@ public class SummonerSpell {
                 ", maxammo=" + maxammo +
                 ", rangeBurn=" + rangeBurn +
                 ", gameImage=" + gameImage +
-                ", gameModes=" + gameModes +
-                ", cooldown=" + cooldown +
-                ", cooldownBurn=" + cooldownBurn +
-                ", cost=" + cost +
-                ", costBurn=" + costBurn +
-                ", effect=" + effect +
-                ", effectBurn=" + effectBurn +
-                ", range=" + range +
                 '}';
     }
 }

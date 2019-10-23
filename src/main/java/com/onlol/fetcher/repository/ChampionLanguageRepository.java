@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChampionLanguageRepository extends JpaRepository<ChampionLanguage, Integer> {
-    ChampionLanguage findByChampionAndLanguageAndVersion(Champion champion, Language language, GameVersion gameVersion);
+    ChampionLanguage findByChampionAndLanguageAndGameVersion(Champion champion, Language language, GameVersion gameVersion);
 }

@@ -1,6 +1,7 @@
 package com.onlol.fetcher.firstrun;
 
 import com.onlol.fetcher.api.connector.LeaguesConnector;
+import com.onlol.fetcher.ddragon.connector.*;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.RunLog;
 import com.onlol.fetcher.repository.RunLogRepository;
@@ -28,6 +29,20 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private GameItemsConnector gameItemsConnector;
+
+    @Autowired
+    private GameInfoConnector gameInfoConnector;
+
+    @Autowired
+    private GameDataConnector gameDataConnector;
+
+    @Autowired
+    private GameChampionConnector gameChampionConnector;
+    @Autowired
+    private GameSummonerConnector gameSummonerConnector;
 
     /* Execute after app is fully loaded and setup */
     public void onApplicationEvent(ApplicationStartedEvent contextRefreshedEvent) {
@@ -72,69 +87,70 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.realmsInit();
         this.logger.info("Retriving game types...");
         this.gameTypesInit();
-        this.logger.info("Retriving league challenger leaders...");
-        this.challengerLadderInit();
-        this.logger.info("Retriving league grandmaster ladders...");
-        this.grandMasterLadderInit();
-        this.logger.info("Retriving league master ladders...");
-        this.masterLadderInit();
+        //this.logger.info("Retriving league challenger leaders...");
+        //this.challengerLadderInit();
+        //this.logger.info("Retriving league grandmaster ladders...");
+        //this.grandMasterLadderInit();
+        //this.logger.info("Retriving league master ladders...");
+        //this.masterLadderInit();
         this.logger.info("Retriving LoL status...");
         this.lolStatusInit();
+        this.logger.info("App first init finished!");
     }
 
     private void gameVersionsInit() {
-        this.ddragonConnector.versions();
+        this.gameInfoConnector.versions();
     }
     private void challengerLadderInit() {
         this.leaguesConnector.challengerLadderGlobal();
     }
 
     private void gameLanguagesInit() {
-        this.ddragonConnector.languages();
+        this.gameInfoConnector.languages();
     }
 
     private void gameChampionsInit() {
         if (this.env.getActiveProfiles()[0].equalsIgnoreCase("dev")) {
-            this.ddragonConnector.champions();
+            this.gameChampionConnector.champions();
         } else {
-            this.ddragonConnector.championsHistorical();
+            this.gameChampionConnector.championsHistorical();
         }
     }
 
     private void championRotationInit() {
-        this.ddragonConnector.championRotation();
+        this.gameChampionConnector.championRotation();
     }
 
     private void seasonsInit() {
-        this.ddragonConnector.seasons();
+        this.gameInfoConnector.seasons();
     }
 
     private void queuesInit() {
-        this.ddragonConnector.queues();
+        this.gameDataConnector.gameQueues();
     }
 
     private void mapsInit() {
-        this.ddragonConnector.maps();
+        this.gameDataConnector.gameMaps();
     }
 
     private void gameModesInit() {
-        this.ddragonConnector.gameModes();
+        this.gameDataConnector.gameModes();
     }
 
     private void itemsInit() {
         if (this.env.getActiveProfiles()[0].equalsIgnoreCase("dev")) {
-            this.ddragonConnector.items();
+            this.gameItemsConnector.items();
         } else {
-            this.ddragonConnector.itemsHistorical();
+            this.gameItemsConnector.itemsHistorical();
         }
     }
 
     private void realmsInit() {
-        this.ddragonConnector.realms();
+        this.gameInfoConnector.realms();
     }
 
     private void gameTypesInit() {
-        this.ddragonConnector.gameTypes();
+        this.gameDataConnector.gameTypes();
     }
     private void masterLadderInit() {
         this.leaguesConnector.masterLadderGlobal();
@@ -143,14 +159,14 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.leaguesConnector.grandMasterLadderGlobal();
     }
     private void lolStatusInit() {
-        this.ddragonConnector.lolStatus();
+        this.gameInfoConnector.statusShard();
     }
 
     private void gameSummonerSpellsInit() {
-        this.ddragonConnector.summonerSpells();
+        this.gameSummonerConnector.summonerSpells();
     }
 
     private void summonerProfileImagesInit() {
-        this.ddragonConnector.summonerProfileImages();
+        this.gameSummonerConnector.summonerProfileImages();
     }
 }

@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Service
 public class GameSummonerFiller {
@@ -28,7 +26,7 @@ public class GameSummonerFiller {
     private SummonerProfileImageRepository summonerProfileImageRepository;
 
     public SummonerSpell fillSummonerSpell(String keyName, DDSummonerSpellDTO ddSummonerSpellDTO, GameVersion gameVersion) {
-        SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndVersion(ddSummonerSpellDTO.getKey(), gameVersion);
+        SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndGameVersion(ddSummonerSpellDTO.getKey(), gameVersion);
         if (summonerSpell != null) {
             return summonerSpell;
         }
@@ -49,15 +47,17 @@ public class GameSummonerFiller {
         for (String mode : ddSummonerSpellDTO.getModes()) {
             gameModes.add(this.gameDataFiller.fillGameMode(mode));
         }
+        /* TODO: hace rfuncionar esto
         summonerSpell.setGameModes(gameModes);
         summonerSpell.setCooldown(Arrays.asList(ddSummonerSpellDTO.getCooldown()));
+
         summonerSpell.setCooldownBurn(ddSummonerSpellDTO.getCooldownBurn());
         summonerSpell.setCostBurn(ddSummonerSpellDTO.getCostBurn());
         summonerSpell.setEffectBurn(Arrays.asList(ddSummonerSpellDTO.getEffectBurn()));
         summonerSpell.setRange(Arrays.asList(ddSummonerSpellDTO.getRange()));
         summonerSpell.setEffect(Arrays.stream(ddSummonerSpellDTO.getEffect())
                 .flatMap(Arrays::stream)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()));*/
         this.summonerSpellRepository.save(summonerSpell);
         return summonerSpell;
     }
@@ -81,7 +81,7 @@ public class GameSummonerFiller {
     }
 
     public SummonerProfileImage fillSummonerProfileImage(DDSummonerImageDTO sampleSummonerImage, GameVersion gameVersion) {
-        SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndVersion(sampleSummonerImage.getId(), gameVersion);
+        SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndGameVersion(sampleSummonerImage.getId(), gameVersion);
         if (summonerProfileImage != null) {
             return summonerProfileImage;
         }

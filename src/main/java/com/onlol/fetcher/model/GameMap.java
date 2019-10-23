@@ -15,8 +15,8 @@ public class GameMap {
     @Column(nullable = true, unique = true)
     private Integer mapId;
 
-    @Column(nullable = true, unique = true)
-    private String mapName;
+    @Column(nullable = true, unique = false)
+    private String mapName; // Must be string since name is not unique and it has no ID so it could be several map's
 
     @Column(nullable = true, unique = false)
     private String notes;

@@ -69,7 +69,7 @@ public class GameChampionConnector {
                     new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.error("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception" + e.getMessage());
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -112,7 +112,7 @@ public class GameChampionConnector {
                         new TypeReference<ApiChampionInfoDTO>() {
                         });
             } catch (DataNotfoundException e) {
-                this.logger.error("Data not found, got exception" + e.getMessage());
+                this.logger.info("Data not found, got exception" + e.getMessage());
                 return;
             } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
                 return;

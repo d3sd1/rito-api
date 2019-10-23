@@ -3,9 +3,9 @@ package com.onlol.fetcher.api.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
+import com.onlol.fetcher.ddragon.connector.GameChampionConnector;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
@@ -23,13 +23,7 @@ import java.util.Optional;
 public class MatchConnector {
 
     @Autowired
-    private DdragonConnector ddragonConnector;
-
-    @Autowired
-    private ApiKeyManager apiKeyManager;
-
-    @Autowired
-    private ApiKeyRepository apiKeyRepository;
+    private GameChampionConnector gameChampionConnector;
 
     @Autowired
     private ChampionRepository championRepository;
@@ -192,7 +186,7 @@ public class MatchConnector {
                 if (champion != null) {
                     matchList.setChamp(champion);
                 } else {
-                    this.ddragonConnector.champions();
+                    this.gameChampionConnector.champions();
                     this.matchListByAccount(summoner, beginIndex);
                 }
                 matchList.setLane(lane);
@@ -300,7 +294,7 @@ public class MatchConnector {
 
 
         /* Get game type */
-        GameType gameType = this.gameTypeRepository.findByGametype(apiMatchDTO.getGameType());
+        GameType gameType = this.gameTypeRepository.findByGameType(apiMatchDTO.getGameType());
         if (gameType == null) {
             GameType dbGameType = new GameType();
             dbGameType.setGameType(apiMatchDTO.getGameType());

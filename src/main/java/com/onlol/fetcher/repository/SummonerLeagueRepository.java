@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SummonerLeagueRepository extends JpaRepository<SummonerLeague, Long> {
-    SummonerLeague findBySummonerAndQueueType(Summoner summoner, GameQueueType gameQueueType);
+    SummonerLeague findBySummonerAndGameQueueType(Summoner summoner, GameQueueType gameQueueType);
 }

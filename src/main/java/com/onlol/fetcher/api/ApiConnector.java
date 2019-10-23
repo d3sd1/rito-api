@@ -95,7 +95,7 @@ public class ApiConnector {
                     A blacklisted API key was provided with the API request.
                     The API request was for an incorrect or unsupported path.
                      */
-                    this.logService.debug("Forbidden URL: " + url);
+                    this.logService.info("Forbidden URL: " + url);
                     throw new DataNotfoundException();
                 case 404:
                     /*

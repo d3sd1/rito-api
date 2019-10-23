@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SummonerSpellRepository extends JpaRepository<SummonerSpell, Integer> {
-    SummonerSpell findByIdAndVersion(Integer id, GameVersion gameVersion);
+    SummonerSpell findByIdAndGameVersion(Integer id, GameVersion gameVersion);
 }

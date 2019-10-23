@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GameItemRepository extends JpaRepository<GameItem, Long> {
-    GameItem findByVersionAndItemId(GameVersion gameVersion, Integer itemId);
+    GameItem findByGameVersionAndItemId(GameVersion gameVersion, Integer itemId);
 }

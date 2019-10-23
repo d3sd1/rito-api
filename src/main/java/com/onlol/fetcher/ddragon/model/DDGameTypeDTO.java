@@ -1,15 +1,15 @@
 package com.onlol.fetcher.ddragon.model;
 
 public class DDGameTypeDTO {
-    private String gameType = "";
+    private String gametype = ""; // lowercase is a MUST!!
     private String description = "";
 
-    public String getGameType() {
-        return gameType;
+    public String getGametype() {
+        return gametype;
     }
 
-    public void setGameType(String gameType) {
-        this.gameType = gameType;
+    public void setGametype(String gametype) {
+        this.gametype = gametype;
     }
 
     public String getDescription() {
@@ -23,7 +23,7 @@ public class DDGameTypeDTO {
     @Override
     public String toString() {
         return "DDGameTypeDTO{" +
-                "gameType='" + gameType + '\'' +
+                "gameType='" + gametype + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

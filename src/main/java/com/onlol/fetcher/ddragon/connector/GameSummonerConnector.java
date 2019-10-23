@@ -84,7 +84,7 @@ public class GameSummonerConnector {
                         });
             }
         } catch (DataNotfoundException e) {
-            this.logger.error("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception" + e.getMessage());
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -119,7 +119,7 @@ public class GameSummonerConnector {
                         });
             }
         } catch (DataNotfoundException e) {
-            this.logger.error("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception" + e.getMessage());
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
