@@ -441,7 +441,7 @@ public class LeaguesConnector {
                 sampleFeaturedGames = this.jacksonMapper.readValue(json, new TypeReference<SampleFeaturedGames>() {
                 });
             } else {
-                sampleFeaturedGames = new SampleFeaturedGames();
+                return new FeaturedGameInterval();
             }
         } catch (Exception e) {
             e.printStackTrace();

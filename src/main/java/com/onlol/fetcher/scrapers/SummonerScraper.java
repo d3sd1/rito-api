@@ -45,16 +45,16 @@ public class SummonerScraper {
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
         Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
-        if(summoner == null) {
+        if (summoner == null) {
             this.logger.info("No summoners to update.");
             return;
         }
-        if(!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
+        if (!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
             this.logger.info(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
 
             try {
                 TimeUnit.SECONDS.sleep(30);
-            } catch(Exception e) {
+            } catch (Exception e) {
 
             }
 
@@ -62,14 +62,13 @@ public class SummonerScraper {
         }
         this.logger.info("Updating summoner " + summoner.getName());
         summoner = this.summonerConnector.bySummonerId(summoner);
-        System.exit(0); // debugging riot api
-/*
+
         this.logger.info("Retrieving games of summoner " + summoner.getName());
         this.matchConnector.matchListByAccount(summoner);
 
         this.logger.info("Retrieving summoner champion mastery...");
         this.summonerConnector.championMastery(summoner);
-*/
+
         this.logger.info("Retrieving summoner leagues...");
         this.leaguesConnector.summonerLeagues(summoner);
     }
