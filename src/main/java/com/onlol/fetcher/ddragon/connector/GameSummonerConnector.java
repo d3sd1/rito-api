@@ -48,7 +48,7 @@ public class GameSummonerConnector {
     private SeasonRepository seasonRepository;
 
     @Autowired
-    private QueueRepository queueRepository;
+    private GameQueueRepository gameQueueRepository;
 
     @Autowired
     private GameMapRepository gameMapRepository;

@@ -6,6 +6,7 @@ import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.ApiChampionInfoDTO;
+import com.onlol.fetcher.ddragon.filler.ChampionFiller;
 import com.onlol.fetcher.ddragon.model.DDChampionDTO;
 import com.onlol.fetcher.ddragon.model.DDDdragonDTO;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
@@ -13,14 +14,20 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
+import com.onlol.fetcher.model.Champion;
+import com.onlol.fetcher.model.Language;
+import com.onlol.fetcher.model.Region;
+import com.onlol.fetcher.model.Version;
+import com.onlol.fetcher.repository.LanguageRepository;
+import com.onlol.fetcher.repository.RegionRepository;
+import com.onlol.fetcher.repository.VersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class GameChampionConnector {
@@ -30,15 +37,6 @@ public class GameChampionConnector {
 
     @Autowired
     private LanguageRepository languageRepository;
-
-    @Autowired
-    private ChampionRepository championRepository;
-
-    @Autowired
-    private ChampionStatsRepository championStatsRepository;
-
-    @Autowired
-    private ChampionRotationRepository championRotationRepository;
 
     @Autowired
     private RegionRepository regionRepository;
@@ -53,10 +51,7 @@ public class GameChampionConnector {
     private LogService logger;
 
     @Autowired
-    private ChampionLanguageRepository championLanguageRepository;
-
-    @Autowired
-    private ChampionTagRepository championTagRepository;
+    private ChampionFiller championFiller;
 
     public void champions() {
         Version usedVersion = this.versionRepository.findTopByOrderByIdDesc();
@@ -65,13 +60,13 @@ public class GameChampionConnector {
     }
 
     public void champions(Version version, Language lang) { // Retrieves selected patch champion data
-        DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>> ddragonData = null;
+        DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>> ddragonData;
         try {
             ddragonData = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_CHAMPIONS
                             .replace("{{VERSION}}", version.getVersion())
                             .replace("{{LANGUAGE}}", lang.getKeyName())),
-                    new TypeReference<SampleDdragon<LinkedHashMap<String, SampleChampion>>>() {
+                    new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
             this.logger.error("Data not found, got exception" + e.getMessage());
@@ -83,165 +78,57 @@ public class GameChampionConnector {
             return;
         }
 
-        LinkedHashMap<String, SampleChampion> sampleChampions = ddragonData.getData();
+        LinkedHashMap<String, DDChampionDTO> sampleChampions = ddragonData.getData();
 
+        for (Map.Entry<String, DDChampionDTO> entry : sampleChampions.entrySet()) {
+            DDChampionDTO ddChampionDTO = entry.getValue();
 
-        ArrayList<Champion> champions = new ArrayList<>();
-        for (Map.Entry<String, SampleChampion> entry : sampleChampions.entrySet()) {
-            SampleChampion champion = entry.getValue();
-
-            // Since LoL swapped key and ID, let's swap it for performance
-            Champion dbChampion = this.championRepository.findByChampId(Integer.parseInt(champion.getKey()));
-
-            if (dbChampion == null) {
-                dbChampion = new Champion();
+            Champion champion = this.championFiller.fillChampion(ddChampionDTO);
+            if (champion != null) {
+                this.championFiller.fillChampionStats(ddChampionDTO, champion, version);
+                this.championFiller.fillChampionLanguage(ddChampionDTO, champion, lang, version);
             }
-
-            dbChampion.setChampId(Integer.parseInt(champion.getKey()));
-            dbChampion.setKeyName(champion.getId().toLowerCase());
-
-            /* Save champion tags */
-            List<ChampionTag> championTags = new ArrayList<>();
-            for (String tag : champion.getTags()) {
-                ChampionTag championTag = this.championTagRepository.findByKeyName(tag);
-                if (championTag == null) {
-                    championTag = new ChampionTag();
-                    championTag.setKeyName(tag);
-                    this.championTagRepository.save(championTag);
-                }
-                championTags.add(championTag);
-            }
-            dbChampion.setChampionTags(championTags);
-
-            dbChampion = this.championRepository.save(dbChampion);
-            champions.add(dbChampion);
-
-            // Update champion stats for version
-            ChampionStats dbChampionStats = this.championStatsRepository.findByChampionAndVersion(dbChampion, version);
-            if (dbChampionStats == null) {
-                dbChampionStats = new ChampionStats();
-                dbChampionStats.setChampion(dbChampion);
-                dbChampionStats.setVersion(version);
-                dbChampionStats.setHp(champion.getStats().getHp());
-                dbChampionStats.setHpPerLevel(champion.getStats().getHpperlevel());
-                dbChampionStats.setMp(champion.getStats().getMp());
-                dbChampionStats.setMpPerLevel(champion.getStats().getMpperlevel());
-                dbChampionStats.setMovSpeed(champion.getStats().getMovespeed());
-                dbChampionStats.setArmor(champion.getStats().getArmor());
-                dbChampionStats.setArmorPerLevel(champion.getStats().getArmorperlevel());
-                dbChampionStats.setSpellBlockPerLevel(champion.getStats().getSpellblock());
-                dbChampionStats.setSpellBlockPerLevel(champion.getStats().getSpellblockperlevel());
-                dbChampionStats.setAttackRange(champion.getStats().getAttackrange());
-                dbChampionStats.setHpRegen(champion.getStats().getHpregen());
-                dbChampionStats.setHpRegenPerLevel(champion.getStats().getHpregenperlevel());
-                dbChampionStats.setMpRegen(champion.getStats().getMpregen());
-                dbChampionStats.setMpRegenPerLevel(champion.getStats().getMpregenperlevel());
-                dbChampionStats.setCrit(champion.getStats().getCrit());
-                dbChampionStats.setCritPerLevel(champion.getStats().getCritperlevel());
-                dbChampionStats.setAttackDamage(champion.getStats().getAttackdamage());
-                dbChampionStats.setAttackDamagePerLevel(champion.getStats().getAttackdamageperlevel());
-                dbChampionStats.setAttackSpeedOffset(champion.getStats().getAttackspeedoffset());
-                dbChampionStats.setAttackDamagePerLevel(champion.getStats().getAttackspeedperlevel());
-                this.championStatsRepository.save(dbChampionStats);
-            }
-            /* Save champion texts */
-            ChampionLanguage championLanguage = this.championLanguageRepository.
-                    findByChampionAndLanguageAndVersion(dbChampion, lang, version);
-            if (championLanguage == null) {
-                championLanguage = new ChampionLanguage();
-                championLanguage.setChampion(dbChampion);
-                championLanguage.setLanguage(lang);
-                championLanguage.setBlurb(champion.getBlurb());
-                championLanguage.setName(champion.getName());
-                championLanguage.setTitle(champion.getTitle());
-                championLanguage.setVersion(version);
-
-                championLanguage.setPartype(champion.getPartype());
-            }
-            this.championLanguageRepository.save(championLanguage);
         }
-        return champions;
     }
 
 
     public void championsHistorical() { // Retrieves all patches champ data
-        ArrayList<Champion> champions = new ArrayList<>();
         List<Version> versions = this.versionRepository.findAll();
         Collections.reverse(versions);
         for (Version version : versions) {
             for (Language lang : this.languageRepository.findAll()) {
-                List<Champion> champ = this.champions(version, lang);
-                if (champ != null) {
-                    champions.addAll(champ);
-                }
-
+                this.champions(version, lang);
             }
         }
-        return champions;
     }
 
     public void championRotation() {
-        ArrayList<ChampionRotation> championRotations = new ArrayList<>();
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
         for (Region region : this.regionRepository.findAll()) {
             ApiChampionInfoDTO champRotation = null;
             try {
-                String json = this.apiConnector.get(V3.CHAMPION_ROTATION.
-                        replace("{{HOST}}", region.getHostName()), true);
-                if (json != null) {
-                    champRotation = this.jacksonMapper.readValue(json, new TypeReference<ApiChampionInfoDTO>() {
-                    });
-                } else {
-                    champRotation = new ApiChampionInfoDTO();
-                }
+                champRotation = this.jacksonMapper.readValue(
+                        this.apiConnector.get(V3.CHAMPION_ROTATION.
+                                replace("{{HOST}}", region.getHostName()), true),
+                        new TypeReference<ApiChampionInfoDTO>() {
+                        });
+            } catch (DataNotfoundException e) {
+                this.logger.error("Data not found, got exception" + e.getMessage());
+                return;
+            } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+                return;
             } catch (Exception e) {
-                e.printStackTrace();
-                this.logger.error("Could not retrieve champion rotation: " + e.getMessage());
+                this.logger.error("Got generic exception" + e.getMessage());
+                return;
             }
 
             for (Integer champId : champRotation.getFreeChampionIds()) {
-                Champion champion = this.championRepository.findByChampId(champId);
-                ChampionRotation championRotation =
-                        this.championRotationRepository.findByRotationDateAndRegionAndChampionAndForNewPlayers(
-                                dateFormat.format(new Date()), region, champion, false
-                        );
-
-                if (championRotation == null) {
-                    championRotation = new ChampionRotation();
-                    championRotation.setChampion(champion);
-                    championRotation.setForNewPlayers(false);
-                    championRotation.setRegion(region);
-                    championRotation.setRotationDate(dateFormat.format(new Date()));
-                    championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
-                    this.championRotationRepository.save(championRotation);
-                }
-                championRotations.add(championRotation);
+                this.championFiller.fillChampionRotation(false, champId, region, champRotation.getMaxNewPlayerLevel());
             }
 
             for (Integer champId : champRotation.getFreeChampionIdsForNewPlayers()) {
-                Champion champion = this.championRepository.findByChampId(champId);
-                ChampionRotation championRotation =
-                        this.championRotationRepository.findByRotationDateAndRegionAndChampionAndForNewPlayers(
-                                dateFormat.format(new Date()), region, champion, true
-                        );
-
-                if (championRotation == null) {
-                    championRotation = new ChampionRotation();
-                    championRotation.setChampion(champion);
-                    championRotation.setForNewPlayers(true);
-                    championRotation.setRegion(region);
-                    championRotation.setRotationDate(dateFormat.format(new Date()));
-                    championRotation.setMaxNewPlayerLevel(champRotation.getMaxNewPlayerLevel());
-                    this.championRotationRepository.save(championRotation);
-                }
-                championRotations.add(championRotation);
+                this.championFiller.fillChampionRotation(true, champId, region, champRotation.getMaxNewPlayerLevel());
             }
         }
-
-
-        return championRotations;
     }
 
 }

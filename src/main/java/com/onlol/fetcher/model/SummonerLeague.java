@@ -17,7 +17,7 @@ public class SummonerLeague {
     private Summoner summoner;
 
     @OneToOne
-    private QueueType queueType;
+    private GameQueueType gameQueueType;
 
     @OneToOne
     private LeagueTier leagueTier;
@@ -145,12 +145,12 @@ public class SummonerLeague {
         this.leaguePoints = leaguePoints;
     }
 
-    public QueueType getQueueType() {
-        return queueType;
+    public GameQueueType getGameQueueType() {
+        return gameQueueType;
     }
 
-    public void setQueueType(QueueType queueType) {
-        this.queueType = queueType;
+    public void setGameQueueType(GameQueueType gameQueueType) {
+        this.gameQueueType = gameQueueType;
     }
 
     @Override
@@ -158,7 +158,7 @@ public class SummonerLeague {
         return "SummonerLeague{" +
                 "id=" + id +
                 ", summoner=" + summoner +
-                ", queueType=" + queueType +
+                ", queueType=" + gameQueueType +
                 ", leagueTier=" + leagueTier +
                 ", leagueRank=" + leagueRank +
                 ", leagueMiniSeries=" + leagueMiniSeries +

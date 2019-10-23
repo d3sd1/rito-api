@@ -2,26 +2,29 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameType {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private String gametype;
+    private Integer id;
+
+    @Column(nullable = false, unique = true)
+    private String gameType;
 
     @Column(nullable = true, unique = false)
     private String description;
 
-    public String getGametype() {
-        return gametype;
+    public String getGameType() {
+        return gameType;
     }
 
-    public void setGametype(String gametype) {
-        this.gametype = gametype;
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
     }
 
     public String getDescription() {
@@ -32,10 +35,19 @@ public class GameType {
         this.description = description;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "GameType{" +
-                "gametype='" + gametype + '\'' +
+                "id=" + id +
+                ", gametype='" + gameType + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

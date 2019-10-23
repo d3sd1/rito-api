@@ -1,26 +1,10 @@
-package com.onlol.fetcher.model;
+package com.onlol.fetcher.ddragon.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Queue {
-    @Id
-    @Column(nullable = false, unique = true)
-    private Integer queueId;
-
-    @Column(nullable = true, unique = false)
-    private String map;
-
-    @Column(nullable = true, unique = false)
-    private String description;
-
-    @Column(nullable = true, unique = false)
-    private String notes;
+public class DDQueueDTO {
+    private Integer queueId = 0;
+    private String map = "";
+    private String description = "";
+    private String notes = "";
 
     public Integer getQueueId() {
         return queueId;
@@ -56,7 +40,7 @@ public class Queue {
 
     @Override
     public String toString() {
-        return "Queue{" +
+        return "DDQueueDTO{" +
                 "queueId=" + queueId +
                 ", map='" + map + '\'' +
                 ", description='" + description + '\'' +

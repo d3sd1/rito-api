@@ -40,7 +40,7 @@ public class LeaguesConnector {
     private ChampionRepository championRepository;
 
     @Autowired
-    private QueueRepository queueRepository;
+    private GameQueueRepository gameQueueRepository;
 
     @Autowired
     private ApiConnector apiConnector;
@@ -58,7 +58,7 @@ public class LeaguesConnector {
     private LeagueRankRepository leagueRankRepository;
 
     @Autowired
-    private QueueTypeRepository queueTypeRepository;
+    private GameQueueTypeRepository gameQueueTypeRepository;
 
     @Autowired
     private LeagueMiniSeriesRepository leagueMiniSeriesRepository;
@@ -93,17 +93,17 @@ public class LeaguesConnector {
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
-            QueueType queuetype = this.queueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
+            GameQueueType queuetype = this.gameQueueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
             if (queuetype == null) {
-                queuetype = new QueueType();
+                queuetype = new GameQueueType();
                 queuetype.setKeyName(apiLeagueItemDTO.getQueueType());
-                this.queueTypeRepository.save(queuetype);
+                this.gameQueueTypeRepository.save(queuetype);
             }
             SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queuetype);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
-                summonerLeague.setQueueType(queuetype);
+                summonerLeague.setGameQueueType(queuetype);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
             LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(apiLeagueItemDTO.getTier());
@@ -158,19 +158,19 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
-            for (QueueType queueType : this.queueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.challengerLadder(region, queueType));
+            for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
+                summonerLeagues.addAll(this.challengerLadder(region, gameQueueType));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> challengerLadder(Region region, QueueType queueType) {
+    public ArrayList<SummonerLeague> challengerLadder(Region region, GameQueueType gameQueueType) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             String json = this.apiConnector.get(
                     V4.LEAGUES_CHALLENGER
-                            .replace("{{QUEUE}}", queueType.getKeyName())
+                            .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
             );
@@ -221,11 +221,11 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
-                summonerLeague.setQueueType(queueType);
+                summonerLeague.setGameQueueType(gameQueueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
             summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
@@ -254,19 +254,19 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> masterLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
-            for (QueueType queueType : this.queueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.masterLadder(region, queueType));
+            for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
+                summonerLeagues.addAll(this.masterLadder(region, gameQueueType));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> masterLadder(Region region, QueueType queueType) {
+    public ArrayList<SummonerLeague> masterLadder(Region region, GameQueueType gameQueueType) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             apiLeagueListDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_MASTER
-                            .replace("{{QUEUE}}", queueType.getKeyName())
+                            .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
             ), new TypeReference<ApiLeagueListDTO>() {
@@ -314,11 +314,11 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
-                summonerLeague.setQueueType(queueType);
+                summonerLeague.setGameQueueType(gameQueueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
             summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
@@ -348,19 +348,19 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> grandMasterLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
-            for (QueueType queueType : this.queueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.grandMasterLadder(region, queueType));
+            for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
+                summonerLeagues.addAll(this.grandMasterLadder(region, gameQueueType));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> grandMasterLadder(Region region, QueueType queueType) {
+    public ArrayList<SummonerLeague> grandMasterLadder(Region region, GameQueueType gameQueueType) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             String json = this.apiConnector.get(
                     V4.LEAGUES_GRANDMASTER
-                            .replace("{{QUEUE}}", queueType.getKeyName())
+                            .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
             );
@@ -411,11 +411,11 @@ public class LeaguesConnector {
                 this.summonerRepository.save(summoner);
             }
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queueType);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, gameQueueType);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
-                summonerLeague.setQueueType(queueType);
+                summonerLeague.setGameQueueType(gameQueueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
             summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());

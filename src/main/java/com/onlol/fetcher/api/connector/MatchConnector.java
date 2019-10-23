@@ -50,7 +50,7 @@ public class MatchConnector {
     private LaneRepository laneRepository;
 
     @Autowired
-    private QueueRepository queueRepository;
+    private GameQueueRepository gameQueueRepository;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -140,15 +140,15 @@ public class MatchConnector {
 
 
                 /* Get queue */
-                Queue queue = this.queueRepository.findTopByQueueId(apiMatchReferenceDto.getQueue());
-                if (queue == null) {
-                    Queue dbQueue = new Queue();
-                    dbQueue.setQueueId(apiMatchReferenceDto.getQueue());
+                GameQueue gameQueue = this.gameQueueRepository.findTopByQueueId(apiMatchReferenceDto.getQueue());
+                if (gameQueue == null) {
+                    GameQueue dbGameQueue = new GameQueue();
+                    dbGameQueue.setQueueId(apiMatchReferenceDto.getQueue());
 
-                    this.queueRepository.save(dbQueue);
-                    queue = dbQueue;
+                    this.gameQueueRepository.save(dbGameQueue);
+                    gameQueue = dbGameQueue;
                 }
-                matchList.setQueue(queue);
+                matchList.setGameQueue(gameQueue);
 
 
                 /* Get role */
@@ -252,15 +252,15 @@ public class MatchConnector {
 
 
         /* Get queue */
-        Queue queue = this.queueRepository.findTopByQueueId(apiMatchDTO.getQueueId());
-        if (queue == null) {
-            Queue dbQueue = new Queue();
-            dbQueue.setQueueId(apiMatchDTO.getQueueId());
+        GameQueue gameQueue = this.gameQueueRepository.findTopByQueueId(apiMatchDTO.getQueueId());
+        if (gameQueue == null) {
+            GameQueue dbGameQueue = new GameQueue();
+            dbGameQueue.setQueueId(apiMatchDTO.getQueueId());
 
-            this.queueRepository.save(dbQueue);
-            queue = dbQueue;
+            this.gameQueueRepository.save(dbGameQueue);
+            gameQueue = dbGameQueue;
         }
-        matchGame.setQueue(queue);
+        matchGame.setGameQueue(gameQueue);
 
 
         /* Get season */
@@ -303,7 +303,7 @@ public class MatchConnector {
         GameType gameType = this.gameTypeRepository.findByGametype(apiMatchDTO.getGameType());
         if (gameType == null) {
             GameType dbGameType = new GameType();
-            dbGameType.setGametype(apiMatchDTO.getGameType());
+            dbGameType.setGameType(apiMatchDTO.getGameType());
 
             this.gameTypeRepository.save(dbGameType);
             gameType = dbGameType;

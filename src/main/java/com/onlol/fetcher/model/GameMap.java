@@ -2,18 +2,20 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameMap {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
+    private Integer id;
+
+    @Column(nullable = true, unique = true)
     private Integer mapId;
 
-    @Column(nullable = true, unique = false)
+    @Column(nullable = true, unique = true)
     private String mapName;
 
     @Column(nullable = true, unique = false)
@@ -43,10 +45,19 @@ public class GameMap {
         this.notes = notes;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "GameMap{" +
-                "mapId=" + mapId +
+                "id=" + id +
+                ", mapId=" + mapId +
                 ", mapName='" + mapName + '\'' +
                 ", notes='" + notes + '\'' +
                 '}';

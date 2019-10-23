@@ -3,6 +3,7 @@ package com.onlol.fetcher.ddragon.model;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+//TODO: use DDragon T
 public class DDItemSetDTO {
     private String type = "";
     private String version = "";

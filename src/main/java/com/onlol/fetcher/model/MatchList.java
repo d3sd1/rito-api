@@ -32,7 +32,7 @@ public class MatchList {
     private Season season; // season int
 
     @OneToOne
-    private Queue queue; // season int
+    private GameQueue gameQueue; // season int
 
     @OneToOne
     private Role role; // role string
@@ -96,12 +96,12 @@ public class MatchList {
         this.season = season;
     }
 
-    public Queue getQueue() {
-        return queue;
+    public GameQueue getGameQueue() {
+        return gameQueue;
     }
 
-    public void setQueue(Queue queue) {
-        this.queue = queue;
+    public void setGameQueue(GameQueue gameQueue) {
+        this.gameQueue = gameQueue;
     }
 
     public Role getRole() {
@@ -130,7 +130,7 @@ public class MatchList {
                 ", champ=" + champ +
                 ", region=" + region +
                 ", season=" + season +
-                ", queue=" + queue +
+                ", queue=" + gameQueue +
                 ", role=" + role +
                 ", timestamp=" + timestamp +
                 '}';

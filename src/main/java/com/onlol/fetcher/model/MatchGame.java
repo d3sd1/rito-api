@@ -26,7 +26,7 @@ public class MatchGame {
     private Season season;
 
     @OneToOne
-    private Queue queue;
+    private GameQueue gameQueue;
 
     @Column(nullable = true, unique = false)
     private String gameVersion; // major.minor version
@@ -87,12 +87,12 @@ public class MatchGame {
         this.season = season;
     }
 
-    public Queue getQueue() {
-        return queue;
+    public GameQueue getGameQueue() {
+        return gameQueue;
     }
 
-    public void setQueue(Queue queue) {
-        this.queue = queue;
+    public void setGameQueue(GameQueue gameQueue) {
+        this.gameQueue = gameQueue;
     }
 
     public String getGameVersion() {
@@ -183,7 +183,7 @@ public class MatchGame {
                 ", retrieving=" + retrieving +
                 ", expired=" + expired +
                 ", season=" + season +
-                ", queue=" + queue +
+                ", queue=" + gameQueue +
                 ", gameVersion='" + gameVersion + '\'' +
                 ", region=" + region +
                 ", gameMap=" + gameMap +
