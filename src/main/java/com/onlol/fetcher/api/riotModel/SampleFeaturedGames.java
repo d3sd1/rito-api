@@ -1,10 +1,11 @@
 package com.onlol.fetcher.api.riotModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SampleFeaturedGames {
     private Integer clientRefreshInterval;
-    private List<SampleFeaturedGameInfo> gameList;
+    private List<SampleFeaturedGameInfo> gameList = new ArrayList<>();
 
     public Integer getClientRefreshInterval() {
         return clientRefreshInterval;
