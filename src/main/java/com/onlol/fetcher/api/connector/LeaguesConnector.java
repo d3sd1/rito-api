@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
+import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.riotModel.*;
@@ -81,6 +82,8 @@ public class LeaguesConnector {
                     true
             ), new TypeReference<ArrayList<SampleSummonerLeague>>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner lagues not found: " + summoner.getName());
         } catch (IOException e) {
             this.logger.error("No se ha podido retornar la liga del invocador " + summoner.getName());
         }
@@ -172,6 +175,8 @@ public class LeaguesConnector {
                     true
             ), new TypeReference<SampleSummonerLeagueList>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (IOException e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
@@ -263,6 +268,8 @@ public class LeaguesConnector {
                     true
             ), new TypeReference<SampleSummonerLeagueList>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (IOException e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de masters " + e.getMessage());
@@ -355,6 +362,8 @@ public class LeaguesConnector {
                     true
             ), new TypeReference<SampleSummonerLeagueList>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (IOException e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de masters " + e.getMessage());

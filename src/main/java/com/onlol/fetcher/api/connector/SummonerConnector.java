@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
+import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.Region;
 import com.onlol.fetcher.api.model.Summoner;
 import com.onlol.fetcher.api.model.SummonerChampionMastery;
@@ -69,6 +70,8 @@ public class SummonerConnector {
                     true
             ), new TypeReference() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner not found: " + name);
         } catch (IOException e) {
             this.logger.error("No se ha podido retornar al invocador " + name);
         }
@@ -99,6 +102,8 @@ public class SummonerConnector {
                     true
             ), new TypeReference<Summoner>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner not found: " + summoner.getName());
         } catch (IOException e) {
             summoner = null;
             e.printStackTrace();
@@ -127,6 +132,8 @@ public class SummonerConnector {
                     true
             ), new TypeReference<Summoner>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner not found: " + summoner.getName());
         } catch (IOException e) {
             summoner = null;
             e.printStackTrace();
@@ -158,6 +165,8 @@ public class SummonerConnector {
                     true
             ), new TypeReference<Summoner>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner not found: " + summoner.getName());
         } catch (IOException e) {
             retrievedSummoner = null;
             e.printStackTrace();
@@ -186,7 +195,7 @@ public class SummonerConnector {
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(Summoner summoner) {
-        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries;
+        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = new ArrayList<>();
         try {
             sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONER_CHAMPION_MASTERY
@@ -195,6 +204,8 @@ public class SummonerConnector {
                     true
             ), new TypeReference<Summoner>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Summoner not found: " + summoner.getName());
         } catch (IOException e) {
             sampleSummonerChampionMasteries = new ArrayList<>();
             e.printStackTrace();

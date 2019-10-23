@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.exceptions.MatchNotfoundException;
+import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
 import com.onlol.fetcher.api.riotModel.*;
@@ -216,7 +216,7 @@ public class MatchConnector {
                     true
             ), new TypeReference<SampleMatchLists>() {
             });
-        } catch (MatchNotfoundException e) {
+        } catch (DataNotfoundException e) {
             this.logger.error("El match no existe..." + matchGame.getGameId().toString());
             matchGame = this.matchGameRepository.findByGameId(matchGame.getGameId());
             if (matchGame != null) {

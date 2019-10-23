@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V3;
 import com.onlol.fetcher.api.endpoints.V4;
+import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.Queue;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.api.repository.*;
@@ -127,6 +128,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_VERSIONS),
                     new TypeReference<ArrayList<String>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon versions.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve versions: " + e.getMessage());
         }
@@ -160,6 +163,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_SEASONS),
                     new TypeReference<ArrayList<Season>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon seasons.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve seasons: " + e.getMessage());
         }
@@ -177,6 +182,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_QUEUES),
                     new TypeReference<ArrayList<Queue>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon queues.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve queues: " + e.getMessage());
         }
@@ -194,6 +201,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_MAPS),
                     new TypeReference<ArrayList<GameMap>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon maps.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve maps: " + e.getMessage());
         }
@@ -212,6 +221,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_TYPES),
                     new TypeReference<ArrayList<GameType>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon game types.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve game types: " + e.getMessage());
         }
@@ -238,6 +249,8 @@ public class DdragonConnector {
                 } else {
                     sampleRealm = new SampleRealm();
                 }
+            } catch (DataNotfoundException e) {
+                this.logger.warning("Could not retrieve ddragon realms.");
             } catch (IOException e) {
                 this.logger.error("Could not retrieve realms: " + e.getMessage());
             }
@@ -278,6 +291,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_MODES),
                     new TypeReference<ArrayList<GameMode>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon game modes.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve realms: " + e.getMessage());
         }
@@ -295,6 +310,8 @@ public class DdragonConnector {
                     this.apiConnector.get(V4.DDRAGON_LANGUAGES),
                     new TypeReference<ArrayList<String>>() {
                     });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon languages.");
         } catch (IOException e) {
             this.logger.error("Could not retrieve languages: " + e.getMessage());
         }
@@ -528,6 +545,8 @@ public class DdragonConnector {
             } else {
                 sampleItemSet = new SampleItemSet();
             }
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon items.");
         } catch (IOException e) {
             e.printStackTrace();
             this.logger.error("Could not retrieve items: " + e.getMessage());
@@ -682,6 +701,8 @@ public class DdragonConnector {
                     true
             ), new TypeReference<SampleRegionShard>() {
             });
+        } catch (DataNotfoundException e) {
+            this.logger.warning("Could not retrieve ddragon region shard.");
         } catch (IOException e) {
             sampleRegionShard = null;
             e.printStackTrace();

@@ -1,6 +1,6 @@
 package com.onlol.fetcher.api;
 
-import com.onlol.fetcher.api.exceptions.MatchNotfoundException;
+import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.ApiKey;
 import com.onlol.fetcher.api.repository.ApiKeyRepository;
 import com.onlol.fetcher.logger.LogService;
@@ -28,15 +28,15 @@ public class ApiConnector {
     @Autowired
     private ApiKeyRepository apiKeyRepository;
 
-    public String get(String url) throws MatchNotfoundException {
+    public String get(String url) throws DataNotfoundException {
         return this.get(url, false, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey) throws MatchNotfoundException {
+    public String get(String url, boolean needsApiKey) throws DataNotfoundException {
         return this.get(url, needsApiKey, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey, byte attempts) throws MatchNotfoundException {
+    public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity requestEntity = null;
         ApiKey apiKey = null;
@@ -75,7 +75,7 @@ public class ApiConnector {
                     break;
                 case 404:
                     this.logService.info("Unknown url: " + url);
-                    throw new MatchNotfoundException();
+                    throw new DataNotfoundException();
                 case 429:
                     if (needsApiKey) {
                         apiKey.setBanned(true);
