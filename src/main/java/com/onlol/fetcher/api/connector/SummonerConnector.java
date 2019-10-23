@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.ApiKeyManager;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.exceptions.DataNotfoundException;
-import com.onlol.fetcher.api.model.Summoner;
-import com.onlol.fetcher.api.model.SummonerChampionMastery;
-import com.onlol.fetcher.api.model.SummonerNameHistorical;
-import com.onlol.fetcher.api.repository.*;
-import com.onlol.fetcher.api.riotModel.SampleSummonerChampionMastery;
+import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
+import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.Summoner;
+import com.onlol.fetcher.model.SummonerChampionMastery;
+import com.onlol.fetcher.model.SummonerNameHistorical;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -197,7 +197,7 @@ public class SummonerConnector {
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(Summoner summoner) {
-        ArrayList<SampleSummonerChampionMastery> sampleSummonerChampionMasteries = new ArrayList<>();
+        ArrayList<ApiChampionMasteryDTO> sampleSummonerChampionMasteries = new ArrayList<>();
         try {
             sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONER_CHAMPION_MASTERY
@@ -216,20 +216,20 @@ public class SummonerConnector {
 
 
         ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
-        for (SampleSummonerChampionMastery sampleSummonerChampionMastery : sampleSummonerChampionMasteries) {
+        for (ApiChampionMasteryDTO apiChampionMasteryDTO : sampleSummonerChampionMasteries) {
             SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
             if (summonerChampionMastery == null) {
                 summonerChampionMastery = new SummonerChampionMastery();
             }
             summonerChampionMastery.setSummoner(summoner);
-            summonerChampionMastery.setChampion(this.championRepository.findByChampId(sampleSummonerChampionMastery.getChampionId()));
-            summonerChampionMastery.setChampionLevel(sampleSummonerChampionMastery.getChampionLevel());
-            summonerChampionMastery.setChampionPoints(sampleSummonerChampionMastery.getChampionPoints());
-            summonerChampionMastery.setChampionPointsSinceLastLevel(sampleSummonerChampionMastery.getChampionPointsSinceLastLevel());
-            summonerChampionMastery.setChampionPointsUntilNextLevel(sampleSummonerChampionMastery.getChampionPointsUntilNextLevel());
-            summonerChampionMastery.setChestGranted(sampleSummonerChampionMastery.isChestGranted());
-            summonerChampionMastery.setLastPlayTime(new Timestamp(sampleSummonerChampionMastery.getLastPlayTime()).toLocalDateTime());
-            summonerChampionMastery.setTokensEarned(sampleSummonerChampionMastery.getTokensEarned());
+            summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
+            summonerChampionMastery.setChampionLevel(apiChampionMasteryDTO.getChampionLevel());
+            summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
+            summonerChampionMastery.setChampionPointsSinceLastLevel(apiChampionMasteryDTO.getChampionPointsSinceLastLevel());
+            summonerChampionMastery.setChampionPointsUntilNextLevel(apiChampionMasteryDTO.getChampionPointsUntilNextLevel());
+            summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
+            summonerChampionMastery.setLastPlayTime(new Timestamp(apiChampionMasteryDTO.getLastPlayTime()).toLocalDateTime());
+            summonerChampionMastery.setTokensEarned(apiChampionMasteryDTO.getTokensEarned());
             this.summonerChampionMasteryRepository.save(summonerChampionMastery);
         }
         return summonerChampionMasteries;

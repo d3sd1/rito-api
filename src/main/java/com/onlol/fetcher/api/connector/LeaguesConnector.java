@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.exceptions.DataNotfoundException;
 import com.onlol.fetcher.api.model.*;
-import com.onlol.fetcher.api.repository.*;
-import com.onlol.fetcher.api.riotModel.*;
+import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,14 +73,14 @@ public class LeaguesConnector {
     private ObjectMapper jacksonMapper;
 
     public ArrayList<SummonerLeague> summonerLeagues(Summoner summoner) {
-        ArrayList<SampleSummonerLeague> sampleSummonerLeagues = null;
+        ArrayList<ApiLeagueItemDTO> apiLeagueItemDTOS = null;
         try {
-            sampleSummonerLeagues = this.jacksonMapper.readValue(this.apiConnector.get(
+            apiLeagueItemDTOS = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_BY_SUMMONER
                             .replace("{{SUMMONER_ID}}", summoner.getId())
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference<ArrayList<SampleSummonerLeague>>() {
+            ), new TypeReference<ArrayList<ApiLeagueItemDTO>>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues not found: " + summoner.getName());
@@ -88,15 +88,15 @@ public class LeaguesConnector {
             this.logger.error("No se ha podido retornar la liga del invocador " + summoner.getName());
         }
 
-        if (sampleSummonerLeagues == null) {
+        if (apiLeagueItemDTOS == null) {
             return new ArrayList<>();
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagues) {
-            QueueType queuetype = this.queueTypeRepository.findByKeyName(sampleSummonerLeague.getQueueType());
+        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
+            QueueType queuetype = this.queueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
             if (queuetype == null) {
                 queuetype = new QueueType();
-                queuetype.setKeyName(sampleSummonerLeague.getQueueType());
+                queuetype.setKeyName(apiLeagueItemDTO.getQueueType());
                 this.queueTypeRepository.save(queuetype);
             }
             SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queuetype);
@@ -106,19 +106,19 @@ public class LeaguesConnector {
                 summonerLeague.setQueueType(queuetype);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
-            LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeague.getTier());
+            LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(apiLeagueItemDTO.getTier());
             if (leagueTier == null) {
                 leagueTier = new LeagueTier();
-                leagueTier.setKeyName(sampleSummonerLeague.getTier());
+                leagueTier.setKeyName(apiLeagueItemDTO.getTier());
                 this.leagueTierRepository.save(leagueTier);
             }
             summonerLeague.setLeagueTier(leagueTier);
 
 
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
+            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
                 leagueRank = new LeagueRank();
-                leagueRank.setKeyName(sampleSummonerLeague.getRank());
+                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
                 this.leagueRankRepository.save(leagueRank);
             }
             summonerLeague.setLeagueRank(leagueRank);
@@ -126,7 +126,7 @@ public class LeaguesConnector {
 
             /* Check if player is playing miniseries */
             LeagueMiniSeries leagueMiniSeries = null;
-            if (sampleSummonerLeague.getMiniSeries() != null) {
+            if (apiLeagueItemDTO.getMiniSeries() != null) {
                 leagueMiniSeries = this.leagueMiniSeriesRepository.findBySummoner(summoner);
                 if (leagueMiniSeries == null) {
                     leagueMiniSeries = new LeagueMiniSeries();
@@ -134,22 +134,22 @@ public class LeaguesConnector {
                     this.leagueMiniSeriesRepository.save(leagueMiniSeries);
                 }
 
-                leagueMiniSeries.setWins(sampleSummonerLeague.getMiniSeries().getWins());
-                leagueMiniSeries.setLosses(sampleSummonerLeague.getMiniSeries().getLosses());
-                leagueMiniSeries.setProgress(sampleSummonerLeague.getMiniSeries().getProgress());
-                leagueMiniSeries.setTarget(sampleSummonerLeague.getMiniSeries().getTarget());
+                leagueMiniSeries.setWins(apiLeagueItemDTO.getMiniSeries().getWins());
+                leagueMiniSeries.setLosses(apiLeagueItemDTO.getMiniSeries().getLosses());
+                leagueMiniSeries.setProgress(apiLeagueItemDTO.getMiniSeries().getProgress());
+                leagueMiniSeries.setTarget(apiLeagueItemDTO.getMiniSeries().getTarget());
                 this.leagueMiniSeriesRepository.save(leagueMiniSeries);
             }
 
             summonerLeague.setLeagueMiniSeries(leagueMiniSeries);
 
-            summonerLeague.setHotStreak(sampleSummonerLeague.isHotStreak());
-            summonerLeague.setWins(sampleSummonerLeague.getWins());
-            summonerLeague.setLosses(sampleSummonerLeague.getLosses());
-            summonerLeague.setVeteran(sampleSummonerLeague.isVeteran());
-            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
-            summonerLeague.setFreshBlood(sampleSummonerLeague.isFreshBlood());
-            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
+            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
+            summonerLeague.setWins(apiLeagueItemDTO.getWins());
+            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
+            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
+            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
+            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
             this.summonerLeagueRepository.save(summonerLeague);
         }
         return summonerLeagues;
@@ -166,7 +166,7 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> challengerLadder(Region region, QueueType queueType) {
-        SampleSummonerLeagueList sampleSummonerLeagueList = null;
+        ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             String json = this.apiConnector.get(
                     V4.LEAGUES_CHALLENGER
@@ -175,7 +175,7 @@ public class LeaguesConnector {
                     true
             );
             if (json != null) {
-                sampleSummonerLeagueList = this.jacksonMapper.readValue(json, new TypeReference<SampleSummonerLeagueList>() {
+                apiLeagueListDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiLeagueListDTO>() {
                 });
             }
         } catch (DataNotfoundException e) {
@@ -187,34 +187,34 @@ public class LeaguesConnector {
 
 
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        if (sampleSummonerLeagueList == null) {
+        if (apiLeagueListDTO == null) {
             return summonerLeagues;
         }
 
         /* Find and save league tier */
-        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeagueList.getTier());
-        if (leagueTier == null && sampleSummonerLeagueList.getTier() != null) {
+        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(apiLeagueListDTO.getTier());
+        if (leagueTier == null && apiLeagueListDTO.getTier() != null) {
             leagueTier = new LeagueTier();
-            leagueTier.setKeyName(sampleSummonerLeagueList.getTier());
+            leagueTier.setKeyName(apiLeagueListDTO.getTier());
             this.leagueTierRepository.save(leagueTier);
         }
 
 
         /* Find and save league */
-        League league = this.leagueRepository.findByRiotId(sampleSummonerLeagueList.getLeagueId());
-        if (league == null && sampleSummonerLeagueList.getLeagueId() != null) {
+        League league = this.leagueRepository.findByRiotId(apiLeagueListDTO.getLeagueId());
+        if (league == null && apiLeagueListDTO.getLeagueId() != null) {
             league = new League();
-            league.setRiotId(sampleSummonerLeagueList.getLeagueId());
+            league.setRiotId(apiLeagueListDTO.getLeagueId());
             this.leagueRepository.save(league);
         }
 
-        for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagueList.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(sampleSummonerLeague.getSummonerId());
+        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
+            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(sampleSummonerLeague.getSummonerId());
-                summoner.setName(sampleSummonerLeague.getSummonerName());
+                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.
                 summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
@@ -228,18 +228,18 @@ public class LeaguesConnector {
                 summonerLeague.setQueueType(queueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
-            summonerLeague.setHotStreak(sampleSummonerLeague.isHotStreak());
-            summonerLeague.setWins(sampleSummonerLeague.getWins());
-            summonerLeague.setVeteran(sampleSummonerLeague.isVeteran());
-            summonerLeague.setLosses(sampleSummonerLeague.getLosses());
-            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
-            summonerLeague.setFreshBlood(sampleSummonerLeague.isFreshBlood());
-            summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
+            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
+            summonerLeague.setWins(apiLeagueItemDTO.getWins());
+            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
+            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
+            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
+            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
+            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
                 leagueRank = new LeagueRank();
-                leagueRank.setKeyName(sampleSummonerLeague.getRank());
+                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
                 this.leagueRankRepository.save(leagueRank);
             }
             summonerLeague.setLeagueRank(leagueRank);
@@ -262,14 +262,14 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> masterLadder(Region region, QueueType queueType) {
-        SampleSummonerLeagueList sampleSummonerLeagueList = null;
+        ApiLeagueListDTO apiLeagueListDTO = null;
         try {
-            sampleSummonerLeagueList = this.jacksonMapper.readValue(this.apiConnector.get(
+            apiLeagueListDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_MASTER
                             .replace("{{QUEUE}}", queueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<SampleSummonerLeagueList>() {
+            ), new TypeReference<ApiLeagueListDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
@@ -280,34 +280,34 @@ public class LeaguesConnector {
 
 
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        if (sampleSummonerLeagueList == null) {
+        if (apiLeagueListDTO == null) {
             return summonerLeagues;
         }
 
         /* Find and save league tier */
-        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeagueList.getTier());
-        if (leagueTier == null && sampleSummonerLeagueList.getTier() != null) {
+        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(apiLeagueListDTO.getTier());
+        if (leagueTier == null && apiLeagueListDTO.getTier() != null) {
             leagueTier = new LeagueTier();
-            leagueTier.setKeyName(sampleSummonerLeagueList.getTier());
+            leagueTier.setKeyName(apiLeagueListDTO.getTier());
             this.leagueTierRepository.save(leagueTier);
         }
 
 
         /* Find and save league */
-        League league = this.leagueRepository.findByRiotId(sampleSummonerLeagueList.getLeagueId());
-        if (league == null && sampleSummonerLeagueList.getLeagueId() != null) {
+        League league = this.leagueRepository.findByRiotId(apiLeagueListDTO.getLeagueId());
+        if (league == null && apiLeagueListDTO.getLeagueId() != null) {
             league = new League();
-            league.setRiotId(sampleSummonerLeagueList.getLeagueId());
+            league.setRiotId(apiLeagueListDTO.getLeagueId());
             this.leagueRepository.save(league);
         }
 
-        for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagueList.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(sampleSummonerLeague.getSummonerId());
+        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
+            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(sampleSummonerLeague.getSummonerId());
-                summoner.setName(sampleSummonerLeague.getSummonerName());
+                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.
                 summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
@@ -321,18 +321,18 @@ public class LeaguesConnector {
                 summonerLeague.setQueueType(queueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
-            summonerLeague.setHotStreak(sampleSummonerLeague.isHotStreak());
-            summonerLeague.setWins(sampleSummonerLeague.getWins());
-            summonerLeague.setVeteran(sampleSummonerLeague.isVeteran());
-            summonerLeague.setLosses(sampleSummonerLeague.getLosses());
-            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
-            summonerLeague.setFreshBlood(sampleSummonerLeague.isFreshBlood());
-            summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
+            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
+            summonerLeague.setWins(apiLeagueItemDTO.getWins());
+            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
+            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
+            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
+            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
+            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
                 leagueRank = new LeagueRank();
-                leagueRank.setKeyName(sampleSummonerLeague.getRank());
+                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
                 this.leagueRankRepository.save(leagueRank);
             }
             summonerLeague.setLeagueRank(leagueRank);
@@ -356,7 +356,7 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> grandMasterLadder(Region region, QueueType queueType) {
-        SampleSummonerLeagueList sampleSummonerLeagueList = null;
+        ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             String json = this.apiConnector.get(
                     V4.LEAGUES_GRANDMASTER
@@ -365,7 +365,7 @@ public class LeaguesConnector {
                     true
             );
             if (json != null) {
-                sampleSummonerLeagueList = this.jacksonMapper.readValue(json, new TypeReference<SampleSummonerLeagueList>() {
+                apiLeagueListDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiLeagueListDTO>() {
                 });
             }
         } catch (DataNotfoundException e) {
@@ -377,34 +377,34 @@ public class LeaguesConnector {
 
 
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        if (sampleSummonerLeagueList == null) {
+        if (apiLeagueListDTO == null) {
             return summonerLeagues;
         }
 
         /* Find and save league tier */
-        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(sampleSummonerLeagueList.getTier());
-        if (leagueTier == null && sampleSummonerLeagueList.getTier() != null) {
+        LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(apiLeagueListDTO.getTier());
+        if (leagueTier == null && apiLeagueListDTO.getTier() != null) {
             leagueTier = new LeagueTier();
-            leagueTier.setKeyName(sampleSummonerLeagueList.getTier());
+            leagueTier.setKeyName(apiLeagueListDTO.getTier());
             this.leagueTierRepository.save(leagueTier);
         }
 
 
         /* Find and save league */
-        League league = this.leagueRepository.findByRiotId(sampleSummonerLeagueList.getLeagueId());
-        if (league == null && sampleSummonerLeagueList.getLeagueId() != null) {
+        League league = this.leagueRepository.findByRiotId(apiLeagueListDTO.getLeagueId());
+        if (league == null && apiLeagueListDTO.getLeagueId() != null) {
             league = new League();
-            league.setRiotId(sampleSummonerLeagueList.getLeagueId());
+            league.setRiotId(apiLeagueListDTO.getLeagueId());
             this.leagueRepository.save(league);
         }
 
-        for (SampleSummonerLeague sampleSummonerLeague : sampleSummonerLeagueList.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(sampleSummonerLeague.getSummonerId());
+        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
+            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(sampleSummonerLeague.getSummonerId());
-                summoner.setName(sampleSummonerLeague.getSummonerName());
+                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.
                 summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
@@ -418,18 +418,18 @@ public class LeaguesConnector {
                 summonerLeague.setQueueType(queueType);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
-            summonerLeague.setHotStreak(sampleSummonerLeague.isHotStreak());
-            summonerLeague.setWins(sampleSummonerLeague.getWins());
-            summonerLeague.setVeteran(sampleSummonerLeague.isVeteran());
-            summonerLeague.setLosses(sampleSummonerLeague.getLosses());
-            summonerLeague.setInactive(sampleSummonerLeague.isInactive());
-            summonerLeague.setFreshBlood(sampleSummonerLeague.isFreshBlood());
-            summonerLeague.setLeaguePoints(sampleSummonerLeague.getLeaguePoints());
+            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
+            summonerLeague.setWins(apiLeagueItemDTO.getWins());
+            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
+            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
+            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
+            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
+            summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
             summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(sampleSummonerLeague.getRank());
+            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
             if (leagueRank == null) {
                 leagueRank = new LeagueRank();
-                leagueRank.setKeyName(sampleSummonerLeague.getRank());
+                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
                 this.leagueRankRepository.save(leagueRank);
             }
             summonerLeague.setLeagueRank(leagueRank);
@@ -447,13 +447,13 @@ public class LeaguesConnector {
     }
 
     public FeaturedGameInterval featuredGames(Region region) {
-        SampleFeaturedGames sampleFeaturedGames = null;
+        ApiFeaturedGamesDTO apiFeaturedGamesDTO = null;
         try {
             String json = this.apiConnector.get(
                     V4.FEATURED_GAMES
                             .replace("{{HOST}}", region.getHostName()), true);
             if (json != null) {
-                sampleFeaturedGames = this.jacksonMapper.readValue(json, new TypeReference<SampleFeaturedGames>() {
+                apiFeaturedGamesDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiFeaturedGamesDTO>() {
                 });
             } else {
                 return new FeaturedGameInterval();
@@ -463,20 +463,20 @@ public class LeaguesConnector {
             this.logger.error("No se ha podido retornar las partidas promocionadas " + e.getMessage());
         }
         FeaturedGameInterval featuredGameInterval = new FeaturedGameInterval();
-        featuredGameInterval.setClientRefreshInterval(sampleFeaturedGames.getClientRefreshInterval());
+        featuredGameInterval.setClientRefreshInterval(apiFeaturedGamesDTO.getClientRefreshInterval());
 
         ArrayList<MatchGame> matchGames = new ArrayList<>();
-        for (SampleFeaturedGameInfo sampleFeaturedGameInfo : sampleFeaturedGames.getGameList()) {
-            System.out.println(sampleFeaturedGameInfo.getGameId());
-            MatchGame matchGame = this.matchGameRepository.findByGameId(sampleFeaturedGameInfo.getGameId());
+        for (ApiFeaturedGameInfoDTO apiFeaturedGameInfoDto : apiFeaturedGamesDTO.getGameList()) {
+            System.out.println(apiFeaturedGameInfoDto.getGameId());
+            MatchGame matchGame = this.matchGameRepository.findByGameId(apiFeaturedGameInfoDto.getGameId());
             if (matchGame == null) {
                 matchGame = new MatchGame();
-                matchGame.setGameId(sampleFeaturedGameInfo.getGameId());
+                matchGame.setGameId(apiFeaturedGameInfoDto.getGameId());
                 matchGame.setRegion(region);
                 this.matchGameRepository.save(matchGame);
             }
             //TODO: completar esta clase
-            for (SampleBannedChampion sampleBannedChampion : sampleFeaturedGameInfo.getBannedChampions()) {
+            for (ApiBannedChampionDTO apiBannedChampionDTO : apiFeaturedGameInfoDto.getBannedChampions()) {
                 continue;
             }
 /*

@@ -1,9 +1,12 @@
 package com.onlol.fetcher.api;
 
-import com.onlol.fetcher.api.exceptions.DataNotfoundException;
-import com.onlol.fetcher.api.model.ApiKey;
-import com.onlol.fetcher.api.repository.ApiKeyRepository;
+import com.onlol.fetcher.exceptions.ApiBadRequestException;
+import com.onlol.fetcher.exceptions.ApiDownException;
+import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
+import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.ApiKey;
+import com.onlol.fetcher.repository.ApiKeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,16 +31,15 @@ public class ApiConnector {
     @Autowired
     private ApiKeyRepository apiKeyRepository;
 
-    public String get(String url) throws DataNotfoundException {
+    public String get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
         return this.get(url, false, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey) throws DataNotfoundException {
+    public String get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
         return this.get(url, needsApiKey, Byte.decode("0"));
     }
 
-    //TODO: en lugar de retornar null, retornar excepcion?
-    public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException {
+    public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity requestEntity = null;
@@ -65,20 +67,51 @@ public class ApiConnector {
                     String.class);
         } catch (HttpClientErrorException e) {
             switch (e.getStatusCode().value()) {
+                case 400:
+                    /*
+                    Common Reasons:
+                    A provided parameter is in the wrong format (e.g., a string instead of an integer).
+                    A provided parameter is invalid (e.g., beginTime and startTime specify a time range that is too large).
+                    A required parameter was not provided.
+                     */
+                    this.logService.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. " + url + " with exception " + e.getMessage());
+                    throw new ApiBadRequestException();
                 case 401:
+                    /*
+                    Common Reasons:
+                    An API key has not been included in the request.
+                     */
                     if (needsApiKey) {
                         apiKey.setBanned(true);
                         apiKey.setValid(false);
                         this.apiKeyRepository.save(apiKey);
                     }
-                    break;
+                    this.logService.error("ACTION REQUIRED. Unauthorized URL has thrown a 401 UNAUTHORIZED CODE. " + url + " with exception " + e.getMessage());
+                    throw new ApiUnauthorizedException();
                 case 403:
+                    /*
+                    Common Reasons:
+                    An invalid API key was provided with the API request.
+                    A blacklisted API key was provided with the API request.
+                    The API request was for an incorrect or unsupported path.
+                     */
                     this.logService.debug("Forbidden URL: " + url);
-                    break;
+                    throw new DataNotfoundException();
                 case 404:
+                    /*
+                    Common Reasons:
+                    The ID or name provided does not match any existing resource (e.g., there is no Summoner matching the specified ID).
+                    There are no resources that match the parameters specified.
+                     */
                     this.logService.info("Unknown url: " + url);
                     throw new DataNotfoundException();
+
+
                 case 429:
+                    /*
+                    Common Reasons:
+                    Unregulated API calls.
+                     */
                     if (needsApiKey) {
                         apiKey.setBanned(true);
                         apiKey.setValid(true);
@@ -89,37 +122,44 @@ public class ApiConnector {
             }
         } catch (HttpServerErrorException e) {
             switch (e.getStatusCode().value()) {
+                case 500:
+                    this.logService.warning("Api struggling with 500 on " + url + " with exception " + e.getMessage());
+                    throw new ApiDownException();
                 case 503:
-                    try {
-                        TimeUnit.SECONDS.sleep(3);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    // Prevent cycle. Retry only 3 times just in case.
-                    if (attempts < 3) {
-                        this.logService.warning("Api seems to be down on endpoint " + url + " with exception " + e.getMessage());
-                        return this.get(url, needsApiKey, ++attempts);
-                    } else {
-                        return null;
-                    }
+                    this.sleepGet(url, needsApiKey, attempts, e);
 
             }
         } catch (ResourceAccessException e) {
-            try {
-                TimeUnit.SECONDS.sleep(3);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            // Prevent cycle. Retry only 3 times just in case.
-            if (attempts < 3) {
-                this.logService.warning("Api got temporal troubles resolving " + url + " with exception " + e.getMessage());
-                return this.get(url, needsApiKey, ++attempts);
-            } else {
-                return null;
-            }
+            this.sleepGet(url, needsApiKey, attempts, e);
         }
-        //System.out.println(resp.getHeaders()); TODO: best effort - detectar limites y almacenarlos en db, almacenando llamadas y tipos de llamadas?
-        return resp == null ? null : resp.getBody();
+
+        return resp.getBody();
+    }
+
+    public String sleepGet(String url, boolean needsApiKey, Byte attempts, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+        // Prevent cycle. Retry only 3 times just in case.
+        if (attempts < 3) {
+            this.logService.warning("Api seems to be down on endpoint (503) " + url + " with exception " + e.getMessage());
+            return this.get(url, needsApiKey, ++attempts);
+        } else {
+            throw new ApiDownException();
+        }
+    }
+
+    public void post() {
+        /*
+        Tener en cuenta este back code :)
+        415 (Unsupported Media Type) This error indicates that the server is refusing to service the request because the body of the request is in a format that is not supported.
+
+Common Reasons
+
+The Content-Type header was not appropriately set.
+         */
     }
 
 }

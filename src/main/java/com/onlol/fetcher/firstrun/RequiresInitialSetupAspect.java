@@ -1,7 +1,7 @@
 package com.onlol.fetcher.firstrun;
 
-import com.onlol.fetcher.api.repository.RunLogRepository;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.repository.RunLogRepository;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

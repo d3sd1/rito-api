@@ -1,10 +1,9 @@
 package com.onlol.fetcher.firstrun;
 
-import com.onlol.fetcher.api.connector.DdragonConnector;
 import com.onlol.fetcher.api.connector.LeaguesConnector;
-import com.onlol.fetcher.api.model.RunLog;
-import com.onlol.fetcher.api.repository.RunLogRepository;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.RunLog;
+import com.onlol.fetcher.repository.RunLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -17,9 +16,6 @@ so every next time, app has needed data.
  */
 @Component
 public class InitialSetup implements ApplicationListener<ApplicationStartedEvent> {
-
-    @Autowired
-    private DdragonConnector ddragonConnector;
 
     @Autowired
     private RunLogRepository runLogRepository;

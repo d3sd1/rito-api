@@ -1,8 +1,8 @@
 package com.onlol.fetcher.api;
 
-import com.onlol.fetcher.api.model.ApiKey;
-import com.onlol.fetcher.api.repository.ApiKeyRepository;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.ApiKey;
+import com.onlol.fetcher.repository.ApiKeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

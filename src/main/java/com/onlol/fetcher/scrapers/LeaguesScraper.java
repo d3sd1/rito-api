@@ -1,8 +1,8 @@
 package com.onlol.fetcher.scrapers;
 
 import com.onlol.fetcher.api.connector.LeaguesConnector;
-import com.onlol.fetcher.api.repository.RegionRepository;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.repository.RegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
