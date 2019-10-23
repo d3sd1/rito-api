@@ -47,7 +47,7 @@ public class ApiConnector {
                     TimeUnit.SECONDS.sleep(60);
                 } catch (InterruptedException e) {
                 }
-                return this.get(url, needsApiKey, attempts++);
+                return this.get(url, needsApiKey, ++attempts);
             }
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-Riot-Token", apiKey.getApiKey());
@@ -80,7 +80,7 @@ public class ApiConnector {
                         apiKey.setValid(true);
                         this.apiKeyRepository.save(apiKey);
                     }
-                    return this.get(url, needsApiKey, attempts++);
+                    return this.get(url, needsApiKey, ++attempts);
 
             }
         } catch (HttpServerErrorException e) {
@@ -93,8 +93,8 @@ public class ApiConnector {
                     }
                     // Prevent cycle. Retry only 3 times just in case.
                     if (attempts < 3) {
-                        this.logService.warning("Api seems to be down on endpoint " + url);
-                        return this.get(url, needsApiKey, attempts++);
+                        this.logService.warning("Api seems to be down on endpoint " + url + " with exception " + e.getMessage());
+                        return this.get(url, needsApiKey, ++attempts);
                     } else {
                         return null;
                     }

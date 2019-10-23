@@ -434,13 +434,16 @@ public class LeaguesConnector {
     public FeaturedGameInterval featuredGames(Region region) {
         SampleFeaturedGames sampleFeaturedGames = null;
         try {
-            sampleFeaturedGames = this.jacksonMapper.readValue(this.apiConnector.get(
+            String json = this.apiConnector.get(
                     V4.FEATURED_GAMES
-                            .replace("{{HOST}}", region.getHostName()),
-                    true
-            ), new TypeReference<SampleFeaturedGames>() {
-            });
-        } catch (IOException e) {
+                            .replace("{{HOST}}", region.getHostName()), true);
+            if (json != null) {
+                sampleFeaturedGames = this.jacksonMapper.readValue(json, new TypeReference<SampleFeaturedGames>() {
+                });
+            } else {
+                sampleFeaturedGames = new SampleFeaturedGames();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar las partidas promocionadas " + e.getMessage());
         }
