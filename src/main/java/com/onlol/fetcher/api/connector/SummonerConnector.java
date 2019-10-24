@@ -69,7 +69,7 @@ public class SummonerConnector {
             this.logger.error("Got generic exception" + e.getMessage());
             return;
         }
-        this.summonerFiller.fillSummoner(summonerFiller);
+        //TODO this.summonerFiller.fillSummoner(summonerFiller);
     }
 /*
     public Summoner byPuuid(Summoner summoner) {

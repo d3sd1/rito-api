@@ -1,14 +1,8 @@
 package com.onlol.fetcher.api.filler;
 
-import com.onlol.fetcher.api.model.ApiSummonerDTO;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerNameHistorical;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class SummonerFiller {
@@ -18,7 +12,7 @@ public class SummonerFiller {
     /*
     TODO: pensar algo... ya que la actualizacion completa tiene que ser con el mismo api key o dar un api key a cada invocador para que les
     actualice individualmente... o algo que se me ocurra :)
-     */
+
     public void fillSummoner(ApiSummonerDTO apiSummonerDTO) {
         Summoner summoner = this.summonerRepository.findByAccountId()
 
@@ -37,5 +31,5 @@ public class SummonerFiller {
                 }
             }
         }
-    }
+    }   */
 }

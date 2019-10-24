@@ -72,7 +72,9 @@ public class LeaguesConnector {
     private ObjectMapper jacksonMapper;
 
     public ArrayList<SummonerLeague> summonerLeagues(Summoner summoner) {
+        /* TODO
         ArrayList<ApiLeagueItemDTO> apiLeagueItemDTOS = null;
+
         try {
             apiLeagueItemDTOS = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_BY_SUMMONER
@@ -151,7 +153,7 @@ public class LeaguesConnector {
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
             this.summonerLeagueRepository.save(summonerLeague);
         }*/
-        return summonerLeagues;
+        return new ArrayList<>();
     }
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
@@ -212,7 +214,7 @@ public class LeaguesConnector {
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                //TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
                 summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.
@@ -305,7 +307,7 @@ public class LeaguesConnector {
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                // TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
                 summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.
@@ -402,7 +404,7 @@ public class LeaguesConnector {
             Summoner summoner = null;
             if (!opSummoner.isPresent()) {
                 summoner = new Summoner();
-                summoner.setId(apiLeagueItemDTO.getSummonerId());
+                // TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
                 summoner.setName(apiLeagueItemDTO.getSummonerName());
                 summoner.setRegion(region);
                 // Set prev date, so we queue this summoner for being updated.

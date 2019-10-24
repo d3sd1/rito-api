@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +87,9 @@ public class MatchConnector {
 
     public List<MatchList> matchListByAccount(Summoner summoner, Long beginIndex) {
         ApiMatchlistDto apiMatchlistDto;
+        /* TODO
         try {
+
             System.out.println(summoner);
             System.out.println(V4.MATCHLIST_BY_ACCOUNT
                     .replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
@@ -128,12 +129,12 @@ public class MatchConnector {
 
                 matchList.setMatch(matchGame);
 
-                /* Get platform constant */
+                /* Get platform constant *
                 Region region = this.regionRepository.findByServicePlatform(apiMatchReferenceDto.getPlatformId());
                 matchList.setRegion(region);
 
 
-                /* Get queue */
+                /* Get queue *
                 GameQueue gameQueue = this.gameQueueRepository.findTopByQueueId(apiMatchReferenceDto.getQueue());
                 if (gameQueue == null) {
                     GameQueue dbGameQueue = new GameQueue();
@@ -145,7 +146,7 @@ public class MatchConnector {
                 matchList.setGameQueue(gameQueue);
 
 
-                /* Get role */
+                /* Get role *
                 Role role = this.roleRepository.findByKeyName(apiMatchReferenceDto.getRole());
                 if (role == null) {
                     Role dbRole = new Role();
@@ -158,7 +159,7 @@ public class MatchConnector {
                 }
                 matchList.setRole(role);
 
-                /* Get season */
+                /* Get season *
                 GameSeason gameSeason = this.gameSeasonRepository.findTopById(apiMatchReferenceDto.getSeason());
                 if (gameSeason == null) {
                     GameSeason dbGameSeason = new GameSeason();
@@ -169,7 +170,7 @@ public class MatchConnector {
                 }
                 matchList.setGameSeason(gameSeason);
 
-                /* Get lane */
+                /* Get lane *
                 Lane lane = this.laneRepository.findByKeyName(apiMatchReferenceDto.getLane());
                 if (lane == null && apiMatchReferenceDto.getLane() != null) {
                     Lane dbLane = new Lane();
@@ -181,7 +182,7 @@ public class MatchConnector {
                 matchList.setLane(lane);
 
 
-                /* Get champ */
+                /* Get champ *
                 Champion champion = this.championRepository.findByChampId(apiMatchReferenceDto.getChampion());
                 if (champion != null) {
                     matchList.setChamp(champion);
@@ -200,8 +201,8 @@ public class MatchConnector {
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
         if (apiMatchlistDto.getEndIndex() < apiMatchlistDto.getTotalGames()) {
             this.matchListByAccount(summoner, apiMatchlistDto.getEndIndex() + 1);
-        }
-        return matchLists;
+        }*/
+        return new ArrayList<>();
     }
 
 
@@ -309,7 +310,7 @@ public class MatchConnector {
 
         this.matchGameRepository.save(matchGame);
 
-        /* Add summoners to update */
+        /* Add summoners to update *
         for (
                 ApiParticipantIdentityDTO apiParticipantIdentityDto : apiMatchDTO.getParticipantIdentities()) {
 
@@ -317,8 +318,8 @@ public class MatchConnector {
             Summoner dbSummoner = this.summonerRepository.findByAccountId(apiParticipantIdentityDto.getPlayer().getAccountId());
             if (dbSummoner == null) {
                 dbSummoner = new Summoner();
-                dbSummoner.setAccountId(apiParticipantIdentityDto.getPlayer().getAccountId());
-                dbSummoner.setId(apiParticipantIdentityDto.getPlayer().getSummonerId());
+                //TODO dbSummoner.setAccountId(apiParticipantIdentityDto.getPlayer().getAccountId());
+                //TODO dbSummoner.setId(apiParticipantIdentityDto.getPlayer().getSummonerId());
                 dbSummoner.setRegion(matchGame.getRegion());
                 dbSummoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
                 dbSummoner.setName(apiParticipantIdentityDto.getPlayer().getSummonerName());
@@ -387,7 +388,7 @@ public class MatchConnector {
             if (opsummoner.isEmpty()) {
                 summoner = new Summoner();
                 summoner.setRegion(matchGame.getRegion());
-                summoner.setId(apiParticipantIdentityDto.getPlayer().getSummonerId());
+                //TODO summoner.setId(apiParticipantIdentityDto.getPlayer().getSummonerId());
                 summoner = this.summonerRepository.save(summoner);
             } else {
                 summoner = opsummoner.get();

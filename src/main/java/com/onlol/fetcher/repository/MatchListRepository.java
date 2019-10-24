@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MatchListRepository extends JpaRepository<MatchList, String> {
-    MatchList findByMatchGameIdAndSummonerAccountId(Long matchId, String summonerId);
+    //TODO MatchList findByMatchGameIdAndSummonerAccountId(Long matchId, String summonerId);
 }

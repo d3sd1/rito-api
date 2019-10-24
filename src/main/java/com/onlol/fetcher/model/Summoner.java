@@ -3,10 +3,7 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,14 +11,12 @@ import java.time.LocalDateTime;
 public class Summoner {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private String id;
+    private Integer id;
 
-    @Column(nullable = true, unique = true)
-    private String accountId;
-
-    @Column(nullable = true, unique = true)
-    private String puuid;
+    @Column(nullable = false, unique = false)
+    private Long riotRealId;
 
     @Column(nullable = false, unique = false)
     private String name;
@@ -41,28 +36,20 @@ public class Summoner {
     @OneToOne
     private Region region;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getAccountId() {
-        return accountId;
+    public Long getRiotRealId() {
+        return riotRealId;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getPuuid() {
-        return puuid;
-    }
-
-    public void setPuuid(String puuid) {
-        this.puuid = puuid;
+    public void setRiotRealId(Long riotRealId) {
+        this.riotRealId = riotRealId;
     }
 
     public String getName() {
@@ -116,9 +103,8 @@ public class Summoner {
     @Override
     public String toString() {
         return "Summoner{" +
-                "id='" + id + '\'' +
-                ", accountId='" + accountId + '\'' +
-                ", puuid='" + puuid + '\'' +
+                "id=" + id +
+                ", riotRealId=" + riotRealId +
                 ", name='" + name + '\'' +
                 ", profileIconId=" + profileIconId +
                 ", revisionDate=" + revisionDate +
