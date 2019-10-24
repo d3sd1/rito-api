@@ -38,7 +38,7 @@ public class GameDataConnector {
         ArrayList<DDGameModeDTO> modes;
         try {
             modes = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_MODES),
+                    this.apiConnector.get(V4.DDRAGON_MODES).getJson(),
                     new TypeReference<ArrayList<DDGameModeDTO>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -61,7 +61,7 @@ public class GameDataConnector {
         ArrayList<DDQueueDTO> queues;
         try {
             queues = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_QUEUES),
+                    this.apiConnector.get(V4.DDRAGON_QUEUES).getJson(),
                     new TypeReference<ArrayList<DDQueueDTO>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -84,7 +84,7 @@ public class GameDataConnector {
 
         try {
             maps = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_MAPS),
+                    this.apiConnector.get(V4.DDRAGON_MAPS).getJson(),
                     new TypeReference<ArrayList<DDGameMapDTO>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -107,7 +107,7 @@ public class GameDataConnector {
         ArrayList<DDGameTypeDTO> gameTypes;
         try {
             gameTypes = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_TYPES),
+                    this.apiConnector.get(V4.DDRAGON_TYPES).getJson(),
                     new TypeReference<ArrayList<DDGameTypeDTO>>() {
                     });
         } catch (DataNotfoundException e) {

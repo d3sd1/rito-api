@@ -5,6 +5,7 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.ApiCall;
 import com.onlol.fetcher.model.ApiKey;
 import com.onlol.fetcher.repository.ApiKeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +32,15 @@ public class ApiConnector {
     @Autowired
     private ApiKeyRepository apiKeyRepository;
 
-    public String get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+    public ApiCall get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
         return this.get(url, false, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
         return this.get(url, needsApiKey, Byte.decode("0"));
     }
 
-    public String get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity requestEntity = null;
@@ -133,10 +134,10 @@ public class ApiConnector {
             this.sleepGet(url, needsApiKey, attempts, e);
         }
 
-        return resp.getBody();
+        return new ApiCall(apiKey, resp.getBody());
     }
 
-    public String sleepGet(String url, boolean needsApiKey, Byte attempts, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
+    public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
         try {
             TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException ex) {

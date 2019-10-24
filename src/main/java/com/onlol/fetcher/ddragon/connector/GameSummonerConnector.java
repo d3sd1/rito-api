@@ -74,15 +74,12 @@ public class GameSummonerConnector {
         DDDdragonDTO<LinkedHashMap<String, DDSummonerSpellDTO>> ddragonData = null;
         ArrayList<SummonerSpell> summonerSpells = new ArrayList<>();
         try {
-            String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_SPELLS
-                    .replace("{{VERSION}}", gameVersion.getVersion())
-                    .replace("{{LANGUAGE}}", language.getKeyName()));
-            if (json != null) {
-                ddragonData = this.jacksonMapper.readValue(
-                        json,
-                        new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDSummonerSpellDTO>>>() {
-                        });
-            }
+            ddragonData = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_SUMMONER_SPELLS
+                            .replace("{{VERSION}}", gameVersion.getVersion())
+                            .replace("{{LANGUAGE}}", language.getKeyName())).getJson(),
+                    new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDSummonerSpellDTO>>>() {
+                    });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());
             return;
@@ -109,15 +106,13 @@ public class GameSummonerConnector {
         DDDdragonDTO<LinkedHashMap<Integer, DDSummonerImageDTO>> ddragonData = null;
         ArrayList<SummonerProfileImage> summonerProfileImages = new ArrayList<>();
         try {
-            String json = this.apiConnector.get(V4.DDRAGON_SUMMONER_IMAGES
-                    .replace("{{VERSION}}", gameVersion.getVersion())
-                    .replace("{{LANGUAGE}}", "en_US")); // lang not relevant...
-            if (json != null) {
-                ddragonData = this.jacksonMapper.readValue(
-                        json,
-                        new TypeReference<DDDdragonDTO<LinkedHashMap<Integer, DDSummonerImageDTO>>>() {
-                        });
-            }
+            ddragonData = this.jacksonMapper.readValue(
+                    this.apiConnector.get(V4.DDRAGON_SUMMONER_IMAGES
+                            .replace("{{VERSION}}", gameVersion.getVersion())
+                            .replace("{{LANGUAGE}}", "en_US")).getJson(),
+                    new TypeReference<DDDdragonDTO<LinkedHashMap<Integer, DDSummonerImageDTO>>>() {
+                    });
+
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());
             return;

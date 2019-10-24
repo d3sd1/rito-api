@@ -65,7 +65,7 @@ public class GameChampionConnector {
             ddragonData = this.jacksonMapper.readValue(
                     this.apiConnector.get(V4.DDRAGON_CHAMPIONS
                             .replace("{{VERSION}}", gameVersion.getVersion())
-                            .replace("{{LANGUAGE}}", lang.getKeyName())),
+                            .replace("{{LANGUAGE}}", lang.getKeyName())).getJson(),
                     new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDChampionDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -108,7 +108,7 @@ public class GameChampionConnector {
             try {
                 champRotation = this.jacksonMapper.readValue(
                         this.apiConnector.get(V3.CHAMPION_ROTATION.
-                                replace("{{HOST}}", region.getHostName()), true),
+                                replace("{{HOST}}", region.getHostName()), true).getJson(),
                         new TypeReference<ApiChampionInfoDTO>() {
                         });
             } catch (DataNotfoundException e) {

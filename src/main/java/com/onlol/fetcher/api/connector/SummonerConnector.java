@@ -58,7 +58,7 @@ public class SummonerConnector {
                             .replace("{{SUMMONER_NAME}}", summoner.getName().replaceAll(" ", "%20"))
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference<ApiSummonerDTO>() {
+            ).getJson(), new TypeReference<ApiSummonerDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());

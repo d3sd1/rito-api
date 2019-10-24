@@ -50,7 +50,7 @@ public class GameInfoConnector {
         ArrayList<String> stringLanguages;
         try {
             stringLanguages = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_LANGUAGES),
+                    this.apiConnector.get(V4.DDRAGON_LANGUAGES).getJson(),
                     new TypeReference<ArrayList<String>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -84,7 +84,7 @@ public class GameInfoConnector {
                     V3.SHARD_DATA
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<ApiShardStatusDTO>() {
+            ).getJson(), new TypeReference<ApiShardStatusDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());
@@ -103,7 +103,7 @@ public class GameInfoConnector {
             DDRealmDTO sampleRealm;
             try {
                 sampleRealm = this.jacksonMapper.readValue(
-                        this.apiConnector.get(V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion())),
+                        this.apiConnector.get(V4.DDRAGON_REALM.replace("{{REGION}}", region.getServiceRegion())).getJson(),
                         new TypeReference<DDRealmDTO>() {
                         });
             } catch (DataNotfoundException e) {
@@ -124,7 +124,7 @@ public class GameInfoConnector {
         ArrayList<String> stringVersions = null;
         try {
             stringVersions = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_VERSIONS),
+                    this.apiConnector.get(V4.DDRAGON_VERSIONS).getJson(),
                     new TypeReference<ArrayList<String>>() {
                     });
         } catch (DataNotfoundException e) {
@@ -150,7 +150,7 @@ public class GameInfoConnector {
         ArrayList<DDGameSeasonDTO> gameSeasons;
         try {
             gameSeasons = this.jacksonMapper.readValue(
-                    this.apiConnector.get(V4.DDRAGON_SEASONS),
+                    this.apiConnector.get(V4.DDRAGON_SEASONS).getJson(),
                     new TypeReference<ArrayList<DDGameSeasonDTO>>() {
                     });
         } catch (DataNotfoundException e) {

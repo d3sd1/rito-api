@@ -169,16 +169,13 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> challengerLadder(Region region, GameQueueType gameQueueType) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
-            String json = this.apiConnector.get(
+            apiLeagueListDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_CHALLENGER
                             .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            );
-            if (json != null) {
-                apiLeagueListDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiLeagueListDTO>() {
-                });
-            }
+            ).getJson(), new TypeReference<ApiLeagueListDTO>() {
+            });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {
@@ -270,7 +267,7 @@ public class LeaguesConnector {
                             .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<ApiLeagueListDTO>() {
+            ).getJson(), new TypeReference<ApiLeagueListDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
@@ -359,16 +356,13 @@ public class LeaguesConnector {
     public ArrayList<SummonerLeague> grandMasterLadder(Region region, GameQueueType gameQueueType) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
-            String json = this.apiConnector.get(
+            apiLeagueListDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_GRANDMASTER
                             .replace("{{QUEUE}}", gameQueueType.getKeyName())
                             .replace("{{HOST}}", region.getHostName()),
                     true
-            );
-            if (json != null) {
-                apiLeagueListDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiLeagueListDTO>() {
-                });
-            }
+            ).getJson(), new TypeReference<ApiLeagueListDTO>() {
+            });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {
@@ -450,15 +444,10 @@ public class LeaguesConnector {
     public FeaturedGameInterval featuredGames(Region region) {
         ApiFeaturedGamesDTO apiFeaturedGamesDTO = null;
         try {
-            String json = this.apiConnector.get(
+            apiFeaturedGamesDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.FEATURED_GAMES
-                            .replace("{{HOST}}", region.getHostName()), true);
-            if (json != null) {
-                apiFeaturedGamesDTO = this.jacksonMapper.readValue(json, new TypeReference<ApiFeaturedGamesDTO>() {
-                });
-            } else {
-                return new FeaturedGameInterval();
-            }
+                            .replace("{{HOST}}", region.getHostName()), true).getJson(), new TypeReference<ApiFeaturedGamesDTO>() {
+            });
         } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar las partidas promocionadas " + e.getMessage());

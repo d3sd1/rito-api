@@ -81,7 +81,7 @@ public class GameItemsConnector {
         try {
             sampleItemSet = this.jacksonMapper.readValue(this.apiConnector.get(V4.DDRAGON_ITEMS
                             .replace("{{VERSION}}", gameVersion.getVersion())
-                            .replace("{{LANGUAGE}}", lang.getKeyName())),
+                            .replace("{{LANGUAGE}}", lang.getKeyName())).getJson(),
                     new TypeReference<DDItemSetDTO>() {
                     });
         } catch (DataNotfoundException e) {

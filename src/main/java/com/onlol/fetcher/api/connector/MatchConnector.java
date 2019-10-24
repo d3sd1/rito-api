@@ -214,7 +214,7 @@ public class MatchConnector {
                     V4.MATCHES.replace("{{GAME_ID}}", matchGame.getGameId().toString())
                             .replace("{{HOST}}", matchGame.getRegion().getHostName()),
                     true
-            ), new TypeReference<ApiMatchlistDto>() {
+            ).getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.error("El match no existe..." + matchGame.getGameId().toString());
