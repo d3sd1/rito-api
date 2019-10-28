@@ -16,10 +16,10 @@ public class SummonerToken {
     @Column(nullable = false, unique = true)
     private String summonerTokenId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String accountTokenId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String puuTokenId;
 
     @OneToOne
