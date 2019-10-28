@@ -10,10 +10,7 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.ApiCall;
-import com.onlol.fetcher.model.Region;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerChampionMastery;
+import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
 import com.onlol.fetcher.repository.SummonerNameHistoricalRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Service
 public class SummonerFiller {
@@ -100,51 +98,74 @@ public class SummonerFiller {
         return realMatchId;
     }
     // TODO agrupar mails error
+    /* TODO: hacerlo multikey. por ahora solo se usa una de prod */
 
-    public Summoner fillSummoner(ApiCall apiCall, ApiSummonerDTO apiSummonerDTO) {
-            /* TODO: hacerlo multikey. por ahora solo se usa una de prod
-            Pasos 1: Crear/recuperar summoner
-            paso 2: crear summoner id si no existe
-            paso 3: crear mapa de hash a summoner y api
-             */
-            /*
-        CASOS:
-        1. no existe summoner en db y no existe summoner hash con api
-        2. existe summoner en db y no existe usmmoner hash con api
-        3. existe summoner en db y existe summoner hash con api
+    public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region) {
+        ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
+        apiSummonerDTO.setId(apiLeagueItemDTO.getSummonerId());
+        apiSummonerDTO.setName(apiLeagueItemDTO.getSummonerName());
+        apiSummonerDTO.setSummonerLevel(null);
+        apiSummonerDTO.setProfileIconId(null);
+        apiSummonerDTO.setRevisionDate(null);
+        return this.fillSummoner(apiSummonerDTO, region);
+    }
 
-
-        // Caso 3 - fastest
+    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region) {
+        SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
         Summoner summoner;
-        SummonerToken summonerPrevToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
-        if (summonerPrevToken == null) {
-            summonerPrevToken = new SummonerToken();
-            summonerPrevToken.setPuuTokenId(apiSummonerDTO.getPuuid());
-            summonerPrevToken.setSummonerTokenId(apiSummonerDTO.getId());
-            summonerPrevToken.setApiKey(apiCall.getApiKey());
-            summonerPrevToken.setAccountTokenId(apiSummonerDTO.getAccountId());
-
-            summoner = this.summonerRepository.findByRiotRealId(this.getSummonerRealId());
-            if (summoner == null || summoner.getRiotRealId() == 0) {
-                return null;
-            }
-            summonerPrevToken.setSummoner(summoner);
-            this.summonerTokenRepository.save(summonerPrevToken);
+        /* Init if needed */
+        if (summonerToken == null) {
+            summoner = new Summoner();
+            summoner.setName(apiSummonerDTO.getName());
+            this.summonerRepository.save(summoner);
+            summonerToken = new SummonerToken();
+            summonerToken.setSummonerTokenId(apiSummonerDTO.getId());
+            summonerToken.setSummoner(summoner);
+            this.summonerTokenRepository.save(summonerToken);
         } else {
-            return summonerPrevToken.getSummoner();
+            summoner = summonerToken.getSummoner();
         }
 
-        summoner.setLastTimeUpdated(LocalDateTime.now());
-        summoner = this.summonerRepository.save(summoner);
-        // Update historical name if needed
-        if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(apiSummonerDTO.getName(), summoner) == null) {
-            SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-            summonerNameHistorical.setName(summoner.getName());
+        /* Fullfit summoner token id if needed */
+        if (summoner == null) {
+            // TODO: si no existe en db, eliminar de hsah y summoner table
+        }
+        summoner.setName(apiSummonerDTO.getName());
+        /* Fullfit summoner historical names */
+        SummonerNameHistorical summonerNameHistorical =
+                this.summonerNameHistoricalRepository.findTopByNameAndSummoner(apiSummonerDTO.getName(), summoner);
+        if (summonerNameHistorical == null) {
+            summonerNameHistorical = new SummonerNameHistorical();
+            summonerNameHistorical.setName(apiSummonerDTO.getName());
             summonerNameHistorical.setSummoner(summoner);
+            summonerNameHistorical.setTimestamp(LocalDateTime.now());
             this.summonerNameHistoricalRepository.save(summonerNameHistorical);
         }
-        return summoner; */
-        return null;
+
+        summoner.setRegion(region);
+        boolean firstTime = true;
+        // esto para version multikey summoner.setRiotRealId();
+        if (apiSummonerDTO.getProfileIconId() != null) {
+            summoner.setProfileIconId(apiSummonerDTO.getProfileIconId());
+            firstTime = false;
+        }
+        if (apiSummonerDTO.getSummonerLevel() != null) {
+            summoner.setSummonerLevel(apiSummonerDTO.getSummonerLevel());
+            firstTime = false;
+        }
+        if (apiSummonerDTO.getRevisionDate() != null) {
+            summoner.setRevisionDate(apiSummonerDTO.getRevisionDate());
+            firstTime = false;
+        }
+        /* Set prev date, so we queue this summoner for being updated. */
+        if (firstTime) {
+            summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
+        } else {
+            summoner.setLastTimeUpdated(LocalDateTime.now());
+        }
+        this.summonerRepository.save(summoner);
+
+        return summoner;
     }
 
     public SummonerChampionMastery fillSummonerChampionMastery(Summoner summoner, ApiChampionMasteryDTO apiChampionMasteryDTO) {

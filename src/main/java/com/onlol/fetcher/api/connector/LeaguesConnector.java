@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.model.*;
+import com.onlol.fetcher.api.filler.SummonerFiller;
+import com.onlol.fetcher.api.filler.SummonerLeagueFiller;
+import com.onlol.fetcher.api.model.ApiLeagueItemDTO;
+import com.onlol.fetcher.api.model.ApiLeagueListDTO;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
@@ -12,10 +15,8 @@ import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class LeaguesConnector {
@@ -24,7 +25,7 @@ public class LeaguesConnector {
     private RegionRepository regionRepository;
 
     @Autowired
-    private MatchGameRepository matchGameRepository;
+    private SummonerLeagueFiller summonerLeagueFiller;
 
     @Autowired
     private SummonerRepository summonerRepository;
@@ -60,7 +61,7 @@ public class LeaguesConnector {
     private GameQueueTypeRepository gameQueueTypeRepository;
 
     @Autowired
-    private LeagueMiniSeriesRepository leagueMiniSeriesRepository;
+    private SummonerFiller summonerFiller;
 
     @Autowired
     private FeaturedGameIntervalRepository featuredGameIntervalRepository;
@@ -70,9 +71,8 @@ public class LeaguesConnector {
 
     @Autowired
     private ObjectMapper jacksonMapper;
-
+/* TODO
     public ArrayList<SummonerLeague> summonerLeagues(Summoner summoner) {
-        /* TODO
         ArrayList<ApiLeagueItemDTO> apiLeagueItemDTOS = null;
 
         try {
@@ -93,7 +93,7 @@ public class LeaguesConnector {
             return new ArrayList<>();
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        /*for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
+        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
             GameQueueType queuetype = this.gameQueueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
             if (queuetype == null) {
                 queuetype = new GameQueueType();
@@ -152,9 +152,9 @@ public class LeaguesConnector {
             summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
             summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
             this.summonerLeagueRepository.save(summonerLeague);
-        }*/
+        }
         return new ArrayList<>();
-    }
+    }*/
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
@@ -207,47 +207,11 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
-            Summoner summoner = null;
-            if (!opSummoner.isPresent()) {
-                summoner = new Summoner();
-                //TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
-                summoner.setName(apiLeagueItemDTO.getSummonerName());
-                summoner.setRegion(region);
-                // Set prev date, so we queue this summoner for being updated.
-                summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
-                this.summonerRepository.save(summoner);
-            }
-
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
-            if (summonerLeague == null) {
-                summonerLeague = new SummonerLeague();
-                summonerLeague.setSummoner(summoner);
-                summonerLeague.setGameQueueType(gameQueueType);
-                this.summonerLeagueRepository.save(summonerLeague);
-            }
-            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
-            summonerLeague.setWins(apiLeagueItemDTO.getWins());
-            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
-            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
-            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
-            summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
-            if (leagueRank == null) {
-                leagueRank = new LeagueRank();
-                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
-                this.leagueRankRepository.save(leagueRank);
-            }
-            summonerLeague.setLeagueRank(leagueRank);
-            this.summonerLeagueRepository.save(summonerLeague);
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region);
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
-
-    // Master
-
 
     public ArrayList<SummonerLeague> masterLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
@@ -300,48 +264,11 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
-            Summoner summoner = null;
-            if (!opSummoner.isPresent()) {
-                summoner = new Summoner();
-                // TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
-                summoner.setName(apiLeagueItemDTO.getSummonerName());
-                summoner.setRegion(region);
-                // Set prev date, so we queue this summoner for being updated.
-                summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
-                this.summonerRepository.save(summoner);
-            }
-
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
-            if (summonerLeague == null) {
-                summonerLeague = new SummonerLeague();
-                summonerLeague.setSummoner(summoner);
-                summonerLeague.setGameQueueType(gameQueueType);
-                this.summonerLeagueRepository.save(summonerLeague);
-            }
-            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
-            summonerLeague.setWins(apiLeagueItemDTO.getWins());
-            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
-            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
-            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
-            summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
-            if (leagueRank == null) {
-                leagueRank = new LeagueRank();
-                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
-                this.leagueRankRepository.save(leagueRank);
-            }
-            summonerLeague.setLeagueRank(leagueRank);
-            this.summonerLeagueRepository.save(summonerLeague);
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region);
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
-
-
-    // GrandMaster
-
 
     public ArrayList<SummonerLeague> grandMasterLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
@@ -384,7 +311,6 @@ public class LeaguesConnector {
             this.leagueTierRepository.save(leagueTier);
         }
 
-
         /* Find and save league */
         League league = this.leagueRepository.findByRiotId(apiLeagueListDTO.getLeagueId());
         if (league == null && apiLeagueListDTO.getLeagueId() != null) {
@@ -394,41 +320,9 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Optional<Summoner> opSummoner = this.summonerRepository.findById(apiLeagueItemDTO.getSummonerId());
-            Summoner summoner = null;
-            if (!opSummoner.isPresent()) {
-                summoner = new Summoner();
-                // TODO summoner.setId(apiLeagueItemDTO.getSummonerId());
-                summoner.setName(apiLeagueItemDTO.getSummonerName());
-                summoner.setRegion(region);
-                // Set prev date, so we queue this summoner for being updated.
-                summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
-                this.summonerRepository.save(summoner);
-            }
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region);
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
 
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, gameQueueType);
-            if (summonerLeague == null) {
-                summonerLeague = new SummonerLeague();
-                summonerLeague.setSummoner(summoner);
-                summonerLeague.setGameQueueType(gameQueueType);
-                this.summonerLeagueRepository.save(summonerLeague);
-            }
-            summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
-            summonerLeague.setWins(apiLeagueItemDTO.getWins());
-            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
-            summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
-            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            //summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            //summonerLeague.setLeaguePoints(apiLeagueItemDTO.getLeaguePoints());
-            summonerLeague.setLeagueTier(leagueTier);
-            LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(apiLeagueItemDTO.getRank());
-            if (leagueRank == null) {
-                leagueRank = new LeagueRank();
-                leagueRank.setKeyName(apiLeagueItemDTO.getRank());
-                this.leagueRankRepository.save(leagueRank);
-            }
-            summonerLeague.setLeagueRank(leagueRank);
-            this.summonerLeagueRepository.save(summonerLeague);
         }
         return summonerLeagues;
     }
@@ -442,7 +336,7 @@ public class LeaguesConnector {
     }
 
     public FeaturedGameInterval featuredGames(Region region) {
-        ApiFeaturedGamesDTO apiFeaturedGamesDTO = null;
+       /* TODO  ApiFeaturedGamesDTO apiFeaturedGamesDTO = null;
         try {
             apiFeaturedGamesDTO = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.FEATURED_GAMES
@@ -469,7 +363,7 @@ public class LeaguesConnector {
             for (ApiBannedChampionDTO apiBannedChampionDTO : apiFeaturedGameInfoDto.getBannedChampions()) {
                 continue;
             }
-/*
+
             sampleFeaturedGameInfo.getGameLength()
             sampleFeaturedGameInfo.getGameMode()
             sampleFeaturedGameInfo.getGameQueueConfigId()
@@ -477,7 +371,7 @@ public class LeaguesConnector {
             sampleFeaturedGameInfo.getGameType()
             sampleFeaturedGameInfo.getMapId()
             sampleFeaturedGameInfo.getObservers()
-            sampleFeaturedGameInfo.getParticipants();*/
+            sampleFeaturedGameInfo.getParticipants();
 
 
             this.matchGameRepository.save(matchGame);
@@ -488,7 +382,8 @@ public class LeaguesConnector {
         featuredGameInterval.setTimestamp(LocalDateTime.now());
         this.featuredGameIntervalRepository.save(featuredGameInterval);
 
-        return featuredGameInterval;
+        return featuredGameInterval;*/
+        return null;
     }
 }
 // TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

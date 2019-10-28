@@ -47,7 +47,7 @@ public class SummonerLeague {
     private boolean freshBlood = false;
 
     @Column(nullable = false, unique = false)
-    private Short leaguePoints = 0;
+    private Integer leaguePoints = 0;
 
     public Long getId() {
         return id;
@@ -137,11 +137,11 @@ public class SummonerLeague {
         this.freshBlood = freshBlood;
     }
 
-    public Short getLeaguePoints() {
+    public Integer getLeaguePoints() {
         return leaguePoints;
     }
 
-    public void setLeaguePoints(Short leaguePoints) {
+    public void setLeaguePoints(Integer leaguePoints) {
         this.leaguePoints = leaguePoints;
     }
 

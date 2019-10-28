@@ -28,7 +28,7 @@ public class Summoner {
     private Long revisionDate;
 
     @Column(nullable = true, unique = false)
-    private Integer summonerLevel;
+    private Long summonerLevel;
 
     @Column(nullable = false, unique = false)
     private LocalDateTime lastTimeUpdated = LocalDateTime.now();
@@ -76,11 +76,11 @@ public class Summoner {
         this.revisionDate = revisionDate;
     }
 
-    public Integer getSummonerLevel() {
+    public Long getSummonerLevel() {
         return summonerLevel;
     }
 
-    public void setSummonerLevel(Integer summonerLevel) {
+    public void setSummonerLevel(Long summonerLevel) {
         this.summonerLevel = summonerLevel;
     }
 

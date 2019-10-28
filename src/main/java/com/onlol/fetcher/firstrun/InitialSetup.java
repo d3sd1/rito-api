@@ -87,12 +87,12 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.realmsInit();
         this.logger.info("Retriving game types...");
         this.gameTypesInit();
-        //this.logger.info("Retriving league challenger leaders...");
-        //this.challengerLadderInit();
-        //this.logger.info("Retriving league grandmaster ladders...");
-        //this.grandMasterLadderInit();
-        //this.logger.info("Retriving league master ladders...");
-        //this.masterLadderInit();
+        this.logger.info("Retriving league challenger leaders...");
+        this.challengerLadderInit();
+        this.logger.info("Retriving league grandmaster ladders...");
+        this.grandMasterLadderInit();
+        this.logger.info("Retriving league master ladders...");
+        this.masterLadderInit();
         this.logger.info("Retriving LoL status...");
         this.lolStatusInit();
         this.logger.info("App first init finished!");
