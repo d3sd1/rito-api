@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.bypass.SummonerBypass;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
@@ -39,9 +38,6 @@ public class SummonerConnector {
 
     @Autowired
     private LogService logger;
-
-    @Autowired
-    private SummonerBypass summonerBypass;
 
     @Autowired
     private SummonerRepository summonerRepository;

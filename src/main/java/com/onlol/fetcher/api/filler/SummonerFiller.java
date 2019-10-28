@@ -160,6 +160,15 @@ public class SummonerFiller {
             summoner = summonerToken.getSummoner();
         }
 
+        /* Fullfit summoner token if needed */
+        if (apiSummonerDTO.getPuuid() != null && !apiSummonerDTO.getPuuid().equals("")) {
+            summonerToken.setPuuTokenId(apiSummonerDTO.getPuuid());
+        }
+        if (apiSummonerDTO.getAccountId() != null && !apiSummonerDTO.getAccountId().equals("")) {
+            summonerToken.setAccountTokenId(apiSummonerDTO.getAccountId());
+        }
+        this.summonerTokenRepository.save(summonerToken);
+
         summoner.setName(apiSummonerDTO.getName());
         /* Fullfit summoner historical names */
         SummonerNameHistorical summonerNameHistorical =
