@@ -1,22 +1,18 @@
 package com.onlol.fetcher.api.filler;
 
+import com.onlol.fetcher.api.model.ApiMatchDTO;
 import com.onlol.fetcher.api.model.ApiMatchReferenceDTO;
-import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
-import com.onlol.fetcher.api.model.ApiTeamBansDTO;
-import com.onlol.fetcher.api.model.ApiTeamStatsDTO;
+import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.ddragon.filler.GameDataFiller;
 import com.onlol.fetcher.ddragon.filler.GameInfoFiller;
-import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.model.MatchGame;
+import com.onlol.fetcher.model.MatchList;
 import com.onlol.fetcher.repository.MatchGameRepository;
 import com.onlol.fetcher.repository.MatchListRepository;
 import com.onlol.fetcher.repository.RegionRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class MatchFiller {
@@ -38,9 +34,13 @@ public class MatchFiller {
     @Autowired
     private RegionRepository regionRepository;
 
+    @Autowired
+    private SummonerFiller summonerFiller;
 
-    public MatchList fillMatchListGame(ApiMatchReferenceDTO apiMatchReferenceDto, Summoner summoner) {
 
+    public MatchList fillMatchListGame(ApiMatchReferenceDTO apiMatchReferenceDto, ApiSummonerDTO apiSummonerDTO) {
+/* TODO
+        Summoner summoner = this.summonerFiller.fillSummoner(apiSummonerDTO);
         MatchList matchList = this.matchListRepository.findByMatchGameIdAndSummoner(apiMatchReferenceDto.getGameId(), summoner);
         if (matchList == null) {
             matchList = new MatchList();
@@ -56,30 +56,31 @@ public class MatchFiller {
             matchList.setMatch(matchGame);
             matchList.setRegion(this.regionRepository.findByServicePlatform(apiMatchReferenceDto.getPlatformId()));
 
-            /* Get queue */
+            /* Get queue *
             matchList.setGameQueue(this.gameDataFiller.fillGameQueue(apiMatchReferenceDto.getQueue()));
 
-            /* Get role */
+            /* Get role *
             matchList.setGameRole(this.gameDataFiller.fillGameRole(apiMatchReferenceDto.getRole()));
 
-            /* Get season */
+            /* Get season *
             matchList.setGameSeason(this.gameInfoFiller.fillGameSeason(apiMatchReferenceDto.getSeason()));
 
-            /* Get lane */
+            /* Get lane *
             matchList.setGameLane(this.gameInfoFiller.fillGameLane(apiMatchReferenceDto.getLane()));
 
-            /* Get champ */
+            /* Get champ *
             matchList.setChamp(this.gameDataFiller.fillChampion(apiMatchReferenceDto.getChampion()));
 
             matchList.setTimestamp((new Timestamp(apiMatchReferenceDto.getTimestamp()).toLocalDateTime()));
             matchList.setSummoner(summoner);
             this.matchListRepository.save(matchList);
         }
-        return matchList;
+        return matchList;*/
+        return null;
     }
 
-    public MatchGame fillMatchGame(ApiMatchReferenceDTO apiMatchDTO) {
-
+    public MatchGame fillMatchGame(ApiMatchDTO apiMatchDTO) {
+/*TODO
         matchGame.setGameId(apiMatchDTO.getGameId());
         matchGame.setGameCreation(new
 
@@ -90,7 +91,7 @@ public class MatchFiller {
         matchGame.setGameVersion(apiMatchDTO.getGameVersion());
 
 
-        /* Get queue */
+        /* Get queue *
         GameQueue gameQueue = this.gameQueueRepository.findTopByQueueId(apiMatchDTO.getQueueId());
         if (gameQueue == null) {
             GameQueue dbGameQueue = new GameQueue();
@@ -102,7 +103,7 @@ public class MatchFiller {
         matchGame.setGameQueue(gameQueue);
 
 
-        /* Get season */
+        /* Get season *
         GameSeason gameSeason = this.gameSeasonRepository.findTopById(apiMatchDTO.getSeasonId());
         if (gameSeason == null) {
             GameSeason dbGameSeason = new GameSeason();
@@ -114,7 +115,7 @@ public class MatchFiller {
         matchGame.setGameSeason(gameSeason);
 
 
-        /* Get game map */
+        /* Get game map *
         GameMap gameMap = this.gameMapRepository.findTopByMapId(apiMatchDTO.getMapId());
         if (gameMap == null) {
             GameMap dbGameMap = new GameMap();
@@ -126,7 +127,7 @@ public class MatchFiller {
         matchGame.setGameMap(gameMap);
 
 
-        /* Get game mode */
+        /* Get game mode *
         GameMode gameMode = this.gameModeRepository.findByGameMode(apiMatchDTO.getGameMode());
         if (gameMode == null) {
             GameMode dbGameMode = new GameMode();
@@ -138,7 +139,7 @@ public class MatchFiller {
         matchGame.setGameMode(gameMode);
 
 
-        /* Get game type */
+        /* Get game type *
         GameType gameType = this.gameTypeRepository.findByGameType(apiMatchDTO.getGameType());
         if (gameType == null) {
             GameType dbGameType = new GameType();
@@ -171,7 +172,7 @@ public class MatchFiller {
             }
         }
 
-        /* Match game stats */
+        /* Match game stats *
 
         for (
                 ApiTeamStatsDTO apiTeamStatsDto : apiMatchDTO.getTeams()) {
@@ -206,7 +207,7 @@ public class MatchFiller {
             matchGameTeamStats.setDominionVictoryScore(apiTeamStatsDto.getDominionVictoryScore());
             matchGameTeamStats.setWon(apiTeamStatsDto.getWin().equalsIgnoreCase("Win"));
 
-            /* Fill bans for team just if not set (IMPORTANT) */
+            /* Fill bans for team just if not set (IMPORTANT) *
 
             if (matchGameTeamStats.getBans() == null) {
                 ArrayList<MatchGameTeamBan> matchGameTeamBans = new ArrayList<>();
@@ -224,7 +225,7 @@ public class MatchFiller {
             this.matchGameTeamStatsRepository.save(matchGameTeamStats);
         }
 
-        /* Fill participants */
+        /* Fill participants *
         for (
                 ApiParticipantIdentityDTO apiParticipantIdentityDto : apiMatchDTO.getParticipantIdentities()) {
             Optional<Summoner> opsummoner = this.summonerRepository.findById(apiParticipantIdentityDto.getPlayer().getSummonerId());
@@ -250,6 +251,7 @@ public class MatchFiller {
             //matchGameParticipant.set
 
             this.matchGameParticipantRepository.save(matchGameParticipant);
-        }
+        }*/
+        return null;
     }
 }

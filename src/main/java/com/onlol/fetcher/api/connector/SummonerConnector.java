@@ -1,24 +1,18 @@
 package com.onlol.fetcher.api.connector;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.bypass.SummonerBypass;
-import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
-import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
-import com.onlol.fetcher.exceptions.ApiBadRequestException;
-import com.onlol.fetcher.exceptions.ApiDownException;
-import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
-import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.model.Region;
+import com.onlol.fetcher.model.Summoner;
+import com.onlol.fetcher.model.SummonerChampionMastery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class SummonerConnector {
@@ -45,8 +39,8 @@ public class SummonerConnector {
     private ObjectMapper jacksonMapper;
 
     public Summoner updateSummoner(String summonerName, Region region) {
-        ApiSummonerDTO apiSummonerDTO;
-        ApiCall apiCall;
+        /*ApiSummonerDTO apiSummonerDTO;
+        ApiCall apiCall; TODO
         try {
             apiCall = this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
@@ -69,7 +63,7 @@ public class SummonerConnector {
         if (apiSummonerDTO == null) {
             return;
         }
-        /* Recuperar todos los datos, y después actualizarlos en DB */
+        /* Recuperar todos los datos, y después actualizarlos en DB *
         // tambien contamos con apiSummonerDTO
         List<MatchList> matchLists = this.matchConnector.matchListByAccount(apiSummonerDTO, region);
         List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
@@ -77,11 +71,12 @@ public class SummonerConnector {
 
         //TODO: en este fill rellenar usuario, ya que matchLists debe coger gameIDs, coger un gameId y
         // en esta funcion de baajo buscar un match. de ese match sacar real id y rellenar
-        return this.summonerBypass.fill(apiCall.getApiKey(), apiSummonerDTO);
+        return this.summonerBypass.fill(apiCall.getApiKey(), apiSummonerDTO);*/
+        return null;
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(ApiSummonerDTO apiSummonerDTO, Region region) {
-        ArrayList<ApiChampionMasteryDTO> sampleSummonerChampionMasteries = new ArrayList<>();
+        /*TODO ArrayList<ApiChampionMasteryDTO> sampleSummonerChampionMasteries = new ArrayList<>();
         ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
         try {
             sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
@@ -102,9 +97,10 @@ public class SummonerConnector {
         }
 
         for (ApiChampionMasteryDTO apiChampionMasteryDTO : sampleSummonerChampionMasteries) {
-            this.summonerFiller.fillSummonerChampionMastery();
+            this.summonerFiller.fillSummonerChampionMastery(apiChampionMasteryDTO);
         }
-        return summonerChampionMasteries;
+        return summonerChampionMasteries;*/
+        return null;
     }
 }
 

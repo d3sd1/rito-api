@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.filler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.bypass.SummonerBypass;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
@@ -11,14 +10,18 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.model.ApiCall;
+import com.onlol.fetcher.model.Region;
+import com.onlol.fetcher.model.Summoner;
+import com.onlol.fetcher.model.SummonerChampionMastery;
+import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
 import com.onlol.fetcher.repository.SummonerNameHistoricalRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
 import com.onlol.fetcher.repository.SummonerTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Service
 public class SummonerFiller {
@@ -26,7 +29,7 @@ public class SummonerFiller {
     private SummonerRepository summonerRepository;
 
     @Autowired
-    private SummonerBypass summonerBypass;
+    private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
 
     @Autowired
     private SummonerNameHistoricalRepository summonerNameHistoricalRepository;
@@ -99,7 +102,7 @@ public class SummonerFiller {
     // TODO agrupar mails error
 
     public Summoner fillSummoner(ApiCall apiCall, ApiSummonerDTO apiSummonerDTO) {
-            /*
+            /* TODO: hacerlo multikey. por ahora solo se usa una de prod
             Pasos 1: Crear/recuperar summoner
             paso 2: crear summoner id si no existe
             paso 3: crear mapa de hash a summoner y api
@@ -109,7 +112,7 @@ public class SummonerFiller {
         1. no existe summoner en db y no existe summoner hash con api
         2. existe summoner en db y no existe usmmoner hash con api
         3. existe summoner en db y existe summoner hash con api
-     */
+
 
         // Caso 3 - fastest
         Summoner summoner;
@@ -140,10 +143,11 @@ public class SummonerFiller {
             summonerNameHistorical.setSummoner(summoner);
             this.summonerNameHistoricalRepository.save(summonerNameHistorical);
         }
-        return summoner;
+        return summoner; */
+        return null;
     }
 
-    public void fillSummonerChampionMastery() {/* TODO
+    public SummonerChampionMastery fillSummonerChampionMastery(Summoner summoner, ApiChampionMasteryDTO apiChampionMasteryDTO) {
         SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
         if (summonerChampionMastery == null) {
             summonerChampionMastery = new SummonerChampionMastery();
@@ -157,6 +161,6 @@ public class SummonerFiller {
         summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
         summonerChampionMastery.setLastPlayTime(new Timestamp(apiChampionMasteryDTO.getLastPlayTime()).toLocalDateTime());
         summonerChampionMastery.setTokensEarned(apiChampionMasteryDTO.getTokensEarned());
-        this.summonerChampionMasteryRepository.save(summonerChampionMastery);*/
+        return this.summonerChampionMasteryRepository.save(summonerChampionMastery);
     }
 }

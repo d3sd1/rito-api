@@ -15,6 +15,7 @@ import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.MatchGame;
+import com.onlol.fetcher.model.MatchGameTimeline;
 import com.onlol.fetcher.model.MatchList;
 import com.onlol.fetcher.model.Region;
 import com.onlol.fetcher.repository.*;
@@ -115,7 +116,7 @@ public class MatchConnector {
 
 
         for (ApiMatchReferenceDTO apiMatchReferenceDto : apiMatchlistDto.getMatches()) {
-            matchLists.add(this.matchFiller.fillMatchListGame());
+            matchLists.add(this.matchFiller.fillMatchListGame(apiMatchReferenceDto, apiSummonerDTO));
         }
 
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
@@ -125,6 +126,11 @@ public class MatchConnector {
         return matchLists;
     }
 
+    public MatchGameTimeline matchGameTimeline(MatchGame matchGame) {
+
+        return null;
+        //TODO: recuperar timeline GET /lol/match/v4/timelines/by-match/{matchId}
+    }
 
     public MatchGame match(MatchGame matchGame) {
         ApiMatchDTO apiMatchDTO;
@@ -153,7 +159,7 @@ public class MatchConnector {
             return matchGame;
         }
 
-        this.matchFiller.fillMatchGame();
+        this.matchFiller.fillMatchGame(apiMatchDTO);
 
         return matchGame;
     }

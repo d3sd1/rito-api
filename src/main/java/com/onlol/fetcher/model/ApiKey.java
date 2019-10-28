@@ -14,7 +14,7 @@ public class ApiKey {
     @Column(nullable = false, unique = true)
     private String apiKey;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Integer retryAfter = 0;
 
     @Column(nullable = false, unique = false)
@@ -39,6 +39,9 @@ public class ApiKey {
     }
 
     public void setRetryAfter(Integer retryAfter) {
+        if (retryAfter == null) {
+            retryAfter = 0;
+        }
         this.retryAfter = retryAfter;
     }
 
