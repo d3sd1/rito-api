@@ -19,6 +19,33 @@ public class MatchGameParticipant {
     @OneToOne
     private Summoner summoner; // FROM participantId
 
+    @OneToOne
+    private Champion champion;
+
+    @OneToOne
+    private SummonerSpell spell1;
+
+    @OneToOne
+    private SummonerSpell spell2;
+
+    @OneToMany
+    private List<SummonerLegacyRune> legacyRunes;
+
+    @OneToMany
+    private List<SummonerLegacyMastery> legacyMasteries;
+
+    @OneToOne
+    private MatchGameTeam team;
+
+    @OneToOne
+    private MatchGameParticipantStats stats; //	ParticipantStatsDto	Participant statistics.
+
+    @OneToOne
+    private MatchGameTimeline timeline;
+
+    @OneToOne
+    private LeagueTier highestAchievedSeasonTier; //Highest ranked tier achieved for the previous season in a specific subset of queueIds, if any, otherwise null. Used to display border in game loading screen. Please refer to the Ranked Info documentation. (Legal values: CHALLENGER, MASTER, DIAMOND, PLATINUM, GOLD, SILVER, BRONZE, UNRANKED)
+
     public Long getId() {
         return id;
     }
@@ -43,15 +70,93 @@ public class MatchGameParticipant {
         this.summoner = summoner;
     }
 
-    /*
-    TODO: agregar estos datos aqui en matchconnector linera 432, pero primero se requieren datos runes y spells agregados a db
-    stats	ParticipantStatsDto	Participant statistics.
-    runes	List[RuneDto]	List of legacy Rune information. Not included for matches played with Runes Reforged.
-    timeline	ParticipantTimelineDto	Participant timeline data.
-            teamId	int	100 for blue side. 200 for red side.
-    spell2Id	int	Second Summoner Spell id.
-    masteries	List[MasteryDto]	List of legacy Mastery information. Not included for matches played with Runes Reforged.
-    highestAchievedSeasonTier	string	Highest ranked tier achieved for the previous season in a specific subset of queueIds, if any, otherwise null. Used to display border in game loading screen. Please refer to the Ranked Info documentation. (Legal values: CHALLENGER, MASTER, DIAMOND, PLATINUM, GOLD, SILVER, BRONZE, UNRANKED)
-    spell1Id	int	First Summoner Spell id.
-            championId	int*/
+    public Champion getChampion() {
+        return champion;
+    }
+
+    public void setChampion(Champion champion) {
+        this.champion = champion;
+    }
+
+    public SummonerSpell getSpell1() {
+        return spell1;
+    }
+
+    public void setSpell1(SummonerSpell spell1) {
+        this.spell1 = spell1;
+    }
+
+    public SummonerSpell getSpell2() {
+        return spell2;
+    }
+
+    public void setSpell2(SummonerSpell spell2) {
+        this.spell2 = spell2;
+    }
+
+    public List<SummonerLegacyRune> getLegacyRunes() {
+        return legacyRunes;
+    }
+
+    public void setLegacyRunes(List<SummonerLegacyRune> legacyRunes) {
+        this.legacyRunes = legacyRunes;
+    }
+
+    public List<SummonerLegacyMastery> getLegacyMasteries() {
+        return legacyMasteries;
+    }
+
+    public void setLegacyMasteries(List<SummonerLegacyMastery> legacyMasteries) {
+        this.legacyMasteries = legacyMasteries;
+    }
+
+    public MatchGameTeam getTeam() {
+        return team;
+    }
+
+    public void setTeam(MatchGameTeam team) {
+        this.team = team;
+    }
+
+    public MatchGameParticipantStats getStats() {
+        return stats;
+    }
+
+    public void setStats(MatchGameParticipantStats stats) {
+        this.stats = stats;
+    }
+
+    public MatchGameTimeline getTimeline() {
+        return timeline;
+    }
+
+    public void setTimeline(MatchGameTimeline timeline) {
+        this.timeline = timeline;
+    }
+
+    public LeagueTier getHighestAchievedSeasonTier() {
+        return highestAchievedSeasonTier;
+    }
+
+    public void setHighestAchievedSeasonTier(LeagueTier highestAchievedSeasonTier) {
+        this.highestAchievedSeasonTier = highestAchievedSeasonTier;
+    }
+
+    @Override
+    public String toString() {
+        return "MatchGameParticipant{" +
+                "id=" + id +
+                ", matchGame=" + matchGame +
+                ", summoner=" + summoner +
+                ", champion=" + champion +
+                ", spell1=" + spell1 +
+                ", spell2=" + spell2 +
+                ", legacyRunes=" + legacyRunes +
+                ", legacyMasteries=" + legacyMasteries +
+                ", team=" + team +
+                ", stats=" + stats +
+                ", timeline=" + timeline +
+                ", highestAchievedSeasonTier=" + highestAchievedSeasonTier +
+                '}';
+    }
 }

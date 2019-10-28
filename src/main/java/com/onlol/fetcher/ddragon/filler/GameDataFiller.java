@@ -1,5 +1,6 @@
 package com.onlol.fetcher.ddragon.filler;
 
+import com.onlol.fetcher.ddragon.connector.GameChampionConnector;
 import com.onlol.fetcher.ddragon.model.*;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
@@ -11,6 +12,12 @@ import org.springframework.stereotype.Service;
 public class GameDataFiller {
 
     @Autowired
+    private ChampionRepository championRepository;
+
+    @Autowired
+    private GameChampionConnector gameChampionConnector;
+
+    @Autowired
     private GameModeRepository gameModeRepository;
 
     @Autowired
@@ -18,6 +25,9 @@ public class GameDataFiller {
 
     @Autowired
     private GameTypeRepository gameTypeRepository;
+
+    @Autowired
+    private GameRoleRepository gameRoleRepository;
 
     @Autowired
     private GameMapRepository gameMapRepository;
@@ -49,6 +59,25 @@ public class GameDataFiller {
         return this.gameModeRepository.save(gameMode);
     }
 
+    public GameRole fillGameRole(String roleKeyName) {
+        GameRole gameRole = this.gameRoleRepository.findByKeyName(roleKeyName);
+        if (gameRole == null) {
+            GameRole dbGameRole = new GameRole();
+            dbGameRole.setKeyName(roleKeyName);
+
+            if (dbGameRole.getKeyName() != null) {
+                this.gameRoleRepository.save(dbGameRole);
+                gameRole = dbGameRole;
+            }
+        }
+        return gameRole;
+    }
+
+    public GameQueue fillGameQueue(Integer queueId) {
+        DDQueueDTO ddQueueDTO = new DDQueueDTO();
+        ddQueueDTO.setQueueId(queueId);
+        return this.fillGameQueue(ddQueueDTO);
+    }
     public GameQueue fillGameQueue(DDQueueDTO queueDTO) {
         GameQueue gameQueue = this.gameQueueRepository.findTopByQueueId(queueDTO.getQueueId());
         if (gameQueue != null) {
@@ -118,5 +147,15 @@ public class GameDataFiller {
         gameImage.setW(ddImageDTO.getW());
         gameImage.setH(ddImageDTO.getH());
         return this.gameImageRepository.save(gameImage);
+    }
+
+    public Champion fillChampion(Integer champId) {
+        Champion champion = this.championRepository.findByChampId(champId);
+        if (champion != null) {
+            return champion;
+        } else { // Update champions... New champ added
+            this.gameChampionConnector.champions();
+            return this.fillChampion(champId);
+        }
     }
 }

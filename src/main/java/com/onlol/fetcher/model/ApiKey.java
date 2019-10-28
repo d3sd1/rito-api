@@ -23,6 +23,9 @@ public class ApiKey {
     @Column(nullable = false, unique = false)
     private boolean isValid = true;
 
+    @Column(nullable = false, unique = false)
+    private Long lastTimestampUsed;
+
     public String getApiKey() {
         return apiKey;
     }
@@ -53,5 +56,24 @@ public class ApiKey {
 
     public void setValid(boolean valid) {
         isValid = valid;
+    }
+
+    public Long getLastTimestampUsed() {
+        return lastTimestampUsed;
+    }
+
+    public void setLastTimestampUsed(Long lastTimestampUsed) {
+        this.lastTimestampUsed = lastTimestampUsed;
+    }
+
+    @Override
+    public String toString() {
+        return "ApiKey{" +
+                "apiKey='" + apiKey + '\'' +
+                ", retryAfter=" + retryAfter +
+                ", banned=" + banned +
+                ", isValid=" + isValid +
+                ", lastTimestampUsed=" + lastTimestampUsed +
+                '}';
     }
 }

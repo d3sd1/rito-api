@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.ddragon.filler.GameItemFiller;
+import com.onlol.fetcher.ddragon.model.DDDdragonDTO;
 import com.onlol.fetcher.ddragon.model.DDItemDTO;
-import com.onlol.fetcher.ddragon.model.DDItemSetDTO;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
 import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
@@ -19,6 +19,7 @@ import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
@@ -77,12 +78,12 @@ public class GameItemsConnector {
     }
 
     public void items(GameVersion gameVersion, Language lang) {
-        DDItemSetDTO sampleItemSet;
+        DDDdragonDTO<LinkedHashMap<Integer, DDItemDTO>> sampleItemSet;
         try {
             sampleItemSet = this.jacksonMapper.readValue(this.apiConnector.get(V4.DDRAGON_ITEMS
                             .replace("{{VERSION}}", gameVersion.getVersion())
                             .replace("{{LANGUAGE}}", lang.getKeyName())).getJson(),
-                    new TypeReference<DDItemSetDTO>() {
+                    new TypeReference<DDDdragonDTO<LinkedHashMap<Integer, DDItemDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());

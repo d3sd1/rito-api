@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SummonerRepository extends JpaRepository<Summoner, String> {
     Summoner findTopByOrderByLastTimeUpdated();
+
+    Summoner findByRiotRealId(Long riotRealId);
 }

@@ -1,10 +1,10 @@
 package com.onlol.fetcher.repository;
 
-import com.onlol.fetcher.model.Role;
+import com.onlol.fetcher.model.GameRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, String> {
-    Role findByKeyName(String s);
+public interface GameRoleRepository extends JpaRepository<GameRole, String> {
+    GameRole findByKeyName(String s);
 }

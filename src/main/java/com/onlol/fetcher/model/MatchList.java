@@ -14,7 +14,7 @@ public class MatchList {
     private Long id; // YEMPORAL
 
     @OneToOne
-    private Lane lane; // lane string
+    private GameLane gameLane; // lane string
 
     @OneToOne
     private MatchGame match; // gameId long
@@ -35,7 +35,7 @@ public class MatchList {
     private GameQueue gameQueue; // season int
 
     @OneToOne
-    private Role role; // role string
+    private GameRole gameRole; // role string
 
     @Column(nullable = true, unique = false)
     private LocalDateTime timestamp; // timestamp long
@@ -48,12 +48,12 @@ public class MatchList {
         this.id = id;
     }
 
-    public Lane getLane() {
-        return lane;
+    public GameLane getGameLane() {
+        return gameLane;
     }
 
-    public void setLane(Lane lane) {
-        this.lane = lane;
+    public void setGameLane(GameLane gameLane) {
+        this.gameLane = gameLane;
     }
 
     public MatchGame getMatch() {
@@ -104,12 +104,12 @@ public class MatchList {
         this.gameQueue = gameQueue;
     }
 
-    public Role getRole() {
-        return role;
+    public GameRole getGameRole() {
+        return gameRole;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setGameRole(GameRole gameRole) {
+        this.gameRole = gameRole;
     }
 
     public LocalDateTime getTimestamp() {
@@ -124,14 +124,14 @@ public class MatchList {
     public String toString() {
         return "MatchList{" +
                 "id=" + id +
-                ", lane=" + lane +
+                ", lane=" + gameLane +
                 ", match=" + match +
                 ", summoner=" + summoner +
                 ", champ=" + champ +
                 ", region=" + region +
                 ", season=" + gameSeason +
                 ", queue=" + gameQueue +
-                ", role=" + role +
+                ", role=" + gameRole +
                 ", timestamp=" + timestamp +
                 '}';
     }

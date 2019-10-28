@@ -3,40 +3,31 @@ package com.onlol.fetcher.api.connector;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.ApiKeyManager;
+import com.onlol.fetcher.api.bypass.SummonerBypass;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
+import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
 import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.repository.*;
+import com.onlol.fetcher.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SummonerConnector {
 
     @Autowired
-    private ApiKeyManager apiKeyManager;
+    private MatchConnector matchConnector;
 
     @Autowired
-    private ApiKeyRepository apiKeyRepository;
-
-    @Autowired
-    private SummonerRepository summonerRepository;
-
-    @Autowired
-    private SummonerNameHistoricalRepository summonerNameHistoricalRepository;
-
-    @Autowired
-    private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
-
-    @Autowired
-    private ChampionRepository championRepository;
+    private LeaguesConnector leaguesConnector;
 
     @Autowired
     private ApiConnector apiConnector;
@@ -48,17 +39,22 @@ public class SummonerConnector {
     private LogService logger;
 
     @Autowired
+    private SummonerBypass summonerBypass;
+
+    @Autowired
     private ObjectMapper jacksonMapper;
 
-    public void byName(Summoner summoner) {
-        ApiSummonerDTO retrievedSummoner;
+    public Summoner updateSummoner(String summonerName, Region region) {
+        ApiSummonerDTO apiSummonerDTO;
+        ApiCall apiCall;
         try {
-            retrievedSummoner = this.jacksonMapper.readValue(this.apiConnector.get(
+            apiCall = this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
-                            .replace("{{SUMMONER_NAME}}", summoner.getName().replaceAll(" ", "%20"))
-                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                            .replace("{{SUMMONER_NAME}}", summonerName.replaceAll(" ", "%20"))
+                            .replace("{{HOST}}", region.getHostName()),
                     true
-            ).getJson(), new TypeReference<ApiSummonerDTO>() {
+            );
+            apiSummonerDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiSummonerDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());
@@ -69,157 +65,47 @@ public class SummonerConnector {
             this.logger.error("Got generic exception" + e.getMessage());
             return;
         }
-        //TODO this.summonerFiller.fillSummoner(summonerFiller);
-    }
-/*
-    public Summoner byPuuid(Summoner summoner) {
-        try {
-            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
-                    V4.SUMMONERS_BY_PUUID.replace("{{SUMMONER_PUUID}}", summoner.getPuuid())
-                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
-                    true
-            ), new TypeReference<Summoner>() {
-            });
-        } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (Exception e) {
-            summoner = null;
-            e.printStackTrace();
-            this.logger.error("No se ha podido retornar invocador (byPuuid) " + e.getMessage());
-        }
 
-        if (summoner != null) {
-            summoner.setLastTimeUpdated(LocalDateTime.now());
-            summoner = this.summonerRepository.save(summoner);
-            // Update historical name if needed
-            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
-                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                summonerNameHistorical.setName(summoner.getName());
-                summonerNameHistorical.setSummoner(summoner);
-                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-            }
+        if (apiSummonerDTO == null) {
+            return;
         }
-        return summoner;
+        /* Recuperar todos los datos, y después actualizarlos en DB */
+        // tambien contamos con apiSummonerDTO
+        List<MatchList> matchLists = this.matchConnector.matchListByAccount(apiSummonerDTO, region);
+        List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
+        List<SummonerLeague> summonerLeagues = this.leaguesConnector.summonerLeagues(summoner);
+
+        //TODO: en este fill rellenar usuario, ya que matchLists debe coger gameIDs, coger un gameId y
+        // en esta funcion de baajo buscar un match. de ese match sacar real id y rellenar
+        return this.summonerBypass.fill(apiCall.getApiKey(), apiSummonerDTO);
     }
 
-    public Summoner byAccount(Summoner summoner) {
-        try {
-            summoner = this.jacksonMapper.readValue(this.apiConnector.get(
-                    V4.SUMMONERS_BY_ACCOUNT.replace("{{SUMMONER_ACCOUNT}}", summoner.getAccountId())
-                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
-                    true
-            ), new TypeReference<Summoner>() {
-            });
-        } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (Exception e) {
-            summoner = null;
-            e.printStackTrace();
-            this.logger.error("No se ha podido retornar invocador (byAccount) " + e.getMessage());
-        }
-
-        if (summoner != null) {
-            summoner.setLastTimeUpdated(LocalDateTime.now());
-            summoner = this.summonerRepository.save(summoner);
-            // Update historical name if needed
-            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(summoner.getName(), summoner) == null) {
-                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                summonerNameHistorical.setName(summoner.getName());
-                summonerNameHistorical.setSummoner(summoner);
-                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-            }
-        }
-        return summoner;
-    }
-
-
-    public Summoner bySummonerId(Summoner summoner) {
-        Summoner retrievedSummoner = null;
-        try {
-            System.out.println("SUM ID URL " + V4.SUMMONERS_BY_ID
-                    .replace("{{HOST}}", summoner.getRegion().getHostName())
-                    .replace("{{SUMMONER_ID}}", summoner.getId()));
-            String json = this.apiConnector.get(
-                    V4.SUMMONERS_BY_ID
-                            .replace("{{HOST}}", summoner.getRegion().getHostName())
-                            .replace("{{SUMMONER_ID}}", summoner.getId()),
-                    true
-            );
-            System.out.println("JSON; " + json);
-            if (json != null) {
-                retrievedSummoner = this.jacksonMapper.readValue(json, new TypeReference<Summoner>() {
-                });
-            }
-        } catch (DataNotfoundException e) {
-            e.printStackTrace();
-            this.logger.warning("Summoner not found: " + summoner.getName());
-        } catch (Exception e) {
-            retrievedSummoner = null;
-            e.printStackTrace();
-            this.logger.error("No se ha podido retornar el invoador " + summoner.getName() + " con la excepción " + e.getMessage());
-        }
-        System.out.println("RETRIEVED SUMMONER: " + retrievedSummoner);
-
-        if (retrievedSummoner != null) {
-            summoner.setLastTimeUpdated(LocalDateTime.now());
-            summoner.setName(retrievedSummoner.getName());
-            summoner.setAccountId(retrievedSummoner.getAccountId());
-            summoner.setProfileIconId(retrievedSummoner.getProfileIconId());
-            summoner.setPuuid(retrievedSummoner.getPuuid());
-            summoner.setRevisionDate(retrievedSummoner.getRevisionDate());
-            summoner.setSummonerLevel(retrievedSummoner.getSummonerLevel());
-            // Update historical name if needed
-            if (this.summonerNameHistoricalRepository.findTopByNameAndSummoner(retrievedSummoner.getName(), summoner) == null) {
-                SummonerNameHistorical summonerNameHistorical = new SummonerNameHistorical();
-                summonerNameHistorical.setName(retrievedSummoner.getName());
-                summonerNameHistorical.setSummoner(summoner);
-                summonerNameHistorical.setSummoner(summoner);
-                this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-            }
-            summoner = this.summonerRepository.save(summoner);
-        }
-        return summoner;
-    }
-
-    public ArrayList<SummonerChampionMastery> championMastery(Summoner summoner) {
+    public ArrayList<SummonerChampionMastery> championMastery(ApiSummonerDTO apiSummonerDTO, Region region) {
         ArrayList<ApiChampionMasteryDTO> sampleSummonerChampionMasteries = new ArrayList<>();
+        ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
         try {
             sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.SUMMONER_CHAMPION_MASTERY
-                            .replace("{{SUMMONER_ID}}", summoner.getId())
-                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                            .replace("{{SUMMONER_ID}}", apiSummonerDTO.getId())
+                            .replace("{{HOST}}", region.getHostName()),
                     true
-            ), new TypeReference<SummonerChampionMastery>() {
+            ).getJson(), new TypeReference<SummonerChampionMastery>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner not found: " + summoner.getName());
+            this.logger.info("Data not found, got exception" + e.getMessage());
+            return summonerChampionMasteries;
+        } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            return summonerChampionMasteries;
         } catch (Exception e) {
-            sampleSummonerChampionMasteries = new ArrayList<>();
-            e.printStackTrace();
-            this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
+            this.logger.error("Got generic exception" + e.getMessage());
+            return summonerChampionMasteries;
         }
 
-
-        ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
         for (ApiChampionMasteryDTO apiChampionMasteryDTO : sampleSummonerChampionMasteries) {
-            SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
-            if (summonerChampionMastery == null) {
-                summonerChampionMastery = new SummonerChampionMastery();
-            }
-            summonerChampionMastery.setSummoner(summoner);
-            //summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
-            summonerChampionMastery.setChampionLevel(apiChampionMasteryDTO.getChampionLevel());
-            //summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
-            summonerChampionMastery.setChampionPointsSinceLastLevel(apiChampionMasteryDTO.getChampionPointsSinceLastLevel());
-            summonerChampionMastery.setChampionPointsUntilNextLevel(apiChampionMasteryDTO.getChampionPointsUntilNextLevel());
-            summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
-            summonerChampionMastery.setLastPlayTime(new Timestamp(apiChampionMasteryDTO.getLastPlayTime()).toLocalDateTime());
-            summonerChampionMastery.setTokensEarned(apiChampionMasteryDTO.getTokensEarned());
-            this.summonerChampionMasteryRepository.save(summonerChampionMastery);
+            this.summonerFiller.fillSummonerChampionMastery();
         }
         return summonerChampionMasteries;
     }
-    */
 }
 
 //TODO: coger league ID y utilizar este endpoint para recuperar todos los summoner

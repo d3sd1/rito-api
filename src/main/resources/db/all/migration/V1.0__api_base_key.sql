@@ -30,4 +30,5 @@ VALUES ('RGAPI-a5435ca3-ad49-4a9d-97a1-c42341da504f', false, false, 0),
        ('RGAPI-57234896-991f-4f7e-b7b4-1aa7a0edec0c', false, false, 0),
        ('RGAPI-1b4e65ed-70f0-4d6e-838e-f9795d5161f3', false, false, 0),
        ('RGAPI-dcca8000-3a5c-b109-951f-b23cdbd6f531', false, false, 0),
+       ('RGAPI-a17f94eb-9e77-4904-8b8d-a87928582922', false, false, 0),
        ('RGAPI-0e42ad56-15b8-41e5-ba9b-be0d56cc05bd', false, false, 0);

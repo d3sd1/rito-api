@@ -15,6 +15,9 @@ import java.util.ArrayList;
 public class GameInfoFiller {
 
     @Autowired
+    private GameLaneRepository gameLaneRepository;
+
+    @Autowired
     private LanguageRepository languageRepository;
 
     @Autowired
@@ -172,6 +175,11 @@ public class GameInfoFiller {
         return this.gameVersionRepository.save(gameVersion);
     }
 
+    public GameSeason fillGameSeason(Integer seasonId) {
+        DDGameSeasonDTO ddGameSeasonDTO = new DDGameSeasonDTO();
+        ddGameSeasonDTO.setId(seasonId);
+        return fillGameSeason(ddGameSeasonDTO);
+    }
     public GameSeason fillGameSeason(DDGameSeasonDTO ddGameSeasonDTO) {
 
         GameSeason gameSeason = this.gameSeasonRepository.findTopById(ddGameSeasonDTO.getId());
@@ -182,5 +190,17 @@ public class GameInfoFiller {
         gameSeason.setId(ddGameSeasonDTO.getId());
         gameSeason.setSeason(ddGameSeasonDTO.getSeason());
         return this.gameSeasonRepository.save(gameSeason);
+    }
+
+    public GameLane fillGameLane(String gameLaneKeyName) {
+        GameLane gameLane = this.gameLaneRepository.findByKeyName(gameLaneKeyName);
+        if (gameLane == null && gameLaneKeyName != null) {
+            GameLane dbGameLane = new GameLane();
+            dbGameLane.setKeyName(gameLaneKeyName);
+
+            this.gameLaneRepository.save(dbGameLane);
+            gameLane = dbGameLane;
+        }
+        return gameLane;
     }
 }

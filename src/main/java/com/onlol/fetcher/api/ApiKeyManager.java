@@ -17,7 +17,7 @@ public class ApiKeyManager {
     private LogService logger;
 
     public ApiKey getKey() {
-        ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalse();
+        ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalseOrderByLastTimestampUsedAsc();
         if (apiKey == null) {
             apiKey = this.apiKeyRepository.findTopByBannedIsTrueOrderByRetryAfter();
         }
