@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class GameSummonerFiller {
@@ -47,17 +48,21 @@ public class GameSummonerFiller {
         for (String mode : ddSummonerSpellDTO.getModes()) {
             gameModes.add(this.gameDataFiller.fillGameMode(mode));
         }
-        /* TODO: hace rfuncionar esto
         summonerSpell.setGameModes(gameModes);
-        summonerSpell.setCooldown(Arrays.asList(ddSummonerSpellDTO.getCooldown()));
+        summonerSpell.setCooldown(Arrays.toString(ddSummonerSpellDTO.getCooldown()));
 
         summonerSpell.setCooldownBurn(ddSummonerSpellDTO.getCooldownBurn());
         summonerSpell.setCostBurn(ddSummonerSpellDTO.getCostBurn());
-        summonerSpell.setEffectBurn(Arrays.asList(ddSummonerSpellDTO.getEffectBurn()));
-        summonerSpell.setRange(Arrays.asList(ddSummonerSpellDTO.getRange()));
-        summonerSpell.setEffect(Arrays.stream(ddSummonerSpellDTO.getEffect())
-                .flatMap(Arrays::stream)
-                .collect(Collectors.toList()));*/
+        summonerSpell.setEffectBurn(Arrays.toString(ddSummonerSpellDTO.getEffectBurn()));
+        summonerSpell.setRange(Arrays.toString(ddSummonerSpellDTO.getRange()));
+
+        String effects = "";
+        for (Integer[] effectList : ddSummonerSpellDTO.getEffect()) {
+            effects += Arrays.toString(effectList) + ",";
+        }
+
+        summonerSpell.setEffect(effects);
+
         this.summonerSpellRepository.save(summonerSpell);
         return summonerSpell;
     }

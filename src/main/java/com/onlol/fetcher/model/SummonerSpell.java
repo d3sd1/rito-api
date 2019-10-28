@@ -2,10 +2,8 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,33 +33,30 @@ public class SummonerSpell {
     @OneToOne
     private GameImage gameImage;
 
-    /*
-        @Column(nullable = true, unique = false)
-        private List<GameMode> gameModes;
-     TODO: hacer funcionar esto
+    @ManyToMany
+    private List<GameMode> gameModes;
 
+    @Column(nullable = true, unique = false, columnDefinition = "text")
+    private String cooldown;
 
-        @Column(nullable = true, unique = false)
-        private List<Integer> cooldown;
+    @Column(nullable = false, unique = false)
+    private Float cooldownBurn = 0F;
 
-        @Column(nullable = false, unique = false)
-        private Float cooldownBurn = 0F;
+    @Column(nullable = true, unique = false, columnDefinition = "text")
+    private String cost;
 
-        @Column(nullable = true, unique = false)
-        private List<Integer> cost;
+    @Column(nullable = false, unique = false)
+    private Float costBurn = 0F;
 
-        @Column(nullable = false, unique = false)
-        private Float costBurn = 0F;
+    @Column(nullable = true, unique = false, columnDefinition = "text")
+    private String effect;
 
-        @Column(nullable = true, unique = false)
-        private List<Integer> effect;
+    @Column(nullable = true, unique = false, columnDefinition = "text")
+    private String effectBurn;
 
-        @Column(nullable = true, unique = false)
-        private List<Float> effectBurn;
+    @Column(nullable = true, unique = false, columnDefinition = "text")
+    private String range;
 
-        @Column(nullable = true, unique = false)
-        private List<Integer> range;
-    */
     public Integer getId() {
         return id;
     }
@@ -110,14 +105,6 @@ public class SummonerSpell {
         this.maxammo = maxammo;
     }
 
-    public GameImage getGameImage() {
-        return gameImage;
-    }
-
-    public void setGameImage(GameImage gameImage) {
-        this.gameImage = gameImage;
-    }
-
     public Float getRangeBurn() {
         return rangeBurn;
     }
@@ -126,6 +113,77 @@ public class SummonerSpell {
         this.rangeBurn = rangeBurn;
     }
 
+    public GameImage getGameImage() {
+        return gameImage;
+    }
+
+    public void setGameImage(GameImage gameImage) {
+        this.gameImage = gameImage;
+    }
+
+    public List<GameMode> getGameModes() {
+        return gameModes;
+    }
+
+    public void setGameModes(List<GameMode> gameModes) {
+        this.gameModes = gameModes;
+    }
+
+    public String getCooldown() {
+        return cooldown;
+    }
+
+    public void setCooldown(String cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    public Float getCooldownBurn() {
+        return cooldownBurn;
+    }
+
+    public void setCooldownBurn(Float cooldownBurn) {
+        this.cooldownBurn = cooldownBurn;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
+    }
+
+    public Float getCostBurn() {
+        return costBurn;
+    }
+
+    public void setCostBurn(Float costBurn) {
+        this.costBurn = costBurn;
+    }
+
+    public String getEffect() {
+        return effect;
+    }
+
+    public void setEffect(String effect) {
+        this.effect = effect;
+    }
+
+    public String getEffectBurn() {
+        return effectBurn;
+    }
+
+    public void setEffectBurn(String effectBurn) {
+        this.effectBurn = effectBurn;
+    }
+
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range;
+    }
 
     @Override
     public String toString() {
@@ -138,6 +196,14 @@ public class SummonerSpell {
                 ", maxammo=" + maxammo +
                 ", rangeBurn=" + rangeBurn +
                 ", gameImage=" + gameImage +
+                ", gameModes=" + gameModes +
+                ", cooldown='" + cooldown + '\'' +
+                ", cooldownBurn=" + cooldownBurn +
+                ", cost='" + cost + '\'' +
+                ", costBurn=" + costBurn +
+                ", effect='" + effect + '\'' +
+                ", effectBurn='" + effectBurn + '\'' +
+                ", range='" + range + '\'' +
                 '}';
     }
 }
