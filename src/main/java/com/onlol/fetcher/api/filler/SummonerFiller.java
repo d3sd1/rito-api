@@ -99,7 +99,6 @@ public class SummonerFiller {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
-                System.out.println(apiParticipantIdentityDTO);
                 /* If the same summoner to update, return riot real id. */
                 String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
                 Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
@@ -107,7 +106,6 @@ public class SummonerFiller {
                 if (apiParticipantIdentityDTO.getPlayer().getSummonerId().equals(apiSummonerDTO.getId())) {
                     riotRealId = currentRiotRealId;
                 } else { /* If not, add it to database */
-                    System.out.println("Add summoner to DB: " + apiParticipantIdentityDTO.getPlayer().getSummonerName());
                     this.fillSummoner(apiParticipantIdentityDTO, region, apiCall.getApiKey(), currentRiotRealId);
                 }
             }
