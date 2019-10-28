@@ -71,7 +71,6 @@ public class ApiConnector {
                     HttpMethod.GET, requestEntity,
                     String.class);
         } catch (HttpClientErrorException e) {
-            e.printStackTrace();
             switch (e.getStatusCode().value()) {
                 case 400:
                     /*
