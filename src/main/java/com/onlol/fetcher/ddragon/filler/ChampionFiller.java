@@ -31,11 +31,11 @@ public class ChampionFiller {
 
     public Champion fillChampion(DDChampionDTO championDTO) {
         // Since LoL swapped key and ID, let's swap it for performance
-        Champion dbChampion = this.championRepository.findByChampId(Integer.parseInt(championDTO.getKey()));
+        Champion dbChampion = this.championRepository.findByChampId(Long.parseLong(championDTO.getKey()));
 
         if (dbChampion == null) {
             dbChampion = new Champion();
-            dbChampion.setChampId(Integer.parseInt(championDTO.getKey()));
+            dbChampion.setChampId(Long.parseLong(championDTO.getKey()));
         }
 
         dbChampion.setKeyName(championDTO.getId().toLowerCase());
@@ -110,7 +110,7 @@ public class ChampionFiller {
         return this.championStatsRepository.save(dbChampionStats);
     }
 
-    public ChampionRotation fillChampionRotation(boolean forNewPlayers, Integer champId, Region region, Integer maxNewPlayerLevel) {
+    public ChampionRotation fillChampionRotation(boolean forNewPlayers, Long champId, Region region, Integer maxNewPlayerLevel) {
         Champion champion = this.championRepository.findByChampId(champId);
         ChampionRotation championRotation =
                 this.championRotationRepository.findByRotationDateAndRegionAndChampionAndForNewPlayers(

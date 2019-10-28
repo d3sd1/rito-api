@@ -121,11 +121,11 @@ public class GameChampionConnector {
                 return;
             }
 
-            for (Integer champId : champRotation.getFreeChampionIds()) {
+            for (Long champId : champRotation.getFreeChampionIds()) {
                 this.championFiller.fillChampionRotation(false, champId, region, champRotation.getMaxNewPlayerLevel());
             }
 
-            for (Integer champId : champRotation.getFreeChampionIdsForNewPlayers()) {
+            for (Long champId : champRotation.getFreeChampionIdsForNewPlayers()) {
                 this.championFiller.fillChampionRotation(true, champId, region, champRotation.getMaxNewPlayerLevel());
             }
         }

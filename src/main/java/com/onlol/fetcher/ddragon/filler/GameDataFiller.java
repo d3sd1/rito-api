@@ -149,7 +149,7 @@ public class GameDataFiller {
         return this.gameImageRepository.save(gameImage);
     }
 
-    public Champion fillChampion(Integer champId) {
+    public Champion fillChampion(Long champId) {
         Champion champion = this.championRepository.findByChampId(champId);
         if (champion != null) {
             return champion;
