@@ -47,6 +47,11 @@ public class SummonerFiller {
     private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region) {
         ApiMatchlistDto apiMatchlistDto;
         Long realMatchId = 0L;
+        Long riotRealId = 0L;
+        // In case we have no accountId, just return...
+        if (apiSummonerDTO.getAccountId() == null || apiSummonerDTO.getAccountId().equals("")) {
+            return riotRealId;
+        }
         try {
             apiMatchlistDto = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
@@ -68,6 +73,7 @@ public class SummonerFiller {
 
         // Has no games... We are not interested on the summoner.
         if (apiMatchlistDto.getMatches().isEmpty()) {
+            this.logger.error("Summoner has no matchlist games:" + apiSummonerDTO);
             return realMatchId; // 0
         }
 
@@ -75,41 +81,69 @@ public class SummonerFiller {
             Long gameId = apiMatchReferenceDTO.getGameId();
 
             ApiMatchDTO apiMatchDTO = new ApiMatchDTO();
-
+            ApiCall apiCall = null;
             try {
-                apiMatchDTO = this.jacksonMapper.readValue(this.apiConnector.get(
+                apiCall = this.apiConnector.get(
                         V4.MATCHES.replace("{{GAME_ID}}", String.valueOf(gameId))
                                 .replace("{{HOST}}", region.getHostName()),
                         true
-                ).getJson(), new TypeReference<ApiMatchlistDto>() {
+                );
+                apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchDTO>() {
                 });
             } catch (DataNotfoundException e) {
-
+                e.printStackTrace();
             } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-
+                e.printStackTrace();
             } catch (Exception e) {
+                e.printStackTrace();
                 this.logger.error("Got generic exception" + e.getMessage());
             }
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
+                System.out.println(apiParticipantIdentityDTO);
+                /* If the same summoner to update, return riot real id. */
+                String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
+                Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
 
+                if (apiParticipantIdentityDTO.getPlayer().getSummonerId().equals(apiSummonerDTO.getId())) {
+                    riotRealId = currentRiotRealId;
+                } else { /* If not, add it to database */
+                    System.out.println("Add summoner to DB: " + apiParticipantIdentityDTO.getPlayer().getSummonerName());
+                    this.fillSummoner(apiParticipantIdentityDTO, region, apiCall.getApiKey(), currentRiotRealId);
+                }
             }
+            return riotRealId;
         }
 
         return realMatchId;
     }
     /* TODO: hacerlo multikey. por ahora solo se usa una de prod */
 
+    public Summoner fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Region region, ApiKey apiKey, Long riotRealId) {
+        ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
+        apiSummonerDTO.setId(apiParticipantIdentityDTO.getPlayer().getSummonerId());
+        apiSummonerDTO.setAccountId(apiParticipantIdentityDTO.getPlayer().getCurrentAccountId());
+        apiSummonerDTO.setName(apiParticipantIdentityDTO.getPlayer().getSummonerName());
+        apiSummonerDTO.setSummonerLevel(null); // Must be null for re-updating
+        apiSummonerDTO.setProfileIconId(null); // Must be null for re-updating
+        apiSummonerDTO.setRevisionDate(null); // Must be null for re-updating
+        return this.fillSummoner(apiSummonerDTO, region, apiKey, riotRealId);
+    }
+
     public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region, ApiKey apiKey) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
         apiSummonerDTO.setId(apiLeagueItemDTO.getSummonerId());
         apiSummonerDTO.setName(apiLeagueItemDTO.getSummonerName());
-        apiSummonerDTO.setSummonerLevel(null);
-        apiSummonerDTO.setProfileIconId(null);
-        apiSummonerDTO.setRevisionDate(null);
-        return this.fillSummoner(apiSummonerDTO, region, apiKey);
+        apiSummonerDTO.setSummonerLevel(null); // Must be null for re-updating
+        apiSummonerDTO.setProfileIconId(null); // Must be null for re-updating
+        apiSummonerDTO.setRevisionDate(null); // Must be null for re-updating
+        return this.fillSummoner(apiSummonerDTO, region, apiKey, 0L);
     }
 
     public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
+        return this.fillSummoner(apiSummonerDTO, region, apiKey, 0L);
+    }
+
+    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey, Long riotRealId) {
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
         Summoner summoner;
         /* Init if needed */
@@ -126,10 +160,6 @@ public class SummonerFiller {
             summoner = summonerToken.getSummoner();
         }
 
-        /* Fullfit summoner token id if needed */
-        if (summoner == null) {
-            // TODO: si no existe en db, eliminar de hsah y summoner table
-        }
         summoner.setName(apiSummonerDTO.getName());
         /* Fullfit summoner historical names */
         SummonerNameHistorical summonerNameHistorical =
@@ -144,7 +174,6 @@ public class SummonerFiller {
 
         summoner.setRegion(region);
         boolean firstTime = true;
-        // esto para version multikey summoner.setRiotRealId();
         if (apiSummonerDTO.getProfileIconId() != null) {
             summoner.setProfileIconId(apiSummonerDTO.getProfileIconId());
             firstTime = false;
@@ -162,6 +191,14 @@ public class SummonerFiller {
             summoner.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
         } else {
             summoner.setLastTimeUpdated(LocalDateTime.now());
+        }
+
+        /* Fill riot real id if needed */
+        if (riotRealId != 0) {
+            summoner.setRiotRealId(riotRealId);
+        }
+        if (summoner.getRiotRealId() == null || summoner.getRiotRealId() == 0) {
+            summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region));
         }
         this.summonerRepository.save(summoner);
 

@@ -7,6 +7,7 @@ import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.ApiCall;
 import com.onlol.fetcher.model.ApiKey;
+import com.onlol.fetcher.repository.ApiCallRepository;
 import com.onlol.fetcher.repository.ApiKeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -31,6 +32,9 @@ public class ApiConnector {
 
     @Autowired
     private ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    private ApiCallRepository apiCallRepository;
 
     public ApiCall get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
         return this.get(url, false, Byte.decode("0"));
@@ -67,6 +71,7 @@ public class ApiConnector {
                     HttpMethod.GET, requestEntity,
                     String.class);
         } catch (HttpClientErrorException e) {
+            e.printStackTrace();
             switch (e.getStatusCode().value()) {
                 case 400:
                     /*
@@ -133,8 +138,9 @@ public class ApiConnector {
         } catch (ResourceAccessException e) {
             this.sleepGet(url, needsApiKey, attempts, e);
         }
-
-        return new ApiCall(apiKey, resp.getBody());
+        ApiCall apiCall = new ApiCall(apiKey, resp.getBody());
+        this.apiCallRepository.save(apiCall);
+        return apiCall;
     }
 
     public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {

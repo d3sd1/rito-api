@@ -9,7 +9,6 @@ import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,7 @@ public class SummonerScraper {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Async
+    //@Async
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
@@ -62,6 +61,17 @@ public class SummonerScraper {
         }
         this.logger.info("Updating summoner " + summoner.getName());
         this.summonerConnector.updateSummoner(summoner.getName(), summoner.getRegion());
+        /*
+
+
+        //TODO: en este fill rellenar usuario, ya que matchLists debe coger gameIDs, coger un gameId y
+        // en esta funcion de baajo buscar un match. de ese match sacar real id y rellenar
+        /* Recuperar todos los datos, y después actualizarlos en DB *
+        // tambien contamos con apiSummonerDTO
+        List<MatchList> matchLists = this.matchConnector.matchListByAccount(apiSummonerDTO, region);
+        List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
+        List<SummonerLeague> summonerLeagues = this.leaguesConnector.summonerLeagues(summoner);
+         */
     }
 
 

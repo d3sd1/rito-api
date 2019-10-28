@@ -11,7 +11,7 @@ public class Log {
     @Column(nullable = false, unique = true)
     private long id;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = false, unique = false, columnDefinition = "text")
     private String text;
 
     @Column(nullable = false, unique = false)

@@ -1,14 +1,22 @@
 package com.onlol.fetcher.api.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.bypass.SummonerBypass;
+import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
+import com.onlol.fetcher.exceptions.ApiBadRequestException;
+import com.onlol.fetcher.exceptions.ApiDownException;
+import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
+import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
+import com.onlol.fetcher.model.ApiCall;
 import com.onlol.fetcher.model.Region;
 import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.model.SummonerChampionMastery;
+import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,43 +44,38 @@ public class SummonerConnector {
     private SummonerBypass summonerBypass;
 
     @Autowired
+    private SummonerRepository summonerRepository;
+
+    @Autowired
     private ObjectMapper jacksonMapper;
 
     public Summoner updateSummoner(String summonerName, Region region) {
-        /*ApiSummonerDTO apiSummonerDTO;
-        ApiCall apiCall; TODO
+        ApiSummonerDTO apiSummonerDTO;
+        ApiCall apiCall;
         try {
             apiCall = this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
-                            .replace("{{SUMMONER_NAME}}", summonerName.replaceAll(" ", "%20"))
+                            .replace("{{SUMMONER_NAME}}", summonerName.replaceAll(" ", ""))
                             .replace("{{HOST}}", region.getHostName()),
                     true
             );
             apiSummonerDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiSummonerDTO>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
-            return;
+            this.logger.info("Summoner not found. Removing it from DB.");
+            //TODO: remove from DB?
+            return null;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-            return;
+            return null;
         } catch (Exception e) {
             this.logger.error("Got generic exception" + e.getMessage());
-            return;
+            return null;
         }
 
         if (apiSummonerDTO == null) {
-            return;
+            return null;
         }
-        /* Recuperar todos los datos, y después actualizarlos en DB *
-        // tambien contamos con apiSummonerDTO
-        List<MatchList> matchLists = this.matchConnector.matchListByAccount(apiSummonerDTO, region);
-        List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
-        List<SummonerLeague> summonerLeagues = this.leaguesConnector.summonerLeagues(summoner);
-
-        //TODO: en este fill rellenar usuario, ya que matchLists debe coger gameIDs, coger un gameId y
-        // en esta funcion de baajo buscar un match. de ese match sacar real id y rellenar
-        return this.summonerBypass.fill(apiCall.getApiKey(), apiSummonerDTO);*/
-        return null;
+        return this.summonerFiller.fillSummoner(apiSummonerDTO, region, apiCall.getApiKey());
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(ApiSummonerDTO apiSummonerDTO, Region region) {
