@@ -100,17 +100,17 @@ public class SummonerFiller {
     // TODO agrupar mails error
     /* TODO: hacerlo multikey. por ahora solo se usa una de prod */
 
-    public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region) {
+    public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region, ApiKey apiKey) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
         apiSummonerDTO.setId(apiLeagueItemDTO.getSummonerId());
         apiSummonerDTO.setName(apiLeagueItemDTO.getSummonerName());
         apiSummonerDTO.setSummonerLevel(null);
         apiSummonerDTO.setProfileIconId(null);
         apiSummonerDTO.setRevisionDate(null);
-        return this.fillSummoner(apiSummonerDTO, region);
+        return this.fillSummoner(apiSummonerDTO, region, apiKey);
     }
 
-    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region) {
+    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
         Summoner summoner;
         /* Init if needed */
@@ -120,6 +120,7 @@ public class SummonerFiller {
             this.summonerRepository.save(summoner);
             summonerToken = new SummonerToken();
             summonerToken.setSummonerTokenId(apiSummonerDTO.getId());
+            summonerToken.setApiKey(apiKey);
             summonerToken.setSummoner(summoner);
             this.summonerTokenRepository.save(summonerToken);
         } else {
