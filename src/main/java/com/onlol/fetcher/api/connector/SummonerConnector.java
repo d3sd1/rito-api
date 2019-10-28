@@ -111,4 +111,3 @@ recuperar todos los summoner de la liga y añadirlos para actualizar
 TODO: best effort. scrappear todos los queue tier division una vez por dia y en el initial setup??
 GET /lol/league/v4/entries/{queue}/{tier}/{division}
  */
-//TODO: verificar consistencia de datos y refactorizar proyecto

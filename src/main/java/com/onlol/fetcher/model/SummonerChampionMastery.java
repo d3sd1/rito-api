@@ -23,7 +23,7 @@ public class SummonerChampionMastery {
     private boolean chestGranted = false;
 
     @Column(nullable = false, unique = false)
-    private Long championPoints = 0L;
+    private Integer championPoints = 0;
 
     @Column(nullable = false, unique = false)
     private Long championPointsSinceLastLevel = 0L;
@@ -69,11 +69,11 @@ public class SummonerChampionMastery {
         this.chestGranted = chestGranted;
     }
 
-    public Long getChampionPoints() {
+    public Integer getChampionPoints() {
         return championPoints;
     }
 
-    public void setChampionPoints(Long championPoints) {
+    public void setChampionPoints(Integer championPoints) {
         this.championPoints = championPoints;
     }
 

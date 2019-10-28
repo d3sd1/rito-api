@@ -13,7 +13,7 @@ import java.util.List;
 public class Champion {
     @Id
     @Column(nullable = false, unique = true)
-    private Integer champId;
+    private Long champId;
 
     @Column(nullable = false, unique = false)
     private String keyName;
@@ -21,11 +21,11 @@ public class Champion {
     @ManyToMany
     private List<ChampionTag> championTags;
 
-    public Integer getChampId() {
+    public Long getChampId() {
         return champId;
     }
 
-    public void setChampId(Integer champId) {
+    public void setChampId(Long champId) {
         this.champId = champId;
     }
 

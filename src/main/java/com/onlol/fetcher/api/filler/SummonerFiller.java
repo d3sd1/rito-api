@@ -11,10 +11,7 @@ import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
-import com.onlol.fetcher.repository.SummonerNameHistoricalRepository;
-import com.onlol.fetcher.repository.SummonerRepository;
-import com.onlol.fetcher.repository.SummonerTokenRepository;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +22,9 @@ import java.time.LocalDateTime;
 public class SummonerFiller {
     @Autowired
     private SummonerRepository summonerRepository;
+
+    @Autowired
+    private ChampionRepository championRepository;
 
     @Autowired
     private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
@@ -97,7 +97,6 @@ public class SummonerFiller {
 
         return realMatchId;
     }
-    // TODO agrupar mails error
     /* TODO: hacerlo multikey. por ahora solo se usa una de prod */
 
     public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region, ApiKey apiKey) {
@@ -175,9 +174,9 @@ public class SummonerFiller {
             summonerChampionMastery = new SummonerChampionMastery();
         }
         summonerChampionMastery.setSummoner(summoner);
-        //summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
+        summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
         summonerChampionMastery.setChampionLevel(apiChampionMasteryDTO.getChampionLevel());
-        //summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
+        summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
         summonerChampionMastery.setChampionPointsSinceLastLevel(apiChampionMasteryDTO.getChampionPointsSinceLastLevel());
         summonerChampionMastery.setChampionPointsUntilNextLevel(apiChampionMasteryDTO.getChampionPointsUntilNextLevel());
         summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
