@@ -121,6 +121,11 @@ public class GameDataFiller {
         return this.gameMapRepository.save(gameMap);
     }
 
+    public GameType fillGameType(String gameType) {
+        DDGameTypeDTO ddGameTypeDTO = new DDGameTypeDTO();
+        ddGameTypeDTO.setGametype(gameType);
+        return this.fillGameType(ddGameTypeDTO);
+    }
     public GameType fillGameType(DDGameTypeDTO ddGameTypeDTO) {
         GameType gameType = this.gameTypeRepository.findByGameType(ddGameTypeDTO.getGametype());
         if (gameType != null) {

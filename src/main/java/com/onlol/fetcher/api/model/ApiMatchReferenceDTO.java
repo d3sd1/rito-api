@@ -7,7 +7,7 @@ package com.onlol.fetcher.api.model;
 public class ApiMatchReferenceDTO {
     private String lane = "";
     private Long gameId = 0L;
-    private Integer champion = 0;
+    private Long champion = 0L;
     private String platformId = "";
     private Integer season;
     private Long timestamp = 0L;
@@ -30,11 +30,11 @@ public class ApiMatchReferenceDTO {
         this.gameId = gameId;
     }
 
-    public Integer getChampion() {
+    public Long getChampion() {
         return champion;
     }
 
-    public void setChampion(Integer champion) {
+    public void setChampion(Long champion) {
         this.champion = champion;
     }
 

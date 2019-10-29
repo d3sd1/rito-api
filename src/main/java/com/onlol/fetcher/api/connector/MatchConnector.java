@@ -14,10 +14,7 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.MatchGame;
-import com.onlol.fetcher.model.MatchGameTimeline;
-import com.onlol.fetcher.model.MatchList;
-import com.onlol.fetcher.model.Region;
+import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,14 +92,16 @@ public class MatchConnector {
     public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, Long beginIndex) {
         ApiMatchlistDto apiMatchlistDto;
         List<MatchList> matchLists = new ArrayList<>();
+        ApiCall apiCall = null;
         try {
-            apiMatchlistDto = this.jacksonMapper.readValue(this.apiConnector.get(
+            apiCall = this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
                             .replace("{{SUMMONER_ACCOUNT}}", apiSummonerDTO.getAccountId())
                             .replace("{{HOST}}", region.getHostName())
                             .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
                     true
-            ).getJson(), new TypeReference<ApiMatchlistDto>() {
+            );
+            apiMatchlistDto = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception" + e.getMessage());
@@ -116,7 +115,7 @@ public class MatchConnector {
 
 
         for (ApiMatchReferenceDTO apiMatchReferenceDto : apiMatchlistDto.getMatches()) {
-            matchLists.add(this.matchFiller.fillMatchListGame(apiMatchReferenceDto, apiSummonerDTO));
+            matchLists.add(this.matchFiller.fillMatchListGame(apiMatchReferenceDto, apiSummonerDTO, region, apiCall.getApiKey()));
         }
 
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
