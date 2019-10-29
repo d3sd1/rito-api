@@ -33,6 +33,9 @@ public class Summoner {
     @Column(nullable = false, unique = false)
     private LocalDateTime lastTimeUpdated = LocalDateTime.now();
 
+    @Column(nullable = false, unique = false)
+    private Boolean retrieving = false;
+
     @OneToOne
     private Region region;
 
@@ -100,6 +103,14 @@ public class Summoner {
         this.region = region;
     }
 
+    public Boolean getRetrieving() {
+        return retrieving;
+    }
+
+    public void setRetrieving(Boolean retrieving) {
+        this.retrieving = retrieving;
+    }
+
     @Override
     public String toString() {
         return "Summoner{" +
@@ -110,6 +121,7 @@ public class Summoner {
                 ", revisionDate=" + revisionDate +
                 ", summonerLevel=" + summonerLevel +
                 ", lastTimeUpdated=" + lastTimeUpdated +
+                ", retrieving=" + retrieving +
                 ", region=" + region +
                 '}';
     }

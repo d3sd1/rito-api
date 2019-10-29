@@ -14,7 +14,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -40,11 +42,26 @@ public class SummonerScraper {
     @Autowired
     private JavaMailSender javaMailSender;
 
+
+    @PostConstruct
+    @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
+    public void cleanOrphanSummoners() {
+        this.logger.info("Limpiando summoners huérfanos...");
+        List<Summoner> orphanSummoners = this.summonerRepository.findAllByRetrievingIsTrue();
+        for (Summoner orphanSummoner : orphanSummoners) {
+            orphanSummoner.setRetrieving(false);
+            this.summonerRepository.save(orphanSummoner);
+        }
+    }
+
+    //TODO: hacerlo multikey
     @Async
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000)
     public void getSummonerInfo() {
-        Summoner summoner = this.summonerRepository.findTopByOrderByLastTimeUpdated();
+        Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
+
         if (summoner == null) {
             this.logger.info("No summoners to update.");
             return;
@@ -60,6 +77,10 @@ public class SummonerScraper {
 
             return;
         }
+        //TODO: retrieving no funciona. debe funcionar para que se actualice el invocador 1 vez y no se solape por el async
+        summoner.setRetrieving(true);
+        System.out.println(summoner);
+        summoner = this.summonerRepository.save(summoner);
         this.logger.info("Updating summoner " + summoner.getName());
         this.summonerConnector.updateSummoner(summoner.getName(), summoner.getRegion());
         /*
@@ -73,6 +94,8 @@ public class SummonerScraper {
         List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
         List<SummonerLeague> summonerLeagues = this.leaguesConnector.summonerLeagues(summoner);
          */
+        summoner.setRetrieving(false);
+        summoner = this.summonerRepository.save(summoner);
     }
 
 
