@@ -134,12 +134,14 @@ public class MatchConnector {
     public MatchGame match(MatchGame matchGame) {
         ApiMatchDTO apiMatchDTO;
 
+        ApiCall apiCall = null;
         try {
-            apiMatchDTO = this.jacksonMapper.readValue(this.apiConnector.get(
+            apiCall = this.apiConnector.get(
                     V4.MATCHES.replace("{{GAME_ID}}", matchGame.getGameId().toString())
                             .replace("{{HOST}}", matchGame.getRegion().getHostName()),
                     true
-            ).getJson(), new TypeReference<ApiMatchlistDto>() {
+            );
+            apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.error("El match no existe..." + matchGame.getGameId().toString());
@@ -158,7 +160,7 @@ public class MatchConnector {
             return matchGame;
         }
 
-        this.matchFiller.fillMatchGame(apiMatchDTO);
+        this.matchFiller.fillMatchGame(apiMatchDTO, matchGame.getRegion(), apiCall.getApiKey());
 
         return matchGame;
     }
