@@ -15,7 +15,7 @@ public class Summoner {
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = true, unique = true)
+    @Column(nullable = true, unique = false)
     private Long riotRealId;
 
     @Column(nullable = false, unique = false)

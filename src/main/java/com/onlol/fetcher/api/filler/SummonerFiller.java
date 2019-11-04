@@ -49,7 +49,6 @@ public class SummonerFiller {
 
     private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
         ApiMatchlistDto apiMatchlistDto;
-        Long realMatchId = null;
         Long riotRealId = null;
         // In case we have no accountId, just return...
         if (apiSummonerDTO.getAccountId() == null || apiSummonerDTO.getAccountId().equals("")) {
@@ -67,9 +66,9 @@ public class SummonerFiller {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception");
-            return realMatchId;
+            return null;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-            return realMatchId;
+            return null;
         } catch (Exception e) {
 
             if (e.getMessage() != null) {
@@ -109,7 +108,7 @@ public class SummonerFiller {
                     this.logger.error("Got generic exception" + e.getMessage());
                 }
             }
-            //TODO: riotRealId <- que se recargue siempre
+            //TODO: riotRealId <- que se recargue siempre, no funcioan bien?
             //TODO: match filler aqui <-
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
                 /* If the same summoner to update, return riot real id. */
@@ -122,7 +121,6 @@ public class SummonerFiller {
                     this.fillSummoner(apiParticipantIdentityDTO, region, apiCall.getApiKey(), currentRiotRealId);
                 }
             }
-            return riotRealId;
         }
 
         return riotRealId;
