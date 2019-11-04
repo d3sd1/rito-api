@@ -47,7 +47,7 @@ public class SummonerFiller {
     private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region) {
         ApiMatchlistDto apiMatchlistDto;
         Long realMatchId = 0L;
-        Long riotRealId = 0L;
+        Long riotRealId = null;
         // In case we have no accountId, just return...
         if (apiSummonerDTO.getAccountId() == null || apiSummonerDTO.getAccountId().equals("")) {
             return riotRealId;
@@ -192,7 +192,7 @@ public class SummonerFiller {
         if (riotRealId != 0) {
             summoner.setRiotRealId(riotRealId);
         }
-        if (summoner.getRiotRealId() == null || summoner.getRiotRealId() == 0) {
+        if (summoner.getRiotRealId() == null) {
             summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region));
         }
         summoner = this.summonerRepository.save(summoner);
