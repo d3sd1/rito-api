@@ -37,20 +37,25 @@ public class ApiConnector {
     private ApiCallRepository apiCallRepository;
 
     public ApiCall get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
-        return this.get(url, false, Byte.decode("0"));
+        return this.get(url, false, Byte.decode("0"), null);
     }
 
     public ApiCall get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
-        return this.get(url, needsApiKey, Byte.decode("0"));
+        return this.get(url, needsApiKey, Byte.decode("0"), null);
     }
 
-    public ApiCall get(String url, boolean needsApiKey, byte attempts) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey, ApiKey apiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+        return this.get(url, needsApiKey, Byte.decode("0"), apiKey);
+    }
+
+    public ApiCall get(String url, boolean needsApiKey, byte attempts, ApiKey apiKey) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity requestEntity = null;
-        ApiKey apiKey = null;
         if (needsApiKey) {
-            apiKey = this.apiKeyManager.getKey();
+            if (apiKey == null) {
+                apiKey = this.apiKeyManager.getKey();
+            }
             if (apiKey == null) {
                 // Enqueue after 60s if no api keys present
                 this.logService.error("No api keys found. Sleeping 60 seconds.");
@@ -58,7 +63,7 @@ public class ApiConnector {
                     TimeUnit.SECONDS.sleep(60);
                 } catch (InterruptedException e) {
                 }
-                return this.get(url, needsApiKey, ++attempts);
+                return this.get(url, needsApiKey, ++attempts, apiKey);
             }
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-Riot-Token", apiKey.getApiKey());
@@ -105,7 +110,7 @@ public class ApiConnector {
                         this.apiKeyRepository.save(apiKey);
                         this.logService.info("Invalidated api KEY: " + apiKey.getApiKey());
                         this.logService.info("Forbidden URL 403: " + url + " with api key " + apiKey.getApiKey() + " and body " + e.getResponseBodyAsString());
-                        return this.get(url, needsApiKey, ++attempts);
+                        return this.get(url, needsApiKey, ++attempts, apiKey);
                     } else if (apiKey.getInvalidCalls() <= 10) {
                         apiKey.setInvalidCalls(apiKey.getInvalidCalls() + 1);
                     } else {
@@ -131,7 +136,7 @@ public class ApiConnector {
                         apiKey.setValid(true);
                         this.apiKeyRepository.save(apiKey);
                     }
-                    return this.get(url, needsApiKey, ++attempts);
+                    return this.get(url, needsApiKey, ++attempts, apiKey);
 
             }
         } catch (HttpServerErrorException e) {
@@ -140,11 +145,11 @@ public class ApiConnector {
                     this.logService.warning("Api struggling with 500 on " + url + " with exception " + e.getMessage());
                     throw new ApiDownException();
                 case 503:
-                    this.sleepGet(url, needsApiKey, attempts, e);
+                    this.sleepGet(url, needsApiKey, attempts, apiKey, e);
 
             }
         } catch (ResourceAccessException e) {
-            this.sleepGet(url, needsApiKey, attempts, e);
+            this.sleepGet(url, needsApiKey, attempts, apiKey, e);
         }
         if (apiKey != null) {
             apiKey.setInvalidCalls(0);
@@ -155,7 +160,7 @@ public class ApiConnector {
         return apiCall;
     }
 
-    public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
+    public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, ApiKey apiKey, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
         try {
             TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException ex) {
@@ -164,7 +169,7 @@ public class ApiConnector {
         // Prevent cycle. Retry only 3 times just in case.
         if (attempts < 3) {
             this.logService.warning("Api seems to be down on endpoint (503) " + url + " with exception " + e.getMessage());
-            return this.get(url, needsApiKey, ++attempts);
+            return this.get(url, needsApiKey, ++attempts, apiKey);
         } else {
             throw new ApiDownException();
         }

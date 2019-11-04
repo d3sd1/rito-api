@@ -44,7 +44,7 @@ public class SummonerFiller {
     @Autowired
     private LogService logger;
 
-    private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region) {
+    private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
         ApiMatchlistDto apiMatchlistDto;
         Long realMatchId = null;
         Long riotRealId = null;
@@ -58,7 +58,8 @@ public class SummonerFiller {
                             .replace("{{SUMMONER_ACCOUNT}}", apiSummonerDTO.getAccountId())
                             .replace("{{HOST}}", region.getHostName())
                             .replace("{{BEGIN_INDEX}}", "0"),
-                    true
+                    true,
+                    apiKey
             ).getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
@@ -73,7 +74,6 @@ public class SummonerFiller {
             }
             return riotRealId;
         }
-
         // Has no games... We are not interested on the summoner.
         if (apiMatchlistDto.getMatches().isEmpty()) {
             this.logger.error("Summoner has no matchlist games:" + apiSummonerDTO);
@@ -193,7 +193,7 @@ public class SummonerFiller {
             summoner.setRiotRealId(riotRealId);
         }
         if (summoner.getRiotRealId() == null) {
-            summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region));
+            summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region, apiKey));
         }
         summoner = this.summonerRepository.save(summoner);
 

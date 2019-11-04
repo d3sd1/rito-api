@@ -85,21 +85,22 @@ public class MatchConnector {
     @Autowired
     private LogService logger;
 
-    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region) { // WRAPPER
-        return this.matchListByAccount(apiSummonerDTO, region, 0L);
+    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) { // WRAPPER
+        return this.matchListByAccount(apiSummonerDTO, region, 0L, apiKey);
     }
 
-    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, Long beginIndex) {
+    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, Long beginIndex, ApiKey apiKey) {
         ApiMatchlistDto apiMatchlistDto;
         List<MatchList> matchLists = new ArrayList<>();
-        ApiCall apiCall = null;
+        ApiCall apiCall;
         try {
             apiCall = this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
                             .replace("{{SUMMONER_ACCOUNT}}", apiSummonerDTO.getAccountId())
                             .replace("{{HOST}}", region.getHostName())
                             .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
-                    true
+                    true,
+                    apiKey
             );
             apiMatchlistDto = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
@@ -123,7 +124,7 @@ public class MatchConnector {
 
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
         if (apiMatchlistDto.getEndIndex() < apiMatchlistDto.getTotalGames()) {
-            this.matchListByAccount(apiSummonerDTO, region, apiMatchlistDto.getEndIndex() + 1);
+            this.matchListByAccount(apiSummonerDTO, region, apiMatchlistDto.getEndIndex() + 1, apiKey);
         }
         return matchLists;
     }
