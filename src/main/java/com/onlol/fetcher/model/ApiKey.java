@@ -2,15 +2,16 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiKey {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, unique = true)
+    private Integer id;
+
     @Column(nullable = false, unique = true)
     private String apiKey;
 
@@ -69,10 +70,19 @@ public class ApiKey {
         this.lastTimestampUsed = lastTimestampUsed;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "ApiKey{" +
-                "apiKey='" + apiKey + '\'' +
+                "id=" + id +
+                ", apiKey='" + apiKey + '\'' +
                 ", retryAfter=" + retryAfter +
                 ", banned=" + banned +
                 ", isValid=" + isValid +
