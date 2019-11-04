@@ -1,4 +1,4 @@
-INSERT INTO api_key (api_key, banned, is_valid, last_timestamp_used, retry_after)
+INSERT INTO api_key (api_key, banned, valid, last_timestamp_used, retry_after)
 VALUES ('RGAPI-a5435ca3-ad49-4a9d-97a1-c42341da504f', true, true, 0, 0),
        ('RGAPI-92ef3acf-ddb2-48b8-8e4d-26ad9716b4bf', false, false, 0, 0),
        ('RGAPI-1fee5177-2856-46d9-9519-7716861487fe', true, true, 0, 0),

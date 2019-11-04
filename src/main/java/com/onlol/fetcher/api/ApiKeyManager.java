@@ -17,10 +17,13 @@ public class ApiKeyManager {
     private LogService logger;
 
     public ApiKey getKey() {
-        ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalseOrderByLastTimestampUsedAsc();
+        ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalseAndValidIsTrueOrderByLastTimestampUsedAsc();
 
         if (apiKey == null) {
             apiKey = this.apiKeyRepository.findTopByBannedIsTrueOrderByRetryAfter();
+        }
+        if (apiKey == null) {
+            this.logger.error("All api keys are invalid.");
         }
         if (this.apiKeyRepository.findAll().isEmpty()) {
             this.logger.error("No api keys found...");

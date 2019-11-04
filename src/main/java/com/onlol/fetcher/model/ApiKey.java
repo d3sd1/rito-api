@@ -19,13 +19,21 @@ public class ApiKey {
     private Integer retryAfter = 0;
 
     @Column(nullable = false, unique = false)
-    private boolean banned = false;
+    private boolean banned = false; // 429 err too  many requests handler
 
     @Column(nullable = false, unique = false)
-    private boolean isValid = true;
+    private boolean valid = true; // api key is not usable.
 
     @Column(nullable = false, unique = false)
     private Long lastTimestampUsed;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getApiKey() {
         return apiKey;
@@ -40,9 +48,6 @@ public class ApiKey {
     }
 
     public void setRetryAfter(Integer retryAfter) {
-        if (retryAfter == null) {
-            retryAfter = 0;
-        }
         this.retryAfter = retryAfter;
     }
 
@@ -55,11 +60,11 @@ public class ApiKey {
     }
 
     public boolean isValid() {
-        return isValid;
+        return valid;
     }
 
     public void setValid(boolean valid) {
-        isValid = valid;
+        this.valid = valid;
     }
 
     public Long getLastTimestampUsed() {
@@ -70,14 +75,6 @@ public class ApiKey {
         this.lastTimestampUsed = lastTimestampUsed;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "ApiKey{" +
@@ -85,7 +82,7 @@ public class ApiKey {
                 ", apiKey='" + apiKey + '\'' +
                 ", retryAfter=" + retryAfter +
                 ", banned=" + banned +
-                ", isValid=" + isValid +
+                ", valid=" + valid +
                 ", lastTimestampUsed=" + lastTimestampUsed +
                 '}';
     }

@@ -17,6 +17,9 @@ public class LogService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    private LogService logger;
+
     private Class<?> getCaller() {
         try {
             Class<?> clazz = this.getClass();
@@ -37,14 +40,18 @@ public class LogService {
 
     void sendEmail(String type, String log) {
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom("bugs@onlol.net");
-        msg.setTo("andreigarciacuadra@gmail.com");
+        try {
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setFrom("bugs@onlol.net");
+            msg.setTo("andreigarciacuadra@gmail.com");
 
-        msg.setSubject("[" + type + "] OnLOL Scraper");
-        msg.setText(log);
+            msg.setSubject("[" + type + "] OnLOL Scraper");
+            msg.setText(log);
 
-        javaMailSender.send(msg);
+            javaMailSender.send(msg);
+        } catch (Exception e) {
+            this.logger.error("Could not send email [" + type + "]" + log + " with exception " + e.getMessage());
+        }
 
     }
 

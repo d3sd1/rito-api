@@ -100,11 +100,15 @@ public class ApiConnector {
                     A blacklisted API key was provided with the API request.
                     The API request was for an incorrect or unsupported path.
                      */
-                    apiKey.setBanned(true);
-                    this.apiKeyRepository.save(apiKey);
-                    this.logService.info("Invalidated api KEY: " + apiKey.getApiKey());
-                    this.logService.info("Forbidden URL 403: " + url);
-                    return this.get(url, needsApiKey, ++attempts);
+                    if (attempts < 3 && needsApiKey) {
+                        apiKey.setBanned(true);
+                        this.apiKeyRepository.save(apiKey);
+                        this.logService.info("Invalidated api KEY: " + apiKey.getApiKey());
+                        this.logService.info("Forbidden URL 403: " + url + " with api key " + apiKey.getApiKey() + " and body " + e.getResponseBodyAsString());
+                        return this.get(url, needsApiKey, ++attempts);
+                    } else {
+                        throw new DataNotfoundException();
+                    }
                 case 404:
                     /*
                     Common Reasons:
