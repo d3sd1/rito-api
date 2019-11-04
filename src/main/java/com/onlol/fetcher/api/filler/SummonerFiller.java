@@ -114,7 +114,6 @@ public class SummonerFiller {
 
         return realMatchId;
     }
-    /* TODO: hacerlo multikey. por ahora solo se usa una de prod */
 
     public Summoner fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Region region, ApiKey apiKey, Long riotRealId) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
@@ -146,9 +145,7 @@ public class SummonerFiller {
         Summoner summoner;
         /* Init if needed */
         if (summonerToken == null) {
-            summoner = new Summoner();
-            summoner.setName(apiSummonerDTO.getName());
-            this.summonerRepository.save(summoner);
+            summoner = this.summonerRepository.findOneByRegionAndName(region, apiSummonerDTO.getName());
             summonerToken = new SummonerToken();
             summonerToken.setSummonerTokenId(apiSummonerDTO.getId());
             summonerToken.setApiKey(apiKey);

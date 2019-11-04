@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
+@Entity()
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Summoner {
 
@@ -15,7 +15,7 @@ public class Summoner {
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = true, unique = false)
+    @Column(nullable = true, unique = true)
     private Long riotRealId;
 
     @Column(nullable = false, unique = false)

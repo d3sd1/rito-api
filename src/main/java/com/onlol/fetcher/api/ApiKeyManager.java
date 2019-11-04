@@ -18,12 +18,15 @@ public class ApiKeyManager {
 
     public ApiKey getKey() {
         ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalseOrderByLastTimestampUsedAsc();
+
         if (apiKey == null) {
             apiKey = this.apiKeyRepository.findTopByBannedIsTrueOrderByRetryAfter();
         }
         if (this.apiKeyRepository.findAll().isEmpty()) {
             this.logger.error("No api keys found...");
         }
+        apiKey.setLastTimestampUsed(System.currentTimeMillis());
+        this.apiKeyRepository.save(apiKey);
         return apiKey;
     }
 }

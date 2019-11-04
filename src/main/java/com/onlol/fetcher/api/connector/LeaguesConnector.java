@@ -208,8 +208,9 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO
+            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -267,8 +268,9 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO
+            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -325,8 +327,9 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO
+            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
 
         }
         return summonerLeagues;

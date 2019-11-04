@@ -6,6 +6,7 @@ import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.Summoner;
+import com.onlol.fetcher.repository.RegionRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,9 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @EnableAsync
@@ -43,6 +42,10 @@ public class SummonerScraper {
     private JavaMailSender javaMailSender;
 
 
+    @Autowired
+    private RegionRepository regionRepository;
+
+
     @PostConstruct
     @RequiresInitialSetup
     public void cleanOrphanSummoners() {
@@ -54,18 +57,18 @@ public class SummonerScraper {
         }
     }
 
-    //TODO: hacerlo multikey
     @Async
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 1000)
     public void getSummonerInfo() {
-        Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
-
+        //Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
+        Summoner summoner = this.summonerRepository.findOneByRegionAndName(this.regionRepository.findByServiceRegion("br"), "Pretorian Graves"); //TODO: quitar esto
         if (summoner == null) {
             this.logger.info("No summoners to update.");
             return;
         }
-        if (!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
+        /*if (!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
+        TODO: decom,entar esto
             this.logger.info(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
 
             try {
@@ -75,7 +78,7 @@ public class SummonerScraper {
             }
 
             return;
-        }
+        }*/
         summoner.setRetrieving(true);
         summoner = this.summonerRepository.save(summoner);
         this.logger.info("Updating summoner " + summoner.getName());
