@@ -44,6 +44,9 @@ public class SummonerFiller {
     @Autowired
     private LogService logger;
 
+    @Autowired
+    private MatchFiller matchFiller;
+
     private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
         ApiMatchlistDto apiMatchlistDto;
         Long realMatchId = null;
@@ -74,6 +77,7 @@ public class SummonerFiller {
             }
             return riotRealId;
         }
+
         // Has no games... We are not interested on the summoner.
         if (apiMatchlistDto.getMatches().isEmpty()) {
             this.logger.error("Summoner has no matchlist games:" + apiSummonerDTO);
@@ -81,6 +85,7 @@ public class SummonerFiller {
         }
 
         for (ApiMatchReferenceDTO apiMatchReferenceDTO : apiMatchlistDto.getMatches()) {
+            // Poner esto? this.matchFiller.fillMatchListGame(apiMatchReferenceDTO, apiSummonerDTO, region, apiKey);
             Long gameId = apiMatchReferenceDTO.getGameId();
 
             ApiMatchDTO apiMatchDTO = new ApiMatchDTO();
@@ -104,6 +109,7 @@ public class SummonerFiller {
                     this.logger.error("Got generic exception" + e.getMessage());
                 }
             }
+            //TODO: match filler aqui <-
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
                 /* If the same summoner to update, return riot real id. */
                 String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
