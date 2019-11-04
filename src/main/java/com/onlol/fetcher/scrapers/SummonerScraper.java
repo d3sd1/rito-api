@@ -61,8 +61,7 @@ public class SummonerScraper {
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 1000)
     public void getSummonerInfo() {
-        //Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
-        Summoner summoner = this.summonerRepository.findOneByRegionAndName(this.regionRepository.findByServiceRegion("br"), "Pretorian Graves"); //TODO: quitar esto
+        Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
         if (summoner == null) {
             this.logger.info("No summoners to update.");
             return;

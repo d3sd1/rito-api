@@ -100,15 +100,18 @@ public class ApiConnector {
                     A blacklisted API key was provided with the API request.
                     The API request was for an incorrect or unsupported path.
                      */
-                    this.logService.info("Forbidden URL: " + url);
-                    throw new DataNotfoundException();
+                    apiKey.setBanned(true);
+                    this.apiKeyRepository.save(apiKey);
+                    this.logService.info("Invalidated api KEY: " + apiKey.getApiKey());
+                    this.logService.info("Forbidden URL 403: " + url);
+                    return this.get(url, needsApiKey, ++attempts);
                 case 404:
                     /*
                     Common Reasons:
                     The ID or name provided does not match any existing resource (e.g., there is no Summoner matching the specified ID).
                     There are no resources that match the parameters specified.
                      */
-                    this.logService.info("Unknown url: " + url);
+                    this.logService.info("Unknown url 404: " + url);
                     throw new DataNotfoundException();
 
 
