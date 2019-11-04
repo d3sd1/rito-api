@@ -157,23 +157,13 @@ public class SummonerFiller {
             summonerToken.setApiKey(apiKey);
             summonerToken.setSummoner(summoner);
             this.summonerTokenRepository.save(summonerToken);
-        } else if (summonerToken.getSummoner() != null) {
+        } else if (summonerToken != null && summonerToken.getSummoner() != null) {
             summoner = summonerToken.getSummoner();
         }
 
         /* Fill summoner at first */
 
         summoner.setName(apiSummonerDTO.getName());
-        /* Fullfit summoner historical names */
-        SummonerNameHistorical summonerNameHistorical =
-                this.summonerNameHistoricalRepository.findTopByNameAndSummoner(apiSummonerDTO.getName(), summoner);
-        if (summonerNameHistorical == null) {
-            summonerNameHistorical = new SummonerNameHistorical();
-            summonerNameHistorical.setName(apiSummonerDTO.getName());
-            summonerNameHistorical.setSummoner(summoner);
-            summonerNameHistorical.setTimestamp(LocalDateTime.now());
-            this.summonerNameHistoricalRepository.save(summonerNameHistorical);
-        }
 
         summoner.setRegion(region);
         boolean firstTime = true;
@@ -204,6 +194,17 @@ public class SummonerFiller {
             summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region));
         }
         summoner = this.summonerRepository.save(summoner);
+
+        /* Fullfit summoner historical names */
+        SummonerNameHistorical summonerNameHistorical =
+                this.summonerNameHistoricalRepository.findTopByNameAndSummoner(apiSummonerDTO.getName(), summoner);
+        if (summonerNameHistorical == null) {
+            summonerNameHistorical = new SummonerNameHistorical();
+            summonerNameHistorical.setName(apiSummonerDTO.getName());
+            summonerNameHistorical.setSummoner(summoner);
+            summonerNameHistorical.setTimestamp(LocalDateTime.now());
+            this.summonerNameHistoricalRepository.save(summonerNameHistorical);
+        }
 
         /* Fullfit summoner token if needed */
         if (apiSummonerDTO.getPuuid() != null && !apiSummonerDTO.getPuuid().equals("")) {
