@@ -34,7 +34,7 @@ public class SummonerChampionMastery {
     @Column(nullable = false, unique = false)
     private Integer tokensEarned = 0;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     @JsonProperty(value="summonerId")
     private Summoner summoner;
 

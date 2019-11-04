@@ -17,7 +17,7 @@ public class MatchGameParticipant {
     @OneToOne
     private MatchGame matchGame;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner; // FROM participantId
 
     @OneToOne

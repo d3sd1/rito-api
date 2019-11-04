@@ -22,7 +22,7 @@ public class SummonerToken {
     @Column(nullable = true, unique = true)
     private String puuTokenId;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner;
 
     @OneToOne

@@ -19,7 +19,7 @@ public class MatchList {
     @OneToOne
     private MatchGame match; // gameId long
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner;
 
     @OneToOne

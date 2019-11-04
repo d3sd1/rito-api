@@ -17,7 +17,7 @@ public class SummonerNameHistorical {
     @Column(nullable = false, unique = false)
     private String name;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner;
 
     @Column(nullable = false, unique = false)

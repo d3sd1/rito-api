@@ -13,7 +13,7 @@ public class SummonerLeague {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner;
 
     @OneToOne

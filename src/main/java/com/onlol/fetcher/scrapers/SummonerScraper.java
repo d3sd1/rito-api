@@ -91,8 +91,10 @@ public class SummonerScraper {
         List<SummonerChampionMastery> summonerChampionMasteries = this.championMastery(summoner);
         List<SummonerLeague> summonerLeagues = this.leaguesConnector.summonerLeagues(summoner);
          */
-        summoner.setRetrieving(false);
-        summoner = this.summonerRepository.save(summoner);
+        if (summoner != null) { // If summoner could be updated success
+            summoner.setRetrieving(false);
+            summoner = this.summonerRepository.save(summoner);
+        }
     }
 
 
