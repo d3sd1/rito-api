@@ -46,7 +46,7 @@ public class SummonerFiller {
 
     private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region) {
         ApiMatchlistDto apiMatchlistDto;
-        Long realMatchId = 0L;
+        Long realMatchId = null;
         Long riotRealId = null;
         // In case we have no accountId, just return...
         if (apiSummonerDTO.getAccountId() == null || apiSummonerDTO.getAccountId().equals("")) {
@@ -71,13 +71,13 @@ public class SummonerFiller {
             if (e.getMessage() != null) {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
-            return realMatchId;
+            return riotRealId;
         }
 
         // Has no games... We are not interested on the summoner.
         if (apiMatchlistDto.getMatches().isEmpty()) {
             this.logger.error("Summoner has no matchlist games:" + apiSummonerDTO);
-            return realMatchId; // 0
+            return riotRealId;
         }
 
         for (ApiMatchReferenceDTO apiMatchReferenceDTO : apiMatchlistDto.getMatches()) {
@@ -118,7 +118,7 @@ public class SummonerFiller {
             return riotRealId;
         }
 
-        return realMatchId;
+        return riotRealId;
     }
 
     public Summoner fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Region region, ApiKey apiKey, Long riotRealId) {
@@ -139,11 +139,11 @@ public class SummonerFiller {
         apiSummonerDTO.setSummonerLevel(null); // Must be null for re-updating
         apiSummonerDTO.setProfileIconId(null); // Must be null for re-updating
         apiSummonerDTO.setRevisionDate(null); // Must be null for re-updating
-        return this.fillSummoner(apiSummonerDTO, region, apiKey, 0L);
+        return this.fillSummoner(apiSummonerDTO, region, apiKey, null);
     }
 
     public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
-        return this.fillSummoner(apiSummonerDTO, region, apiKey, 0L);
+        return this.fillSummoner(apiSummonerDTO, region, apiKey, null);
     }
 
     public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey, Long riotRealId) {
@@ -189,7 +189,7 @@ public class SummonerFiller {
         }
 
         /* Fill riot real id if needed */
-        if (riotRealId != 0) {
+        if (riotRealId != null) {
             summoner.setRiotRealId(riotRealId);
         }
         if (summoner.getRiotRealId() == null) {
