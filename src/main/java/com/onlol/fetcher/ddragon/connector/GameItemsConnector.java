@@ -86,7 +86,7 @@ public class GameItemsConnector {
                     new TypeReference<DDDdragonDTO<LinkedHashMap<Integer, DDItemDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;

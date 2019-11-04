@@ -62,7 +62,7 @@ public class SummonerFiller {
             ).getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return realMatchId;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return realMatchId;

@@ -104,7 +104,7 @@ public class MatchConnector {
             apiMatchlistDto = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return matchLists;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return matchLists;

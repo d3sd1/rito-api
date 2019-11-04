@@ -42,7 +42,7 @@ public class GameDataConnector {
                     new TypeReference<ArrayList<DDGameModeDTO>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -65,7 +65,7 @@ public class GameDataConnector {
                     new TypeReference<ArrayList<DDQueueDTO>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -88,7 +88,7 @@ public class GameDataConnector {
                     new TypeReference<ArrayList<DDGameMapDTO>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -111,7 +111,7 @@ public class GameDataConnector {
                     new TypeReference<ArrayList<DDGameTypeDTO>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;

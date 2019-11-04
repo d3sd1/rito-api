@@ -86,7 +86,7 @@ public class SummonerConnector {
             ).getJson(), new TypeReference<SummonerChampionMastery>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return summonerChampionMasteries;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return summonerChampionMasteries;

@@ -54,7 +54,7 @@ public class GameInfoConnector {
                     new TypeReference<ArrayList<String>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -87,7 +87,7 @@ public class GameInfoConnector {
             ).getJson(), new TypeReference<ApiShardStatusDTO>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -107,7 +107,7 @@ public class GameInfoConnector {
                         new TypeReference<DDRealmDTO>() {
                         });
             } catch (DataNotfoundException e) {
-                this.logger.info("Data not found, got exception" + e.getMessage());
+                this.logger.info("Data not found, got exception");
                 return;
             } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
                 return;
@@ -128,7 +128,7 @@ public class GameInfoConnector {
                     new TypeReference<ArrayList<String>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -154,7 +154,7 @@ public class GameInfoConnector {
                     new TypeReference<ArrayList<DDGameSeasonDTO>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;

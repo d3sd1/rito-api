@@ -81,7 +81,7 @@ public class GameSummonerConnector {
                     new TypeReference<DDDdragonDTO<LinkedHashMap<String, DDSummonerSpellDTO>>>() {
                     });
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
@@ -114,7 +114,7 @@ public class GameSummonerConnector {
                     });
 
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception" + e.getMessage());
+            this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
