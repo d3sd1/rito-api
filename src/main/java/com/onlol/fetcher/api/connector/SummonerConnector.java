@@ -58,8 +58,7 @@ public class SummonerConnector {
             apiSummonerDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiSummonerDTO>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.info("Summoner not found. Removing it from DB.");
-            //TODO: remove from DB?
+            this.logger.info("Summoner not found. Should it be removed from db");
             return null;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return null;

@@ -45,7 +45,6 @@ public class SummonerScraper {
 
     @PostConstruct
     @RequiresInitialSetup
-    @Scheduled(cron = "0 1 1 * * ?")
     public void cleanOrphanSummoners() {
         this.logger.info("Limpiando summoners huérfanos...");
         List<Summoner> orphanSummoners = this.summonerRepository.findAllByRetrievingIsTrue();
@@ -58,7 +57,7 @@ public class SummonerScraper {
     //TODO: hacerlo multikey
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 5000, initialDelay = 1000)
     public void getSummonerInfo() {
         Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
 
@@ -77,12 +76,10 @@ public class SummonerScraper {
 
             return;
         }
-        //TODO: retrieving no funciona. debe funcionar para que se actualice el invocador 1 vez y no se solape por el async
         summoner.setRetrieving(true);
-        System.out.println(summoner);
         summoner = this.summonerRepository.save(summoner);
         this.logger.info("Updating summoner " + summoner.getName());
-        this.summonerConnector.updateSummoner(summoner.getName(), summoner.getRegion());
+        summoner = this.summonerConnector.updateSummoner(summoner.getName(), summoner.getRegion());
         /*
 
 
