@@ -109,6 +109,7 @@ public class SummonerFiller {
                     this.logger.error("Got generic exception" + e.getMessage());
                 }
             }
+            //TODO: riotRealId <- que se recargue siempre
             //TODO: match filler aqui <-
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
                 /* If the same summoner to update, return riot real id. */
