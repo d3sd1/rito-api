@@ -142,7 +142,7 @@ public class SummonerFiller {
 
     public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey, Long riotRealId) {
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
-        Summoner summoner;
+        Summoner summoner = new Summoner();
         /* Init if needed */
         if (summonerToken == null) {
             summoner = this.summonerRepository.findOneByRegionAndName(region, apiSummonerDTO.getName());
@@ -151,7 +151,7 @@ public class SummonerFiller {
             summonerToken.setApiKey(apiKey);
             summonerToken.setSummoner(summoner);
             this.summonerTokenRepository.save(summonerToken);
-        } else {
+        } else if (summonerToken.getSummoner() != null) {
             summoner = summonerToken.getSummoner();
         }
 
