@@ -19,6 +19,9 @@ public class ApiKey {
     private Integer retryAfter = 0;
 
     @Column(nullable = false, unique = false)
+    private Integer invalidCalls = 0;
+
+    @Column(nullable = false, unique = false)
     private boolean banned = false; // 429 err too  many requests handler
 
     @Column(nullable = false, unique = false)
@@ -75,12 +78,21 @@ public class ApiKey {
         this.lastTimestampUsed = lastTimestampUsed;
     }
 
+    public Integer getInvalidCalls() {
+        return invalidCalls;
+    }
+
+    public void setInvalidCalls(Integer invalidCalls) {
+        this.invalidCalls = invalidCalls;
+    }
+
     @Override
     public String toString() {
         return "ApiKey{" +
                 "id=" + id +
                 ", apiKey='" + apiKey + '\'' +
                 ", retryAfter=" + retryAfter +
+                ", invalidCalls=" + invalidCalls +
                 ", banned=" + banned +
                 ", valid=" + valid +
                 ", lastTimestampUsed=" + lastTimestampUsed +

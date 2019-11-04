@@ -179,7 +179,7 @@ public class LeaguesConnector {
             apiLeagueListDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiLeagueListDTO>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
+            this.logger.warning("Summoner leagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar el listado de challengers " + e.getMessage());
@@ -208,9 +208,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            //TODO
-            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -268,9 +267,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            //TODO
-            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -327,9 +325,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            //TODO
-            //Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
 
         }
         return summonerLeagues;

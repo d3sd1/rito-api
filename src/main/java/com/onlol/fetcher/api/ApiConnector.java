@@ -100,12 +100,14 @@ public class ApiConnector {
                     A blacklisted API key was provided with the API request.
                     The API request was for an incorrect or unsupported path.
                      */
-                    if (attempts < 3 && needsApiKey) {
+                    if (apiKey.getInvalidCalls() > 10 && needsApiKey) {
                         apiKey.setBanned(true);
                         this.apiKeyRepository.save(apiKey);
                         this.logService.info("Invalidated api KEY: " + apiKey.getApiKey());
                         this.logService.info("Forbidden URL 403: " + url + " with api key " + apiKey.getApiKey() + " and body " + e.getResponseBodyAsString());
                         return this.get(url, needsApiKey, ++attempts);
+                    } else if (apiKey.getInvalidCalls() <= 10) {
+                        apiKey.setInvalidCalls(apiKey.getInvalidCalls() + 1);
                     } else {
                         throw new DataNotfoundException();
                     }
@@ -143,6 +145,10 @@ public class ApiConnector {
             }
         } catch (ResourceAccessException e) {
             this.sleepGet(url, needsApiKey, attempts, e);
+        }
+        if (apiKey != null) {
+            apiKey.setInvalidCalls(0);
+            this.apiKeyRepository.save(apiKey);
         }
         ApiCall apiCall = new ApiCall(apiKey, resp.getBody());
         this.apiCallRepository.save(apiCall);

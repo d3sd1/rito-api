@@ -59,6 +59,7 @@ public class GameInfoConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
+            e.printStackTrace();
             this.logger.error("Got generic exception" + e.getMessage());
             return;
         }
