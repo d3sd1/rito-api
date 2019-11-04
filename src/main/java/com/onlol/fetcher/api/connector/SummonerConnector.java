@@ -64,7 +64,9 @@ public class SummonerConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return null;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return null;
         }
 
@@ -91,7 +93,10 @@ public class SummonerConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return summonerChampionMasteries;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if(e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return summonerChampionMasteries;
         }
 

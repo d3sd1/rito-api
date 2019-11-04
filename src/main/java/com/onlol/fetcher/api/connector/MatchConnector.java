@@ -109,7 +109,10 @@ public class MatchConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return matchLists;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return matchLists;
         }
 
@@ -156,7 +159,10 @@ public class MatchConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return matchGame;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return matchGame;
         }
 

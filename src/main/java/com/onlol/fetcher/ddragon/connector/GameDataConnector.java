@@ -47,7 +47,10 @@ public class GameDataConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
@@ -70,7 +73,10 @@ public class GameDataConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
@@ -93,7 +99,10 @@ public class GameDataConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
@@ -116,7 +125,10 @@ public class GameDataConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 

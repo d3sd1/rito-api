@@ -67,7 +67,10 @@ public class SummonerFiller {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return realMatchId;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return realMatchId;
         }
 
@@ -96,7 +99,10 @@ public class SummonerFiller {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
-                this.logger.error("Got generic exception" + e.getMessage());
+
+                if (e.getMessage() != null) {
+                    this.logger.error("Got generic exception" + e.getMessage());
+                }
             }
             for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
                 /* If the same summoner to update, return riot real id. */
@@ -197,7 +203,7 @@ public class SummonerFiller {
         if (summoner.getRiotRealId() == null || summoner.getRiotRealId() == 0) {
             summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region));
         }
-        this.summonerRepository.save(summoner);
+        summoner = this.summonerRepository.save(summoner);
 
         /* Fullfit summoner token if needed */
         if (apiSummonerDTO.getPuuid() != null && !apiSummonerDTO.getPuuid().equals("")) {

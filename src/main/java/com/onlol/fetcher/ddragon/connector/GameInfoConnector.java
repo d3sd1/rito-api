@@ -60,7 +60,10 @@ public class GameInfoConnector {
             return;
         } catch (Exception e) {
             e.printStackTrace();
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
@@ -93,7 +96,10 @@ public class GameInfoConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
         this.gameInfoFiller.fillRegionShard(region, gameVersion, apiShardStatusDTO);
@@ -113,7 +119,10 @@ public class GameInfoConnector {
             } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
                 return;
             } catch (Exception e) {
-                this.logger.error("Got generic exception" + e.getMessage());
+
+                if (e.getMessage() != null) {
+                    this.logger.error("Got generic exception" + e.getMessage());
+                }
                 return;
             }
 
@@ -134,7 +143,10 @@ public class GameInfoConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
@@ -160,7 +172,10 @@ public class GameInfoConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             return;
         } catch (Exception e) {
-            this.logger.error("Got generic exception" + e.getMessage());
+
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
             return;
         }
 
