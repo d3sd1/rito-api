@@ -148,23 +148,25 @@ public class SummonerFiller {
 
     public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey, Long riotRealId) {
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
-        Summoner summoner = new Summoner();
+        Summoner summoner;
         /* Init if needed */
         if (summonerToken == null) {
             summoner = this.summonerRepository.findOneByRegionAndName(region, apiSummonerDTO.getName());
             summonerToken = new SummonerToken();
             summonerToken.setSummonerTokenId(apiSummonerDTO.getId());
             summonerToken.setApiKey(apiKey);
-            summonerToken.setSummoner(summoner);
             this.summonerTokenRepository.save(summonerToken);
-        } else if (summonerToken != null && summonerToken.getSummoner() != null) {
+        } else {
             summoner = summonerToken.getSummoner();
+        }
+
+        if (summoner == null) {
+            summoner = new Summoner();
         }
 
         /* Fill summoner at first */
 
         summoner.setName(apiSummonerDTO.getName());
-
         summoner.setRegion(region);
         boolean firstTime = true;
         if (apiSummonerDTO.getProfileIconId() != null) {
@@ -213,6 +215,7 @@ public class SummonerFiller {
         if (apiSummonerDTO.getAccountId() != null && !apiSummonerDTO.getAccountId().equals("")) {
             summonerToken.setAccountTokenId(apiSummonerDTO.getAccountId());
         }
+        summonerToken.setSummoner(summoner);
         this.summonerTokenRepository.save(summonerToken);
 
         return summoner;
