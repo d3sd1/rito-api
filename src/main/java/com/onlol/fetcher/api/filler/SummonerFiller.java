@@ -1,14 +1,11 @@
 package com.onlol.fetcher.api.filler;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.endpoints.V4;
-import com.onlol.fetcher.api.model.*;
-import com.onlol.fetcher.exceptions.ApiBadRequestException;
-import com.onlol.fetcher.exceptions.ApiDownException;
-import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
-import com.onlol.fetcher.exceptions.DataNotfoundException;
+import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
+import com.onlol.fetcher.api.model.ApiLeagueItemDTO;
+import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
+import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.*;
@@ -47,99 +44,6 @@ public class SummonerFiller {
     @Autowired
     private MatchFiller matchFiller;
 
-    private Long getSummonerRealId(SummonerToken summonerToken) {
-        ApiMatchlistDto apiMatchlistDto;
-        Long riotRealId = null;
-        try {
-            apiMatchlistDto = this.jacksonMapper.readValue(this.apiConnector.get(
-                    V4.MATCHLIST_BY_ACCOUNT
-                            .replace("{{SUMMONER_ACCOUNT}}", summonerToken.getAccountTokenId())
-                            .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName())
-                            .replace("{{BEGIN_INDEX}}", "0"),
-                    true,
-                    summonerToken.getApiKey()
-            ).getJson(), new TypeReference<ApiMatchlistDto>() {
-            });
-        } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception");
-            return null;
-        } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-            return null;
-        } catch (Exception e) {
-
-            if (e.getMessage() != null) {
-                this.logger.error("Got generic exception" + e.getMessage());
-            }
-            return riotRealId;
-        }
-
-        // Has no games... We are not interested on the summoner.
-        if (apiMatchlistDto.getMatches().isEmpty()) {
-            this.logger.error("Summoner has no matchlist games:" + summonerToken.getSummoner().getName());
-            return riotRealId;
-        }
-
-        for (ApiMatchReferenceDTO apiMatchReferenceDTO : apiMatchlistDto.getMatches()) {
-            // Poner esto? this.matchFiller.fillMatchListGame(apiMatchReferenceDTO, apiSummonerDTO, region, apiKey);
-            Long gameId = apiMatchReferenceDTO.getGameId();
-
-            ApiMatchDTO apiMatchDTO = new ApiMatchDTO();
-            ApiCall apiCall = null;
-            try {
-                apiCall = this.apiConnector.get(
-                        V4.MATCHES.replace("{{GAME_ID}}", String.valueOf(gameId))
-                                .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName()),
-                        true
-                );
-                apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchDTO>() {
-                });
-            } catch (DataNotfoundException e) {
-                e.printStackTrace();
-            } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                if (e.getMessage() != null) {
-                    this.logger.error("Got generic exception" + e.getMessage());
-                }
-            }
-            //TODO: riotRealId <- que se recargue siempre, no funcioan bien?
-            //TODO: match filler aqui <-
-            for (ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
-                /* If the same summoner to update, return riot real id. */
-                String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
-                Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
-
-                if (apiParticipantIdentityDTO.getPlayer().getSummonerId().equals(summonerToken.getSummonerTokenId())) {
-                    riotRealId = currentRiotRealId;
-                } else { /* If not, add it to database. Search summoner by summoner id at first, later on, by real id, and finally by name and region*/
-                    SummonerToken itSummonerToken =
-                            this.summonerTokenRepository.findBySummonerTokenId(apiParticipantIdentityDTO.getPlayer().getSummonerId());
-                    Summoner itSummoner;
-                    if (itSummonerToken != null) {
-                        itSummoner = itSummonerToken.getSummoner();
-                    } else { // find by real id
-                        itSummoner = this.summonerRepository.findByRiotRealId(currentRiotRealId);
-                        if (itSummoner == null) { // find by region and name
-                            //TODO itSummoner = this.summonerRepository.findOneByRegionAndName(apiParticipantIdentityDTO.getPlayer().getCurrentPlatformId());
-                        }
-                    }
-
-                    if (itSummoner == null) { // Summoner is not on db...
-                        itSummoner = new Summoner();
-                        itSummoner.setRiotRealId(currentRiotRealId);
-                        itSummoner.setName(apiParticipantIdentityDTO.getPlayer().getSummonerName());
-                        this.summonerRepository.save(itSummoner);
-                    }
-                    itSummoner.setRiotRealId(currentRiotRealId);
-                    this.fillSummoner(apiParticipantIdentityDTO, itSummoner, apiCall.getApiKey());
-                }
-            }
-        }
-
-        return riotRealId;
-    }
 
     public SummonerToken fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Summoner summoner, ApiKey apiKey) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
@@ -203,10 +107,6 @@ public class SummonerFiller {
             summoner.setLastTimeUpdated(LocalDateTime.now());
         }
 
-        /* Fill riot real id if needed */
-        if (summoner.getRiotRealId() == null) {
-            summoner.setRiotRealId(this.getSummonerRealId(summonerToken));
-        }
         summoner = this.summonerRepository.save(summoner);
 
         /* Fullfit summoner historical names */

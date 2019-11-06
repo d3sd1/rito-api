@@ -70,9 +70,8 @@ public class SummonerScraper {
 
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 5000, initialDelay = 1000)
+    @Scheduled(fixedRate = 1000, initialDelay = 500)
     public void getSummonerInfo() {
-
         Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
         if (summoner == null) {
             this.logger.info("No summoners to update.");
@@ -80,13 +79,11 @@ public class SummonerScraper {
         }
         if (!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
             this.logger.info(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
-
             try {
                 TimeUnit.SECONDS.sleep(30);
             } catch (Exception e) {
 
             }
-
             return;
         }
         this.logger.info("Updating summoner " + summoner.getName());

@@ -22,10 +22,10 @@ public class SummonerLeague {
     @OneToOne
     private LeagueTier leagueTier;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private LeagueRank leagueRank;
 
-    @OneToOne(orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private LeagueMiniSeries leagueMiniSeries;
 
     @Column(nullable = false, unique = false)

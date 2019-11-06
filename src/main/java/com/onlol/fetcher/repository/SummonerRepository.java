@@ -12,8 +12,5 @@ public interface SummonerRepository extends JpaRepository<Summoner, String> {
     Summoner findTopByRetrievingIsFalseOrderByLastTimeUpdated();
 
     List<Summoner> findAllByRetrievingIsTrue();
-
-    Summoner findByRiotRealId(Long riotRealId);
-
     Summoner findOneByRegionAndName(Region region, String name);
 }

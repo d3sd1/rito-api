@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SummonerConnector {
@@ -51,6 +52,10 @@ public class SummonerConnector {
     private ObjectMapper jacksonMapper;
 
     public SummonerToken updateSummoner(Summoner summoner) {
+        return this.updateSummoner(summoner, false);
+    }
+
+    public SummonerToken updateSummoner(Summoner summoner, boolean forceDelete) {
         summoner.setRetrieving(true);
         summoner = this.summonerRepository.save(summoner);
         try {
@@ -63,10 +68,18 @@ public class SummonerConnector {
             SummonerToken summonerToken = this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("summoner", summoner)).forType(SummonerToken.class).readValue(apiCall.getJson());
-            System.out.println(summonerToken);
             return summonerToken;
         } catch (DataNotfoundException e) {
-            this.logger.info("Summoner not found. Removed from retrieval.");
+            // summoner not found (due to region or name change). Check it by summonerId if it's on DB, else, delete.
+            List<SummonerToken> summonerTokens = this.summonerTokenRepository.findBySummoner(summoner);
+            if (summonerTokens.isEmpty() || forceDelete) {
+                // disable summoner. Maybe if the future it turns back! Also cascade delete... Ejem lmao.
+                summoner.setDisabled(true);
+                this.logger.info("Disabled summoner " + summoner.getName());
+                this.summonerRepository.save(summoner);
+            } else {
+                return this.updateSummoner(summonerTokens.get(0).getSummoner(), true);
+            }
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -75,8 +88,10 @@ public class SummonerConnector {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
-        summoner.setRetrieving(false);
-        this.summonerRepository.save(summoner);
+        if (summoner != null) {
+            summoner.setRetrieving(false);
+            this.summonerRepository.save(summoner);
+        }
         return null;
     }
 

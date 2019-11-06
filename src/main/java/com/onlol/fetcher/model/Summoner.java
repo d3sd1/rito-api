@@ -16,7 +16,7 @@ public class Summoner {
     private Integer id;
 
     @Column(nullable = true, unique = false)
-    private Long riotRealId;
+    private boolean disabled;
 
     @Column(nullable = false, unique = false)
     private String name;
@@ -47,12 +47,12 @@ public class Summoner {
         this.id = id;
     }
 
-    public Long getRiotRealId() {
-        return riotRealId;
+    public boolean isDisabled() {
+        return disabled;
     }
 
-    public void setRiotRealId(Long riotRealId) {
-        this.riotRealId = riotRealId;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
     public String getName() {
@@ -115,7 +115,7 @@ public class Summoner {
     public String toString() {
         return "Summoner{" +
                 "id=" + id +
-                ", riotRealId=" + riotRealId +
+                ", disabled=" + disabled +
                 ", name='" + name + '\'' +
                 ", profileIconId=" + profileIconId +
                 ", revisionDate=" + revisionDate +
