@@ -56,8 +56,6 @@ public class SummonerConnector {
     }
 
     public SummonerToken updateSummoner(Summoner summoner, boolean forceDelete) {
-        summoner.setRetrieving(true);
-        summoner = this.summonerRepository.save(summoner);
         SummonerToken summonerToken = null;
         try {
             ApiCall apiCall = this.apiConnector.get(
@@ -87,11 +85,6 @@ public class SummonerConnector {
             if (e.getMessage() != null) {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
-        }
-        if (summonerToken != null) {
-            summoner = summonerToken.getSummoner();
-            summoner.setRetrieving(false);
-            this.summonerRepository.save(summoner);
         }
         return summonerToken;
     }

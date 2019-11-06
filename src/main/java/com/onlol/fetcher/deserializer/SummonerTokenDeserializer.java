@@ -38,6 +38,7 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
     @Override
     public SummonerToken deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException {
+        System.out.println("summoner token oparsers");
         JsonNode productNode = jp.getCodec().readTree(jp);
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(productNode.get("id").textValue());
 
@@ -80,10 +81,10 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
             }*/
             summonerToken = new SummonerToken();
             summonerToken.setApiKey(apiKey);
-            summonerToken.setSummoner(summoner);
             summonerToken.setSummonerTokenId(productNode.get("id").textValue()); // Needed for not-null restriction
             this.summonerTokenRepository.save(summonerToken);
         }
+        summonerToken.setSummoner(summoner); // needed for ghost prevent
         summonerToken.setSummonerTokenId(productNode.get("id").textValue());
         summonerToken.setAccountTokenId(productNode.get("accountId").textValue());
         summonerToken.setPuuTokenId(productNode.get("puuid").textValue());

@@ -1,10 +1,13 @@
 package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.onlol.fetcher.deserializer.SummonerLeagueDeserializer;
 
 import javax.persistence.*;
 
 @Entity
+@JsonDeserialize(using = SummonerLeagueDeserializer.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SummonerLeague {
 

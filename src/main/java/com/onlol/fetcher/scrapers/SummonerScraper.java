@@ -1,5 +1,6 @@
 package com.onlol.fetcher.scrapers;
 
+import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
@@ -25,6 +26,9 @@ public class SummonerScraper {
 
     @Autowired
     private SummonerRepository summonerRepository;
+
+    @Autowired
+    private LeaguesConnector leaguesConnector;
 
     @Autowired
     private LogService logger;
@@ -57,9 +61,19 @@ public class SummonerScraper {
         if (!summoner.getLastTimeUpdated().plusMinutes(3).isBefore(LocalDateTime.now())) {
             return;
         }
+        summoner.setRetrieving(true);
+        summoner = this.summonerRepository.save(summoner);
         this.logger.info("Updating summoner " + summoner.getName());
         noSummonersMessageShown = false;
         SummonerToken summonerToken = this.summonerConnector.updateSummoner(summoner);
+        if (summonerToken == null) {
+            return;
+        }
+        this.leaguesConnector.summonerLeagues(summonerToken);
+
+        summoner = summonerToken.getSummoner();
+        summoner.setRetrieving(false);
+        this.summonerRepository.save(summoner);
     }
 
 
