@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
@@ -43,6 +44,7 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
         summoner.setName(productNode.get("name").textValue());
         summoner.setSummonerLevel(productNode.get("summonerLevel").longValue());
         summoner.setRevisionDate(productNode.get("revisionDate").longValue());
+        summoner.setLastTimeUpdated(LocalDateTime.now());
         this.summonerRepository.save(summoner);
 
         if (summonerToken == null) {

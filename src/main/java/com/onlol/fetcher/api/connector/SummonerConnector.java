@@ -51,6 +51,8 @@ public class SummonerConnector {
     private ObjectMapper jacksonMapper;
 
     public SummonerToken updateSummoner(Summoner summoner) {
+        summoner.setRetrieving(true);
+        summoner = this.summonerRepository.save(summoner);
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
@@ -60,7 +62,7 @@ public class SummonerConnector {
             );
             SummonerToken summonerToken = this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("summoner", summoner)).withType(SummonerToken.class).readValue(apiCall.getJson());
+                    .addValue("summoner", summoner)).forType(SummonerToken.class).readValue(apiCall.getJson());
             System.out.println(summonerToken);
             return summonerToken;
         } catch (DataNotfoundException e) {
@@ -73,6 +75,8 @@ public class SummonerConnector {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
+        summoner.setRetrieving(false);
+        this.summonerRepository.save(summoner);
         return null;
     }
 

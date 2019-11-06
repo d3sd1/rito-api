@@ -89,12 +89,8 @@ public class SummonerScraper {
 
             return;
         }
-        summoner.setRetrieving(true);
-        summoner = this.summonerRepository.save(summoner);
         this.logger.info("Updating summoner " + summoner.getName());
         SummonerToken summonerToken = this.summonerConnector.updateSummoner(summoner);
-        summonerToken.getSummoner().setRetrieving(false);
-        this.summonerRepository.save(summonerToken.getSummoner());
     }
 
 
