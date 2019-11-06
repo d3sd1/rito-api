@@ -10,7 +10,7 @@ package com.onlol.fetcher.api.model;
 public class ApiMiniSeriesDTO {
     private String progress = "";
     private Integer losses = 0;
-    private Integer target = 0;
+    private Short target = 0;
     private Integer wins = 0;
 
     public String getProgress() {
@@ -29,11 +29,11 @@ public class ApiMiniSeriesDTO {
         this.losses = losses;
     }
 
-    public Integer getTarget() {
+    public Short getTarget() {
         return target;
     }
 
-    public void setTarget(Integer target) {
+    public void setTarget(Short target) {
         this.target = target;
     }
 

@@ -8,7 +8,6 @@ import com.onlol.fetcher.api.filler.MatchFiller;
 import com.onlol.fetcher.api.model.ApiMatchDTO;
 import com.onlol.fetcher.api.model.ApiMatchReferenceDTO;
 import com.onlol.fetcher.api.model.ApiMatchlistDto;
-import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
 import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
@@ -85,22 +84,22 @@ public class MatchConnector {
     @Autowired
     private LogService logger;
 
-    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) { // WRAPPER
-        return this.matchListByAccount(apiSummonerDTO, region, 0L, apiKey);
+    public List<MatchList> matchListByAccount(SummonerToken summonerToken) { // WRAPPER
+        return this.matchListByAccount(summonerToken, 0L);
     }
 
-    public List<MatchList> matchListByAccount(ApiSummonerDTO apiSummonerDTO, Region region, Long beginIndex, ApiKey apiKey) {
+    public List<MatchList> matchListByAccount(SummonerToken summonerToken, Long beginIndex) {
         ApiMatchlistDto apiMatchlistDto;
         List<MatchList> matchLists = new ArrayList<>();
         ApiCall apiCall;
         try {
             apiCall = this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
-                            .replace("{{SUMMONER_ACCOUNT}}", apiSummonerDTO.getAccountId())
-                            .replace("{{HOST}}", region.getHostName())
+                            .replace("{{SUMMONER_ACCOUNT}}", summonerToken.getSummonerTokenId())
+                            .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName())
                             .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
                     true,
-                    apiKey
+                    summonerToken.getApiKey()
             );
             apiMatchlistDto = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
@@ -119,12 +118,12 @@ public class MatchConnector {
 
 
         for (ApiMatchReferenceDTO apiMatchReferenceDto : apiMatchlistDto.getMatches()) {
-            matchLists.add(this.matchFiller.fillMatchListGame(apiMatchReferenceDto, apiSummonerDTO, region, apiCall.getApiKey()));
+            matchLists.add(this.matchFiller.fillMatchListGame(apiMatchReferenceDto, summonerToken));
         }
 
         // Iterar todas las partidas, cogiendo como primer resultado la siguiente partida a la última almacenada
         if (apiMatchlistDto.getEndIndex() < apiMatchlistDto.getTotalGames()) {
-            this.matchListByAccount(apiSummonerDTO, region, apiMatchlistDto.getEndIndex() + 1, apiKey);
+            this.matchListByAccount(summonerToken, apiMatchlistDto.getEndIndex() + 1);
         }
         return matchLists;
     }

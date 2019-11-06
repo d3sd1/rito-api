@@ -47,21 +47,17 @@ public class SummonerFiller {
     @Autowired
     private MatchFiller matchFiller;
 
-    private Long getSummonerRealId(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
+    private Long getSummonerRealId(SummonerToken summonerToken) {
         ApiMatchlistDto apiMatchlistDto;
         Long riotRealId = null;
-        // In case we have no accountId, just return...
-        if (apiSummonerDTO.getAccountId() == null || apiSummonerDTO.getAccountId().equals("")) {
-            return riotRealId;
-        }
         try {
             apiMatchlistDto = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
-                            .replace("{{SUMMONER_ACCOUNT}}", apiSummonerDTO.getAccountId())
-                            .replace("{{HOST}}", region.getHostName())
+                            .replace("{{SUMMONER_ACCOUNT}}", summonerToken.getAccountTokenId())
+                            .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName())
                             .replace("{{BEGIN_INDEX}}", "0"),
                     true,
-                    apiKey
+                    summonerToken.getApiKey()
             ).getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
@@ -79,7 +75,7 @@ public class SummonerFiller {
 
         // Has no games... We are not interested on the summoner.
         if (apiMatchlistDto.getMatches().isEmpty()) {
-            this.logger.error("Summoner has no matchlist games:" + apiSummonerDTO);
+            this.logger.error("Summoner has no matchlist games:" + summonerToken.getSummoner().getName());
             return riotRealId;
         }
 
@@ -92,7 +88,7 @@ public class SummonerFiller {
             try {
                 apiCall = this.apiConnector.get(
                         V4.MATCHES.replace("{{GAME_ID}}", String.valueOf(gameId))
-                                .replace("{{HOST}}", region.getHostName()),
+                                .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName()),
                         true
                 );
                 apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchDTO>() {
@@ -115,10 +111,29 @@ public class SummonerFiller {
                 String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
                 Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
 
-                if (apiParticipantIdentityDTO.getPlayer().getSummonerId().equals(apiSummonerDTO.getId())) {
+                if (apiParticipantIdentityDTO.getPlayer().getSummonerId().equals(summonerToken.getSummonerTokenId())) {
                     riotRealId = currentRiotRealId;
-                } else { /* If not, add it to database */
-                    this.fillSummoner(apiParticipantIdentityDTO, region, apiCall.getApiKey(), currentRiotRealId);
+                } else { /* If not, add it to database. Search summoner by summoner id at first, later on, by real id, and finally by name and region*/
+                    SummonerToken itSummonerToken =
+                            this.summonerTokenRepository.findBySummonerTokenId(apiParticipantIdentityDTO.getPlayer().getSummonerId());
+                    Summoner itSummoner;
+                    if (itSummonerToken != null) {
+                        itSummoner = itSummonerToken.getSummoner();
+                    } else { // find by real id
+                        itSummoner = this.summonerRepository.findByRiotRealId(currentRiotRealId);
+                        if (itSummoner == null) { // find by region and name
+                            //TODO itSummoner = this.summonerRepository.findOneByRegionAndName(apiParticipantIdentityDTO.getPlayer().getCurrentPlatformId());
+                        }
+                    }
+
+                    if (itSummoner == null) { // Summoner is not on db...
+                        itSummoner = new Summoner();
+                        itSummoner.setRiotRealId(currentRiotRealId);
+                        itSummoner.setName(apiParticipantIdentityDTO.getPlayer().getSummonerName());
+                        this.summonerRepository.save(itSummoner);
+                    }
+                    itSummoner.setRiotRealId(currentRiotRealId);
+                    this.fillSummoner(apiParticipantIdentityDTO, itSummoner, apiCall.getApiKey());
                 }
             }
         }
@@ -126,7 +141,7 @@ public class SummonerFiller {
         return riotRealId;
     }
 
-    public Summoner fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Region region, ApiKey apiKey, Long riotRealId) {
+    public SummonerToken fillSummoner(ApiParticipantIdentityDTO apiParticipantIdentityDTO, Summoner summoner, ApiKey apiKey) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
         apiSummonerDTO.setId(apiParticipantIdentityDTO.getPlayer().getSummonerId());
         apiSummonerDTO.setAccountId(apiParticipantIdentityDTO.getPlayer().getCurrentAccountId());
@@ -134,29 +149,24 @@ public class SummonerFiller {
         apiSummonerDTO.setSummonerLevel(null); // Must be null for re-updating
         apiSummonerDTO.setProfileIconId(null); // Must be null for re-updating
         apiSummonerDTO.setRevisionDate(null); // Must be null for re-updating
-        return this.fillSummoner(apiSummonerDTO, region, apiKey, riotRealId);
+        return this.fillSummoner(apiSummonerDTO, summoner, apiKey);
     }
 
-    public Summoner fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Region region, ApiKey apiKey) {
+    public SummonerToken fillSummoner(ApiLeagueItemDTO apiLeagueItemDTO, Summoner summoner, ApiKey apiKey) {
         ApiSummonerDTO apiSummonerDTO = new ApiSummonerDTO();
         apiSummonerDTO.setId(apiLeagueItemDTO.getSummonerId());
         apiSummonerDTO.setName(apiLeagueItemDTO.getSummonerName());
         apiSummonerDTO.setSummonerLevel(null); // Must be null for re-updating
         apiSummonerDTO.setProfileIconId(null); // Must be null for re-updating
         apiSummonerDTO.setRevisionDate(null); // Must be null for re-updating
-        return this.fillSummoner(apiSummonerDTO, region, apiKey, null);
+        return this.fillSummoner(apiSummonerDTO, summoner, apiKey);
     }
 
-    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
-        return this.fillSummoner(apiSummonerDTO, region, apiKey, null);
-    }
-
-    public Summoner fillSummoner(ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey, Long riotRealId) {
+    public SummonerToken fillSummoner(ApiSummonerDTO apiSummonerDTO, Summoner summoner, ApiKey apiKey) {
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(apiSummonerDTO.getId());
-        Summoner summoner;
         /* Init if needed */
         if (summonerToken == null) {
-            summoner = this.summonerRepository.findOneByRegionAndName(region, apiSummonerDTO.getName());
+            summoner = this.summonerRepository.findOneByRegionAndName(summoner.getRegion(), apiSummonerDTO.getName());
             summonerToken = new SummonerToken();
             summonerToken.setSummonerTokenId(apiSummonerDTO.getId());
             summonerToken.setApiKey(apiKey);
@@ -172,7 +182,7 @@ public class SummonerFiller {
         /* Fill summoner at first */
 
         summoner.setName(apiSummonerDTO.getName());
-        summoner.setRegion(region);
+        //TODO handle summoner region swap  with trace summoner.setRegion(region);
         boolean firstTime = true;
         if (apiSummonerDTO.getProfileIconId() != null) {
             summoner.setProfileIconId(apiSummonerDTO.getProfileIconId());
@@ -194,11 +204,8 @@ public class SummonerFiller {
         }
 
         /* Fill riot real id if needed */
-        if (riotRealId != null) {
-            summoner.setRiotRealId(riotRealId);
-        }
         if (summoner.getRiotRealId() == null) {
-            summoner.setRiotRealId(this.getSummonerRealId(apiSummonerDTO, region, apiKey));
+            summoner.setRiotRealId(this.getSummonerRealId(summonerToken));
         }
         summoner = this.summonerRepository.save(summoner);
 
@@ -223,7 +230,7 @@ public class SummonerFiller {
         summonerToken.setSummoner(summoner);
         this.summonerTokenRepository.save(summonerToken);
 
-        return summoner;
+        return summonerToken;
     }
 
     public SummonerChampionMastery fillSummonerChampionMastery(Summoner summoner, ApiChampionMasteryDTO apiChampionMasteryDTO) {

@@ -2,11 +2,14 @@ package com.onlol.fetcher.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.onlol.fetcher.deserializer.SummonerTokenDeserializer;
 
 import javax.persistence.*;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonDeserialize(using = SummonerTokenDeserializer.class)
 public class SummonerToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,7 +3,6 @@ package com.onlol.fetcher.api.filler;
 import com.onlol.fetcher.api.model.ApiMatchDTO;
 import com.onlol.fetcher.api.model.ApiMatchReferenceDTO;
 import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
-import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.ddragon.filler.GameDataFiller;
 import com.onlol.fetcher.ddragon.filler.GameInfoFiller;
 import com.onlol.fetcher.model.*;
@@ -40,9 +39,9 @@ public class MatchFiller {
     private SummonerFiller summonerFiller;
 
 
-    public MatchList fillMatchListGame(ApiMatchReferenceDTO apiMatchReferenceDto, ApiSummonerDTO apiSummonerDTO, Region region, ApiKey apiKey) {
+    public MatchList fillMatchListGame(ApiMatchReferenceDTO apiMatchReferenceDto, SummonerToken summonerToken) {
 
-        Summoner summoner = this.summonerFiller.fillSummoner(apiSummonerDTO, region, apiKey);
+        Summoner summoner = summonerToken.getSummoner();
         MatchList matchList = this.matchListRepository.findByMatchGameIdAndSummoner(apiMatchReferenceDto.getGameId(), summoner);
         if (matchList == null) {
             matchList = new MatchList();
@@ -128,7 +127,7 @@ public class MatchFiller {
             String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
             Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
 
-            this.summonerFiller.fillSummoner(apiParticipantIdentityDTO, region, apiKey, currentRiotRealId);
+            //TODO this.summonerFiller.fillSummoner(apiParticipantIdentityDTO, region, apiKey, currentRiotRealId);
         }
 
         /* Match game stats * TODO

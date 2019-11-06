@@ -6,6 +6,7 @@ import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.filler.SummonerLeagueFiller;
+import com.onlol.fetcher.api.model.ApiLeagueEntryDTO;
 import com.onlol.fetcher.api.model.ApiLeagueItemDTO;
 import com.onlol.fetcher.api.model.ApiLeagueListDTO;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
@@ -17,12 +18,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class LeaguesConnector {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private LeagueMiniSeriesRepository leagueMiniSeriesRepository;
 
     @Autowired
     private SummonerLeagueFiller summonerLeagueFiller;
@@ -71,17 +76,18 @@ public class LeaguesConnector {
 
     @Autowired
     private ObjectMapper jacksonMapper;
-/* TODO
-    public ArrayList<SummonerLeague> summonerLeagues(Summoner summoner) {
-        ArrayList<ApiLeagueItemDTO> apiLeagueItemDTOS = null;
+
+    public ArrayList<SummonerLeague> summonerLeagues(SummonerToken summonerToken) {
+        Summoner summoner = summonerToken.getSummoner();
+        Set<ApiLeagueEntryDTO> apiLeagueItemDTOS = null;
 
         try {
             apiLeagueItemDTOS = this.jacksonMapper.readValue(this.apiConnector.get(
                     V4.LEAGUES_BY_SUMMONER
-                            .replace("{{SUMMONER_ID}}", summoner.getId())
+                            .replace("{{SUMMONER_ID}}", summonerToken.getSummonerTokenId())
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
-            ), new TypeReference<ArrayList<ApiLeagueItemDTO>>() {
+            ).getJson(), new TypeReference<Set<ApiLeagueEntryDTO>>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues not found: " + summoner.getName());
@@ -93,14 +99,14 @@ public class LeaguesConnector {
             return new ArrayList<>();
         }
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
-        for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
+        for (ApiLeagueEntryDTO apiLeagueItemDTO : apiLeagueItemDTOS) {
             GameQueueType queuetype = this.gameQueueTypeRepository.findByKeyName(apiLeagueItemDTO.getQueueType());
             if (queuetype == null) {
                 queuetype = new GameQueueType();
                 queuetype.setKeyName(apiLeagueItemDTO.getQueueType());
                 this.gameQueueTypeRepository.save(queuetype);
             }
-            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndQueueType(summoner, queuetype);
+            SummonerLeague summonerLeague = this.summonerLeagueRepository.findBySummonerAndGameQueueType(summoner, queuetype);
             if (summonerLeague == null) {
                 summonerLeague = new SummonerLeague();
                 summonerLeague.setSummoner(summoner);
@@ -125,7 +131,7 @@ public class LeaguesConnector {
             summonerLeague.setLeagueRank(leagueRank);
 
 
-            /* Check if player is playing miniseries *
+            /* Check if player is playing miniseries */
             LeagueMiniSeries leagueMiniSeries = null;
             if (apiLeagueItemDTO.getMiniSeries() != null) {
                 leagueMiniSeries = this.leagueMiniSeriesRepository.findBySummoner(summoner);
@@ -147,14 +153,14 @@ public class LeaguesConnector {
             summonerLeague.setHotStreak(apiLeagueItemDTO.isHotStreak());
             summonerLeague.setWins(apiLeagueItemDTO.getWins());
             summonerLeague.setLosses(apiLeagueItemDTO.getLosses());
-            summonerLeague.setVeteran(apiLeagueItemDTO.isVeteran());
-            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
-            summonerLeague.setFreshBlood(apiLeagueItemDTO.isFreshBlood());
-            summonerLeague.setInactive(apiLeagueItemDTO.isInactive());
+            summonerLeague.setVeteran(apiLeagueItemDTO.getVeteran());
+            summonerLeague.setInactive(apiLeagueItemDTO.getInactive());
+            summonerLeague.setFreshBlood(apiLeagueItemDTO.getFreshBlood());
+            summonerLeague.setInactive(apiLeagueItemDTO.getInactive());
             this.summonerLeagueRepository.save(summonerLeague);
         }
         return new ArrayList<>();
-    }*/
+    }
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
@@ -208,8 +214,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO SummonerToken summonerToken = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summonerToken.getSummoner(), gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -267,8 +273,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO SummonerToken summonerToken = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summonerToken.getSummoner(), gameQueueType, leagueTier, apiLeagueItemDTO));
         }
         return summonerLeagues;
     }
@@ -325,8 +331,8 @@ public class LeaguesConnector {
         }
 
         for (ApiLeagueItemDTO apiLeagueItemDTO : apiLeagueListDTO.getEntries()) {
-            Summoner summoner = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
-            summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summoner, gameQueueType, leagueTier, apiLeagueItemDTO));
+            //TODO SummonerToken summonerToken = this.summonerFiller.fillSummoner(apiLeagueItemDTO, region, apiCall.getApiKey());
+            //summonerLeagues.add(this.summonerLeagueFiller.fillSummonerLeague(summonerToken.getSummoner(), gameQueueType, leagueTier, apiLeagueItemDTO));
 
         }
         return summonerLeagues;
