@@ -81,6 +81,7 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
             summonerToken = new SummonerToken();
             summonerToken.setApiKey(apiKey);
             summonerToken.setSummoner(summoner);
+            summonerToken.setSummonerTokenId(productNode.get("id").textValue()); // Needed for not-null restriction
             this.summonerTokenRepository.save(summonerToken);
         }
         summonerToken.setSummonerTokenId(productNode.get("id").textValue());

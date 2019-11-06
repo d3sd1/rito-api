@@ -20,12 +20,13 @@ public class MatchesScraper {
     @Autowired
     private MatchGameRepository matchGameRepository;
 
-
     @Autowired
     private MatchConnector matchConnector;
 
     @Autowired
     private LogService logger;
+
+    private boolean noMatchesMessageShown;
 
     @PostConstruct
     @RequiresInitialSetup
@@ -41,17 +42,20 @@ public class MatchesScraper {
 
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 5000, initialDelay = 10000)
+    @Scheduled(fixedRate = 1000, initialDelay = 500)
     public void getMatches() {
-        this.logger.info("Retrieving matches...");
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
         if(matchGame == null) {
-            this.logger.info("No matches to update...");
+            if (!this.noMatchesMessageShown) {
+                this.logger.info("No matches to update...");
+                this.noMatchesMessageShown = true;
+            }
             return;
         }
         matchGame.setRetrieving(true);
         this.matchGameRepository.save(matchGame);
         this.logger.info("Updating match: " + matchGame.getGameId());
+        this.noMatchesMessageShown = false;
 
         matchGame = this.matchConnector.match(matchGame);
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame);

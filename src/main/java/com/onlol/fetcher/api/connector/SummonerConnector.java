@@ -58,6 +58,7 @@ public class SummonerConnector {
     public SummonerToken updateSummoner(Summoner summoner, boolean forceDelete) {
         summoner.setRetrieving(true);
         summoner = this.summonerRepository.save(summoner);
+        SummonerToken summonerToken = null;
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.SUMMONERS_BY_NAME
@@ -65,10 +66,9 @@ public class SummonerConnector {
                             .replace("{{HOST}}", summoner.getRegion().getHostName()),
                     true
             );
-            SummonerToken summonerToken = this.jacksonMapper.reader(new InjectableValues.Std()
+            summonerToken = this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("summoner", summoner)).forType(SummonerToken.class).readValue(apiCall.getJson());
-            return summonerToken;
         } catch (DataNotfoundException e) {
             // summoner not found (due to region or name change). Check it by summonerId if it's on DB, else, delete.
             List<SummonerToken> summonerTokens = this.summonerTokenRepository.findBySummoner(summoner);
@@ -88,11 +88,12 @@ public class SummonerConnector {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
-        if (summoner != null) {
+        if (summonerToken != null) {
+            summoner = summonerToken.getSummoner();
             summoner.setRetrieving(false);
             this.summonerRepository.save(summoner);
         }
-        return null;
+        return summonerToken;
     }
 
     public ArrayList<SummonerChampionMastery> championMastery(SummonerToken summonerToken) {

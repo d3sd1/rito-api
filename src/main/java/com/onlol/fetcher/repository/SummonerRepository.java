@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface SummonerRepository extends JpaRepository<Summoner, String> {
-    Summoner findTopByRetrievingIsFalseOrderByLastTimeUpdated();
+    Summoner findTopByRetrievingIsFalseAndDisabledIsFalseOrderByLastTimeUpdated();
 
     List<Summoner> findAllByRetrievingIsTrue();
     Summoner findOneByRegionAndName(Region region, String name);

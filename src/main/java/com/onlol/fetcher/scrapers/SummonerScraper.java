@@ -1,18 +1,12 @@
 package com.onlol.fetcher.scrapers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.model.SummonerToken;
-import com.onlol.fetcher.repository.RegionRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
-import com.onlol.fetcher.repository.SummonerTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @EnableAsync
@@ -31,25 +24,12 @@ public class SummonerScraper {
     private SummonerConnector summonerConnector;
 
     @Autowired
-    private MatchConnector matchConnector;
-
-    @Autowired
     private SummonerRepository summonerRepository;
-
-    @Autowired
-    private SummonerTokenRepository summonerTokenRepository;
 
     @Autowired
     private LogService logger;
 
-
-    @Autowired
-    private JavaMailSender javaMailSender;
-
-
-    @Autowired
-    private RegionRepository regionRepository;
-
+    private boolean noSummonersMessageShown;
 
     @PostConstruct
     @RequiresInitialSetup
@@ -62,31 +42,23 @@ public class SummonerScraper {
         }
     }
 
-    @Autowired
-    private ApiConnector apiConnector;
-
-    @Autowired
-    private ObjectMapper jacksonMapper;
-
     @Async
     @RequiresInitialSetup
     @Scheduled(fixedRate = 1000, initialDelay = 500)
     public void getSummonerInfo() {
-        Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseOrderByLastTimeUpdated();
+        Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseAndDisabledIsFalseOrderByLastTimeUpdated();
         if (summoner == null) {
-            this.logger.info("No summoners to update.");
-            return;
-        }
-        if (!summoner.getLastTimeUpdated().plusDays(7).isBefore(LocalDateTime.now())) {
-            this.logger.info(summoner.getName() + " already up to date. No summoners to update, sleeping 30s...");
-            try {
-                TimeUnit.SECONDS.sleep(30);
-            } catch (Exception e) {
-
+            if (!noSummonersMessageShown) {
+                this.logger.info("No summoners to update.");
+                noSummonersMessageShown = true;
             }
             return;
         }
+        if (!summoner.getLastTimeUpdated().plusMinutes(3).isBefore(LocalDateTime.now())) {
+            return;
+        }
         this.logger.info("Updating summoner " + summoner.getName());
+        noSummonersMessageShown = false;
         SummonerToken summonerToken = this.summonerConnector.updateSummoner(summoner);
     }
 
