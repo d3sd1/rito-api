@@ -42,7 +42,7 @@ public class FeaturedGame {
     @OneToOne
     private GameQueue gameQueue;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String observerKey;
 
     @ManyToMany
