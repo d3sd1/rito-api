@@ -8,16 +8,16 @@ import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.Champion;
 import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.model.SummonerChampionMastery;
+import com.onlol.fetcher.model.SummonerChampionMasteryLevel;
 import com.onlol.fetcher.repository.ChampionRepository;
+import com.onlol.fetcher.repository.SummonerChampionMasteryLevelRepository;
 import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 @Component
 public class SummonerChampionMasteryDeserializer extends StdDeserializer<SummonerChampionMastery> {
@@ -26,6 +26,8 @@ public class SummonerChampionMasteryDeserializer extends StdDeserializer<Summone
     private ChampionRepository championRepository;
     @Autowired
     private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
+    @Autowired
+    private SummonerChampionMasteryLevelRepository summonerChampionMasteryLevelRepository;
 
     @Autowired
     private LogService logger;
@@ -40,23 +42,20 @@ public class SummonerChampionMasteryDeserializer extends StdDeserializer<Summone
 
     @Override
     public SummonerChampionMastery deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException {
-        System.out.println("champ mastery des");
+            throws IOException { // Devolver listas bugeado
         JsonNode node = jp.getCodec().readTree(jp);
         Iterator<JsonNode> nodeItr = node.elements();
-        List<SummonerChampionMastery> summonerChampMasteries = new ArrayList<>();
 
         Summoner summoner = (Summoner) ctxt.findInjectableValue("summoner", null, null);
 
-        System.out.println(nodeItr.hasNext());
+        Integer championMasteryLevel = 0;
+
         while (nodeItr.hasNext()) {
             JsonNode currentChampMastery = nodeItr.next();
-            System.out.println("join" + currentChampMastery.get("championId").longValue());
             Champion champion = this.championRepository.findByChampId(currentChampMastery.get("championId").longValue());
             if (champion == null) {
                 this.logger.error("Champion id not found on summoner champion mastery deserializer: " + currentChampMastery.get("championId").longValue());
             }
-            System.out.println(champion);
             SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummonerAndChampion(summoner, champion);
             if (summonerChampionMastery == null) {
                 summonerChampionMastery = new SummonerChampionMastery();
@@ -70,10 +69,18 @@ public class SummonerChampionMasteryDeserializer extends StdDeserializer<Summone
             summonerChampionMastery.setChestGranted(currentChampMastery.get("chestGranted").booleanValue());
             summonerChampionMastery.setLastPlayTime(new Timestamp(currentChampMastery.get("lastPlayTime").longValue()).toLocalDateTime());
             summonerChampionMastery.setTokensEarned(currentChampMastery.get("tokensEarned").intValue());
-            System.out.println(summonerChampionMastery);
-            summonerChampMasteries.add(this.summonerChampionMasteryRepository.save(summonerChampionMastery));
+            this.summonerChampionMasteryRepository.save(summonerChampionMastery);
+            championMasteryLevel += summonerChampionMastery.getChampionLevel();
         }
 
-        return summonerChampMasteries.get(0);
+        /* Set summoner champion level */
+        SummonerChampionMasteryLevel summonerChampionMasteryLevel = this.summonerChampionMasteryLevelRepository.findBySummoner(summoner);
+        if (summonerChampionMasteryLevel == null) {
+            summonerChampionMasteryLevel = new SummonerChampionMasteryLevel();
+            summonerChampionMasteryLevel.setSummoner(summoner);
+        }
+        summonerChampionMasteryLevel.setLevel(championMasteryLevel);
+        this.summonerChampionMasteryLevelRepository.save(summonerChampionMasteryLevel);
+        return null;
     }
 }

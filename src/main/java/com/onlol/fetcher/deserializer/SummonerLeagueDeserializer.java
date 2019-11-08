@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 @Component
 public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> {
@@ -46,11 +44,9 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
 
     @Override
     public SummonerLeague deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException {
-        System.out.println("league token parser");
+            throws IOException { // Devolver listas bugeado
         JsonNode summonerLeagueNode = jp.getCodec().readTree(jp);
         Iterator<JsonNode> summonerLeagueItr = summonerLeagueNode.elements();
-        List<SummonerLeague> summonerLeagues = new ArrayList<>();
 
         Summoner summoner = (Summoner) ctxt.findInjectableValue("summoner", null, null);
 
@@ -114,8 +110,7 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
             summonerLeague.setFreshBlood(currentLeague.get("freshBlood").booleanValue());
             summonerLeague.setInactive(currentLeague.get("inactive").booleanValue());
             this.summonerLeagueRepository.save(summonerLeague);
-            summonerLeagues.add(summonerLeague);
         }
-        return summonerLeagues.get(0);
+        return null;
     }
 }
