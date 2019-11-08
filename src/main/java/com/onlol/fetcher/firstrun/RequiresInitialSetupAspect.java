@@ -21,9 +21,11 @@ public class RequiresInitialSetupAspect {
 
     @Around("@annotation(RequiresInitialSetup)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (this.runLogRepository.findAll().isEmpty() && !messageShown) {
-            this.logger.debug("Prevented task for being executed before the initial setup is finished.");
-            messageShown = true;
+        if (this.runLogRepository.findAll().isEmpty()) {
+            if (!messageShown) {
+                this.logger.debug("Prevented task for being executed before the initial setup is finished.");
+                messageShown = true;
+            }
             return null;
         }
         messageShown = false;
