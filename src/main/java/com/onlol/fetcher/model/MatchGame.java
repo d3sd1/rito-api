@@ -9,8 +9,13 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchGame {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
+    private Long id;
+
+    @Column(nullable = false, unique = false)
     private Long gameId;
 
     @Column(nullable = false, unique = false)
@@ -54,6 +59,14 @@ public class MatchGame {
 
     @OneToMany
     private List<MatchGameParticipant> matchGameParticipants;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getGameId() {
         return gameId;

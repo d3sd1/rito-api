@@ -1,6 +1,8 @@
 package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.onlol.fetcher.deserializer.FeaturedGameIntervalDeserializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,6 +10,7 @@ import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonDeserialize(using = FeaturedGameIntervalDeserializer.class)
 public class FeaturedGameInterval {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +27,7 @@ public class FeaturedGameInterval {
     private Integer clientRefreshInterval = 0;
 
     @ManyToMany
-    private List<MatchGame> matchGames;
+    private List<FeaturedGame> featuredGames;
 
     public Integer getId() {
         return id;
@@ -58,11 +61,22 @@ public class FeaturedGameInterval {
         this.clientRefreshInterval = clientRefreshInterval;
     }
 
-    public List<MatchGame> getMatchGames() {
-        return matchGames;
+    public List<FeaturedGame> getFeaturedGames() {
+        return featuredGames;
     }
 
-    public void setMatchGames(List<MatchGame> matchGames) {
-        this.matchGames = matchGames;
+    public void setFeaturedGames(List<FeaturedGame> featuredGames) {
+        this.featuredGames = featuredGames;
+    }
+
+    @Override
+    public String toString() {
+        return "FeaturedGameInterval{" +
+                "id=" + id +
+                ", timestamp=" + timestamp +
+                ", region=" + region +
+                ", clientRefreshInterval=" + clientRefreshInterval +
+                ", featuredGames=" + featuredGames +
+                '}';
     }
 }

@@ -194,53 +194,21 @@ public class LeaguesConnector {
     }
 
     public FeaturedGameInterval featuredGames(Region region) {
-       /* TODO  ApiFeaturedGamesDTO apiFeaturedGamesDTO = null;
         try {
-            apiFeaturedGamesDTO = this.jacksonMapper.readValue(this.apiConnector.get(
+
+            ApiCall apiCall = this.apiConnector.get(
                     V4.FEATURED_GAMES
-                            .replace("{{HOST}}", region.getHostName()), true).getJson(), new TypeReference<ApiFeaturedGamesDTO>() {
-            });
+                            .replace("{{HOST}}", region.getHostName()), true
+            );
+            this.jacksonMapper.reader(new InjectableValues.Std()
+                    .addValue("apiKey", apiCall.getApiKey())
+                    .addValue("region", region)).forType(FeaturedGameInterval.class).readValue(apiCall.getJson());
+        } catch (DataNotfoundException e) {
+            // Not catchable since PBE has no featured games lmao :)
         } catch (Exception e) {
             e.printStackTrace();
-            this.logger.error("No se ha podido retornar las partidas promocionadas " + e.getMessage());
+            this.logger.error("No se ha podido retornar el listado de masters " + e.getMessage());
         }
-        FeaturedGameInterval featuredGameInterval = new FeaturedGameInterval();
-        featuredGameInterval.setClientRefreshInterval(apiFeaturedGamesDTO.getClientRefreshInterval());
-
-        ArrayList<MatchGame> matchGames = new ArrayList<>();
-        for (ApiFeaturedGameInfoDTO apiFeaturedGameInfoDto : apiFeaturedGamesDTO.getGameList()) {
-            System.out.println(apiFeaturedGameInfoDto.getGameId());
-            MatchGame matchGame = this.matchGameRepository.findByGameId(apiFeaturedGameInfoDto.getGameId());
-            if (matchGame == null) {
-                matchGame = new MatchGame();
-                matchGame.setGameId(apiFeaturedGameInfoDto.getGameId());
-                matchGame.setRegion(region);
-                this.matchGameRepository.save(matchGame);
-            }
-            //TODO: completar esta clase
-            for (ApiBannedChampionDTO apiBannedChampionDTO : apiFeaturedGameInfoDto.getBannedChampions()) {
-                continue;
-            }
-
-            sampleFeaturedGameInfo.getGameLength()
-            sampleFeaturedGameInfo.getGameMode()
-            sampleFeaturedGameInfo.getGameQueueConfigId()
-            sampleFeaturedGameInfo.getGameStartTime()
-            sampleFeaturedGameInfo.getGameType()
-            sampleFeaturedGameInfo.getMapId()
-            sampleFeaturedGameInfo.getObservers()
-            sampleFeaturedGameInfo.getParticipants();
-
-
-            this.matchGameRepository.save(matchGame);
-            matchGames.add(matchGame);
-        }
-        featuredGameInterval.setMatchGames(matchGames);
-        featuredGameInterval.setRegion(region);
-        featuredGameInterval.setTimestamp(LocalDateTime.now());
-        this.featuredGameIntervalRepository.save(featuredGameInterval);
-
-        return featuredGameInterval;*/
         return null;
     }
 }

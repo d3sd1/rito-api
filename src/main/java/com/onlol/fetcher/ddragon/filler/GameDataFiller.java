@@ -36,6 +36,9 @@ public class GameDataFiller {
     private GameImageRepository gameImageRepository;
 
     @Autowired
+    private MatchGameTeamRepository matchGameTeamRepository;
+
+    @Autowired
     private LogService logger;
 
     public GameMode fillGameMode(String txtMode) {
@@ -162,5 +165,16 @@ public class GameDataFiller {
             this.gameChampionConnector.champions();
             return this.fillChampion(champId);
         }
+    }
+
+    public MatchGameTeam fillGameTeam(Integer gameTeamId) {
+        MatchGameTeam matchGameTeam = this.matchGameTeamRepository.findByTeamId(gameTeamId);
+        if (matchGameTeam != null) {
+            return matchGameTeam;
+        }
+
+        matchGameTeam = new MatchGameTeam();
+        matchGameTeam.setTeamId(gameTeamId);
+        return this.matchGameTeamRepository.save(matchGameTeam);
     }
 }

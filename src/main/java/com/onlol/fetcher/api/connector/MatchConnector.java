@@ -147,8 +147,8 @@ public class MatchConnector {
             apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
             });
         } catch (DataNotfoundException e) {
-            this.logger.error("El match no existe..." + matchGame.getGameId().toString());
-            matchGame = this.matchGameRepository.findByGameId(matchGame.getGameId());
+            this.logger.info("El match no existe..." + matchGame.getGameId().toString());
+            matchGame = this.matchGameRepository.findByGameIdAndRegion(matchGame.getGameId(), matchGame.getRegion());
             if (matchGame != null) {
                 matchGame.setRetrieved(true);
                 matchGame.setRetrieving(false);

@@ -8,9 +8,11 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MatchGameTeamStats {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private Long gameId;
+    private Long id;
 
     @Column(nullable = false, unique = false)
     private boolean firstDragon = false; // Flag indicating whether or not the team scored the first Dragon kill.
@@ -60,12 +62,12 @@ public class MatchGameTeamStats {
     @OneToMany
     private List<MatchGameTeamBan> bans; // If match queueId has a draft, contains banned champion data, otherwise empty.
 
-    public Long getGameId() {
-        return gameId;
+    public Long getId() {
+        return id;
     }
 
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public boolean isFirstDragon() {
@@ -199,7 +201,7 @@ public class MatchGameTeamStats {
     @Override
     public String toString() {
         return "MatchGameTeamStats{" +
-                "gameId=" + gameId +
+                "id=" + id +
                 ", firstDragon=" + firstDragon +
                 ", firstInhibitor=" + firstInhibitor +
                 ", firstRiftHerald=" + firstRiftHerald +

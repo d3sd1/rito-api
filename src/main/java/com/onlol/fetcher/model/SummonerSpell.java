@@ -12,22 +12,22 @@ public class SummonerSpell {
     @Column(nullable = false, unique = true)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String keyName;
 
     @OneToOne
     private GameVersion gameVersion;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Short maxrank = 0;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Short summonerLevel = 0;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Integer maxammo = 0;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Float rangeBurn = 0F;
 
     @OneToOne
@@ -39,13 +39,13 @@ public class SummonerSpell {
     @Column(nullable = true, unique = false, columnDefinition = "text")
     private String cooldown;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Float cooldownBurn = 0F;
 
     @Column(nullable = true, unique = false, columnDefinition = "text")
     private String cost;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Float costBurn = 0F;
 
     @Column(nullable = true, unique = false, columnDefinition = "text")

@@ -155,7 +155,7 @@ public class ApiConnector {
             apiKey.setInvalidCalls(0);
             this.apiKeyRepository.save(apiKey);
         }
-        ApiCall apiCall = new ApiCall(apiKey, resp.getBody());
+        ApiCall apiCall = new ApiCall(apiKey, resp != null ? resp.getBody() : "");
         this.apiCallRepository.save(apiCall);
         return apiCall;
     }

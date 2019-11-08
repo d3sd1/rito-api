@@ -8,6 +8,7 @@ import com.onlol.fetcher.model.Region;
 import com.onlol.fetcher.repository.RegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableAsync
-public class LeaguesScraper /*implements ApplicationListener<ApplicationStartedEvent> */ {
+public class LeaguesScraper implements ApplicationListener<ApplicationStartedEvent> {
 
     @Autowired
     private LeaguesConnector leaguesConnector;
@@ -66,7 +67,11 @@ public class LeaguesScraper /*implements ApplicationListener<ApplicationStartedE
                 Thread.sleep(delay * 1000); // * 1000 since we have seconds
                 FeaturedGameInterval featuredGameInterval = this.leaguesConnector.featuredGames(region);
                 /* If endpoint down... Sleep 5min */
-                this.getFeaturedGames(region, featuredGameInterval.getClientRefreshInterval() == 0 ? 300 : featuredGameInterval.getClientRefreshInterval());
+                Integer clientRefreshInterval = 300;
+                if (featuredGameInterval != null && featuredGameInterval.getClientRefreshInterval() != 0) {
+                    clientRefreshInterval = featuredGameInterval.getClientRefreshInterval();
+                }
+                this.getFeaturedGames(region, clientRefreshInterval);
             } catch (Exception e) {
                 e.printStackTrace();
                 this.logger.warning("Could not sleep on featured games: " + e.getMessage());

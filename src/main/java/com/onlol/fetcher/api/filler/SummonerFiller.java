@@ -87,7 +87,6 @@ public class SummonerFiller {
         /* Fill summoner at first */
 
         summoner.setName(apiSummonerDTO.getName());
-        //TODO handle summoner region swap  with trace summoner.setRegion(region);
         boolean firstTime = true;
         if (apiSummonerDTO.getProfileIconId() != null) {
             summoner.setProfileIconId(apiSummonerDTO.getProfileIconId());

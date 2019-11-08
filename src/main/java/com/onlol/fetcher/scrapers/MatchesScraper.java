@@ -30,7 +30,6 @@ public class MatchesScraper {
 
     @PostConstruct
     @RequiresInitialSetup
-    @Scheduled(cron = "0 1 1 * * ?")
     public void clearOrphanGames() {
         this.logger.info("Limpiando partidas huérfanas...");
         List<MatchGame> orphanGames = this.matchGameRepository.findAllByRetrievedIsFalseAndRetrievingIsTrue();

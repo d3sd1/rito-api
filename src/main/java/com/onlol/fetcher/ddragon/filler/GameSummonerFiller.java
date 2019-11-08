@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class GameSummonerFiller {
@@ -26,12 +27,23 @@ public class GameSummonerFiller {
     @Autowired
     private SummonerProfileImageRepository summonerProfileImageRepository;
 
+    /* Fill only by ID here */
+    public SummonerSpell fillSummonerSpell(Integer id) {
+        Optional<SummonerSpell> summonerSpellOpt = this.summonerSpellRepository.findById(id);
+        if (summonerSpellOpt.isPresent()) {
+            return summonerSpellOpt.get();
+        }
+        SummonerSpell summonerSpell = new SummonerSpell();
+        summonerSpell.setId(id);
+        this.summonerSpellRepository.save(summonerSpell);
+
+        return summonerSpell;
+    }
     public SummonerSpell fillSummonerSpell(String keyName, DDSummonerSpellDTO ddSummonerSpellDTO, GameVersion gameVersion) {
         SummonerSpell summonerSpell = this.summonerSpellRepository.findByIdAndGameVersion(ddSummonerSpellDTO.getKey(), gameVersion);
-        if (summonerSpell != null) {
-            return summonerSpell;
+        if (summonerSpell == null) { // Must be used since we have a wrapper about it fillSummonerSpell(Integer id)
+            summonerSpell = new SummonerSpell();
         }
-        summonerSpell = new SummonerSpell();
         summonerSpell.setId(ddSummonerSpellDTO.getKey());
         summonerSpell.setKeyName(keyName);
         summonerSpell.setGameVersion(gameVersion);
@@ -69,10 +81,9 @@ public class GameSummonerFiller {
 
     public SummonerSpellLanguage fillSummonerSpellLanguage(SummonerSpell summonerSpell, DDSummonerSpellDTO ddSummonerSpellDTO, Language language) {
         SummonerSpellLanguage summonerSpellLanguage = this.summonerSpellLanguageRepository.findBySummonerSpellAndLanguage(summonerSpell, language);
-        if (summonerSpellLanguage != null) {
-            return summonerSpellLanguage;
+        if (summonerSpellLanguage == null) {
+            summonerSpellLanguage = new SummonerSpellLanguage();
         }
-        summonerSpellLanguage = new SummonerSpellLanguage();
         summonerSpellLanguage.setLanguage(language);
         summonerSpellLanguage.setSummonerSpell(summonerSpell);
 
