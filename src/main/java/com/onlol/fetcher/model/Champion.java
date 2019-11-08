@@ -1,14 +1,13 @@
 package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Transactional
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Champion {
     @Id
@@ -18,7 +17,7 @@ public class Champion {
     @Column(nullable = false, unique = false)
     private String keyName;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<ChampionTag> championTags;
 
     public Long getChampId() {

@@ -76,9 +76,8 @@ public class LeaguesConnector {
     @Autowired
     private ObjectMapper jacksonMapper;
 
-    public SummonerLeague summonerLeagues(SummonerToken summonerToken) {
+    public List<SummonerLeague> summonerLeagues(SummonerToken summonerToken) {
         Summoner summoner = summonerToken.getSummoner();
-        SummonerLeague summonerLeagues = null;
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_BY_SUMMONER
@@ -87,7 +86,7 @@ public class LeaguesConnector {
                     true,
                     summonerToken.getApiKey()
             );
-            summonerLeagues = this.jacksonMapper.reader(new InjectableValues.Std()
+            this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("summoner", summoner)).forType(SummonerLeague.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
@@ -96,7 +95,7 @@ public class LeaguesConnector {
             e.printStackTrace();
             this.logger.error("No se ha podido retornar la liga del invocador " + summoner.getName());
         }
-        return summonerLeagues;
+        return this.summonerLeagueRepository.findBySummoner(summoner);
     }
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {

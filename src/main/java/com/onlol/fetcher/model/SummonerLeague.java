@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.onlol.fetcher.deserializer.SummonerLeagueDeserializer;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@JsonDeserialize(using = SummonerLeagueDeserializer.class)
+@JsonDeserialize(using = SummonerLeagueDeserializer.class, as = List.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SummonerLeague {
 

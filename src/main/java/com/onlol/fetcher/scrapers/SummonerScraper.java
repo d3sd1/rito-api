@@ -70,6 +70,7 @@ public class SummonerScraper {
             return;
         }
         this.leaguesConnector.summonerLeagues(summonerToken);
+        this.summonerConnector.championMastery(summonerToken);
 
         summoner = summonerToken.getSummoner();
         summoner.setRetrieving(false);

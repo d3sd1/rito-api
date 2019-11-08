@@ -47,6 +47,7 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
     @Override
     public SummonerLeague deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException {
+        System.out.println("league token parser");
         JsonNode summonerLeagueNode = jp.getCodec().readTree(jp);
         Iterator<JsonNode> summonerLeagueItr = summonerLeagueNode.elements();
         List<SummonerLeague> summonerLeagues = new ArrayList<>();

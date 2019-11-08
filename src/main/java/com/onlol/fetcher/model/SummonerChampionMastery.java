@@ -3,11 +3,16 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.onlol.fetcher.deserializer.SummonerChampionMasteryDeserializer;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Transactional
+@JsonDeserialize(using = SummonerChampionMasteryDeserializer.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SummonerChampionMastery {
 

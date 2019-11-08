@@ -38,7 +38,6 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
     @Override
     public SummonerToken deserialize(JsonParser jp, DeserializationContext ctxt)
             throws IOException {
-        System.out.println("summoner token oparsers");
         JsonNode productNode = jp.getCodec().readTree(jp);
         SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(productNode.get("id").textValue());
 

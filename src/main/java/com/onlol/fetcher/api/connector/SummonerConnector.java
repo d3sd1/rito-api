@@ -1,12 +1,10 @@
 package com.onlol.fetcher.api.connector;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
-import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
 import com.onlol.fetcher.exceptions.ApiBadRequestException;
 import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
@@ -16,12 +14,12 @@ import com.onlol.fetcher.model.ApiCall;
 import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.model.SummonerChampionMastery;
 import com.onlol.fetcher.model.SummonerToken;
+import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
 import com.onlol.fetcher.repository.SummonerTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,7 +29,7 @@ public class SummonerConnector {
     private MatchConnector matchConnector;
 
     @Autowired
-    private LeaguesConnector leaguesConnector;
+    private SummonerChampionMasteryRepository summonerChampionMasteryRepository;
 
     @Autowired
     private ApiConnector apiConnector;
@@ -89,34 +87,27 @@ public class SummonerConnector {
         return summonerToken;
     }
 
-    public ArrayList<SummonerChampionMastery> championMastery(SummonerToken summonerToken) {
-        ArrayList<ApiChampionMasteryDTO> sampleSummonerChampionMasteries = new ArrayList<>();
-        ArrayList<SummonerChampionMastery> summonerChampionMasteries = new ArrayList<>();
+    public List<SummonerChampionMastery> championMastery(SummonerToken summonerToken) {
         try {
-            sampleSummonerChampionMasteries = this.jacksonMapper.readValue(this.apiConnector.get(
+            ApiCall apiCall = this.apiConnector.get(
                     V4.SUMMONER_CHAMPION_MASTERY
                             .replace("{{SUMMONER_ID}}", summonerToken.getSummonerTokenId())
                             .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName()),
-                    true
-            ).getJson(), new TypeReference<SummonerChampionMastery>() {
-            });
+                    true,
+                    summonerToken.getApiKey()
+            );
+            this.jacksonMapper.reader(new InjectableValues.Std()
+                    .addValue("apiKey", apiCall.getApiKey())
+                    .addValue("summoner", summonerToken.getSummoner())).forType(SummonerChampionMastery.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             this.logger.info("Data not found, got exception");
-            return summonerChampionMasteries;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
-            return summonerChampionMasteries;
         } catch (Exception e) {
-
             if(e.getMessage() != null) {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
-            return summonerChampionMasteries;
         }
-
-        for (ApiChampionMasteryDTO apiChampionMasteryDTO : sampleSummonerChampionMasteries) {
-            this.summonerFiller.fillSummonerChampionMastery(summonerToken.getSummoner(), apiChampionMasteryDTO);
-        }
-        return summonerChampionMasteries;
+        return this.summonerChampionMasteryRepository.findBySummoner(summonerToken.getSummoner());
     }
 }
 

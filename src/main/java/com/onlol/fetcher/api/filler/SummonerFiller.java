@@ -2,17 +2,18 @@ package com.onlol.fetcher.api.filler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlol.fetcher.api.ApiConnector;
-import com.onlol.fetcher.api.model.ApiChampionMasteryDTO;
 import com.onlol.fetcher.api.model.ApiLeagueItemDTO;
 import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.model.ApiKey;
+import com.onlol.fetcher.model.Summoner;
+import com.onlol.fetcher.model.SummonerNameHistorical;
+import com.onlol.fetcher.model.SummonerToken;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Service
@@ -131,22 +132,5 @@ public class SummonerFiller {
         this.summonerTokenRepository.save(summonerToken);
 
         return summonerToken;
-    }
-
-    public SummonerChampionMastery fillSummonerChampionMastery(Summoner summoner, ApiChampionMasteryDTO apiChampionMasteryDTO) {
-        SummonerChampionMastery summonerChampionMastery = this.summonerChampionMasteryRepository.findBySummoner(summoner);
-        if (summonerChampionMastery == null) {
-            summonerChampionMastery = new SummonerChampionMastery();
-        }
-        summonerChampionMastery.setSummoner(summoner);
-        summonerChampionMastery.setChampion(this.championRepository.findByChampId(apiChampionMasteryDTO.getChampionId()));
-        summonerChampionMastery.setChampionLevel(apiChampionMasteryDTO.getChampionLevel());
-        summonerChampionMastery.setChampionPoints(apiChampionMasteryDTO.getChampionPoints());
-        summonerChampionMastery.setChampionPointsSinceLastLevel(apiChampionMasteryDTO.getChampionPointsSinceLastLevel());
-        summonerChampionMastery.setChampionPointsUntilNextLevel(apiChampionMasteryDTO.getChampionPointsUntilNextLevel());
-        summonerChampionMastery.setChestGranted(apiChampionMasteryDTO.isChestGranted());
-        summonerChampionMastery.setLastPlayTime(new Timestamp(apiChampionMasteryDTO.getLastPlayTime()).toLocalDateTime());
-        summonerChampionMastery.setTokensEarned(apiChampionMasteryDTO.getTokensEarned());
-        return this.summonerChampionMasteryRepository.save(summonerChampionMastery);
     }
 }
