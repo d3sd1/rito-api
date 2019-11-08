@@ -77,25 +77,24 @@ public class LeaguesConnector {
     private ObjectMapper jacksonMapper;
 
     public List<SummonerLeague> summonerLeagues(SummonerToken summonerToken) {
-        Summoner summoner = summonerToken.getSummoner();
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_BY_SUMMONER
                             .replace("{{SUMMONER_ID}}", summonerToken.getSummonerTokenId())
-                            .replace("{{HOST}}", summoner.getRegion().getHostName()),
+                            .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName()),
                     true,
                     summonerToken.getApiKey()
             );
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("summoner", summoner)).forType(SummonerLeague.class).readValue(apiCall.getJson());
+                    .addValue("summoner", summonerToken.getSummoner())).forType(SummonerLeague.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
-            this.logger.warning("Summoner leagues not found: " + summoner.getName());
+            this.logger.warning("Summoner leagues not found: " + summonerToken.getSummoner().getName());
         } catch (Exception e) {
             e.printStackTrace();
-            this.logger.error("No se ha podido retornar la liga del invocador " + summoner.getName());
+            this.logger.error("No se ha podido retornar la liga del invocador " + summonerToken.getSummoner().getName());
         }
-        return this.summonerLeagueRepository.findBySummoner(summoner);
+        return this.summonerLeagueRepository.findBySummoner(summonerToken.getSummoner());
     }
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
