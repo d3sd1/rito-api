@@ -52,32 +52,6 @@ public class SummonerTokenDeserializer extends StdDeserializer<SummonerToken> {
         this.summonerRepository.save(summoner);
 
         if (summonerToken == null) { // We haven't got the api.key-summoner combination yet
-
-            /*
-            TODO esto hace falta?
-            Check if user has previous tokens. Use cases:
-            1. Hasn't got -> New summoner.
-            2. Has >= 1, and internal summoner ID matchs -> update summoner, since it's the same
-            3. Has >= 1, and internal summoner ID does not match -> new summoner
-             *
-            List<SummonerToken> summonerTokens = this.summonerTokenRepository.findBySummoner(summoner);
-            if(summonerTokens.isEmpty()) { // Case 1
-                summonerToken = new SummonerToken();
-                summonerToken.setApiKey(apiKey);
-                summonerToken.setSummonerTokenId(productNode.get("id").textValue());
-                summonerToken.setSummoner(summoner);
-            } else {
-                SummonerToken byPassTokenPrev = summonerTokens.get(0);
-                SummonerToken byPassTokenUpdated = this.summonerConnector.updateSummoner(byPassTokenPrev.getSummoner());
-                if(byPassTokenPrev.getSummoner().getId().equals(byPassTokenUpdated.getSummoner().getId())) { // Case 2
-                    summonerToken = byPassTokenUpdated;
-                } else { // Case 3
-                    summonerToken = new SummonerToken();
-                    summonerToken.setApiKey(apiKey);
-                    summonerToken.setSummonerTokenId(productNode.get("id").textValue());
-                    summonerToken.setSummoner(summoner);
-                }
-            }*/
             summonerToken = new SummonerToken();
             summonerToken.setApiKey(apiKey);
             summonerToken.setSummonerTokenId(productNode.get("id").textValue()); // Needed for not-null restriction

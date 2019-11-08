@@ -23,9 +23,6 @@ public class SummonerLeague {
     @OneToOne
     private GameQueueType gameQueueType;
 
-    @OneToOne
-    private LeagueTier leagueTier;
-
     @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private LeagueRank leagueRank;
 
@@ -59,14 +56,6 @@ public class SummonerLeague {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public LeagueTier getLeagueTier() {
-        return leagueTier;
-    }
-
-    public void setLeagueTier(LeagueTier leagueTier) {
-        this.leagueTier = leagueTier;
     }
 
     public LeagueRank getLeagueRank() {
@@ -163,7 +152,6 @@ public class SummonerLeague {
                 "id=" + id +
                 ", summoner=" + summoner +
                 ", queueType=" + gameQueueType +
-                ", leagueTier=" + leagueTier +
                 ", leagueRank=" + leagueRank +
                 ", leagueMiniSeries=" + leagueMiniSeries +
                 ", hotStreak=" + hotStreak +

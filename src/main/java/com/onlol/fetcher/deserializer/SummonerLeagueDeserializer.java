@@ -65,13 +65,6 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
                 summonerLeague.setGameQueueType(queuetype);
                 this.summonerLeagueRepository.save(summonerLeague);
             }
-            LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(currentLeague.get("tier").textValue());
-            if (leagueTier == null) {
-                leagueTier = new LeagueTier();
-                leagueTier.setKeyName(currentLeague.get("tier").textValue());
-                this.leagueTierRepository.save(leagueTier);
-            }
-            summonerLeague.setLeagueTier(leagueTier);
 
 
             LeagueRank leagueRank = this.leagueRankRepository.findByKeyName(currentLeague.get("rank").textValue());
