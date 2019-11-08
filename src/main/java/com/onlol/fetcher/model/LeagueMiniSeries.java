@@ -15,16 +15,16 @@ public class LeagueMiniSeries {
     @OneToOne(cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private Summoner summoner;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String progress = "";
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private Short target = 0;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private Integer wins = 0;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private Integer losses = 0;
 
     public Integer getId() {
