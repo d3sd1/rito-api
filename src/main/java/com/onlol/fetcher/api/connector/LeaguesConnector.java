@@ -6,6 +6,9 @@ import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.model.ApiLeagueListDTO;
+import com.onlol.fetcher.exceptions.ApiBadRequestException;
+import com.onlol.fetcher.exceptions.ApiDownException;
+import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
@@ -211,5 +214,39 @@ public class LeaguesConnector {
         }
         return null;
     }
+
+    public League updateLeague(League league) {
+        return this.updateLeague(league, false);
+    }
+
+    public League updateLeague(League league, boolean forceDelete) {
+        try {
+
+            ApiCall apiCall = this.apiConnector.get(
+                    V4.LEAGUES_BY_ID
+                            .replace("{{HOST}}", league.getRegion().getHostName())
+                            .replace("{{LEAGUE_ID}}", league.getRiotId()),
+                    true
+            );
+            this.jacksonMapper.reader(new InjectableValues.Std()
+                    .addValue("apiKey", apiCall.getApiKey())
+                    .addValue("region", league.getRegion())).forType(League.class).readValue(apiCall.getJson());
+
+        } catch (DataNotfoundException e) {
+            // summoner not found (due to region or name change). Check it by summonerId if it's on DB, else, delete.
+            league.setDisabled(true);
+            this.logger.info("Disabled league " + league.getLeagueTier());
+            this.leagueRepository.save(league);
+        } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
+        }
+        return league;
+    }
+
 }
 // TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

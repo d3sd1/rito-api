@@ -27,9 +27,10 @@ public class ApiKeyManager {
         }
         if (this.apiKeyRepository.findAll().isEmpty()) {
             this.logger.error("No api keys found...");
+        } else {
+            apiKey.setLastTimestampUsed(System.currentTimeMillis());
+            this.apiKeyRepository.save(apiKey);
         }
-        apiKey.setLastTimestampUsed(System.currentTimeMillis());
-        this.apiKeyRepository.save(apiKey);
         return apiKey;
     }
 }

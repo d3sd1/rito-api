@@ -155,7 +155,10 @@ public class ApiConnector {
             apiKey.setInvalidCalls(0);
             this.apiKeyRepository.save(apiKey);
         }
-        ApiCall apiCall = new ApiCall(apiKey, resp != null ? resp.getBody() : "");
+        if (resp == null) {
+            throw new DataNotfoundException(); // So it doesn't throws jackson deserialize exception
+        }
+        ApiCall apiCall = new ApiCall(apiKey, resp.getBody());
         this.apiCallRepository.save(apiCall);
         return apiCall;
     }

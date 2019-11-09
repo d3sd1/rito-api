@@ -25,4 +25,5 @@ public class V4 {
     public static final String FEATURED_GAMES = "https://{{HOST}}/lol/spectator/v4/featured-games";
     public static final String LEAGUES_GRANDMASTER = "https://{{HOST}}/lol/league/v4/grandmasterleagues/by-queue/{{QUEUE}}";
     public static final String LEAGUES_MASTER = "https://{{HOST}}/lol/league/v4/masterleagues/by-queue/{{QUEUE}}";
+    public static final String LEAGUES_BY_ID = "https://{{HOST}}/lol/league/v4/leagues/{{LEAGUE_ID}}";
 }

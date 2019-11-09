@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -91,6 +92,9 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
                 league.setRiotId(leagueId);
                 league.setGameQueueType(gameQueueType);
                 league.setLeagueTier(leagueTier);
+                league.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
+                league.setRegion(region);
+                league.setRetrieving(false);
                 this.leagueRepository.save(league);
             }
 
@@ -125,16 +129,20 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
                 summonerToken.setApiKey(apiKey);
                 summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());
                 summonerToken.setSummoner(summoner);
+                this.summonerTokenRepository.save(summonerToken);
             } else {
-                SummonerToken byPassTokenPrev = summonerTokens.get(0);
+                SummonerToken byPassTokenPrev = summonerTokens.get(0); // Vale cualquiera, pero el 0 está siempre
                 SummonerToken byPassTokenUpdated = this.summonerConnector.updateSummoner(byPassTokenPrev.getSummoner());
-                if (byPassTokenPrev.getSummoner().getId().equals(byPassTokenUpdated.getSummoner().getId())) { // Case 2
+                if (byPassTokenPrev.getSummoner() != null && byPassTokenUpdated != null &&
+                        byPassTokenUpdated.getSummoner() != null &&
+                        byPassTokenPrev.getSummoner().getId().equals(byPassTokenUpdated.getSummoner().getId())) { // Case 2, with needed nullpointer checkers
                     summonerToken = byPassTokenUpdated;
                 } else { // Case 3
                     summonerToken = new SummonerToken();
                     summonerToken.setApiKey(apiKey);
                     summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());
                     summonerToken.setSummoner(summoner);
+                    // no se deberia guardar aqui?? pero peta xdd. new summoner not added =D
                 }
             }
 

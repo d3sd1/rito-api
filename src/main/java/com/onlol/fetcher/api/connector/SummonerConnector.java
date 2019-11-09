@@ -110,11 +110,3 @@ public class SummonerConnector {
         return this.summonerChampionMasteryRepository.findBySummoner(summonerToken.getSummoner());
     }
 }
-
-//TODO: coger league ID y utilizar este endpoint para recuperar todos los summoner
-/*
-GET /lol/league/v4/leagues/{leagueId}Get league with given ID, including inactive entries.
-recuperar todos los summoner de la liga y añadirlos para actualizar
-TODO: best effort. scrappear todos los queue tier division una vez por dia y en el initial setup??
-GET /lol/league/v4/entries/{queue}/{tier}/{division}
- */

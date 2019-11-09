@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.onlol.fetcher.deserializer.LeagueDeserializer;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @JsonDeserialize(using = LeagueDeserializer.class)
@@ -23,6 +24,18 @@ public class League {
 
     @OneToOne
     private GameQueueType gameQueueType;
+
+    @Column(nullable = false, unique = false)
+    private LocalDateTime lastTimeUpdated = LocalDateTime.now();
+
+    @Column(nullable = false, unique = false)
+    private Boolean retrieving = false;
+
+    @Column(nullable = true, unique = false)
+    private boolean disabled;
+
+    @OneToOne
+    private Region region;
 
     public Integer getId() {
         return id;
@@ -56,6 +69,38 @@ public class League {
         this.gameQueueType = gameQueueType;
     }
 
+    public LocalDateTime getLastTimeUpdated() {
+        return lastTimeUpdated;
+    }
+
+    public void setLastTimeUpdated(LocalDateTime lastTimeUpdated) {
+        this.lastTimeUpdated = lastTimeUpdated;
+    }
+
+    public Boolean getRetrieving() {
+        return retrieving;
+    }
+
+    public void setRetrieving(Boolean retrieving) {
+        this.retrieving = retrieving;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
     @Override
     public String toString() {
         return "League{" +
@@ -63,6 +108,10 @@ public class League {
                 ", riotId='" + riotId + '\'' +
                 ", leagueTier=" + leagueTier +
                 ", gameQueueType=" + gameQueueType +
+                ", lastTimeUpdated=" + lastTimeUpdated +
+                ", retrieving=" + retrieving +
+                ", disabled=" + disabled +
+                ", region=" + region +
                 '}';
     }
 }
