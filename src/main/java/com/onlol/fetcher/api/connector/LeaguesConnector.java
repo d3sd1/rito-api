@@ -95,16 +95,20 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> challengerLadderGlobal() {
+        return this.challengerLadderGlobal(false);
+    }
+
+    public ArrayList<SummonerLeague> challengerLadderGlobal(boolean initialSetup) {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
             for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.challengerLadder(region, gameQueueType));
+                summonerLeagues.addAll(this.challengerLadder(region, gameQueueType, initialSetup));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> challengerLadder(Region region, GameQueueType gameQueueType) {
+    public ArrayList<SummonerLeague> challengerLadder(Region region, GameQueueType gameQueueType, boolean initialSetup) {
         ApiLeagueListDTO apiLeagueListDTO = null;
         try {
             ApiCall apiCall = this.apiConnector.get(
@@ -115,7 +119,8 @@ public class LeaguesConnector {
             );
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("region", region)).forType(League.class).readValue(apiCall.getJson());
+                    .addValue("region", region)
+                    .addValue("initialSetup", initialSetup)).forType(League.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner leagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {
@@ -126,16 +131,20 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> masterLadderGlobal() {
+        return this.masterLadderGlobal(false);
+    }
+
+    public ArrayList<SummonerLeague> masterLadderGlobal(boolean initialSetup) {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
             for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.masterLadder(region, gameQueueType));
+                summonerLeagues.addAll(this.masterLadder(region, gameQueueType, initialSetup));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> masterLadder(Region region, GameQueueType gameQueueType) {
+    public ArrayList<SummonerLeague> masterLadder(Region region, GameQueueType gameQueueType, boolean initialSetup) {
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_MASTER
@@ -145,7 +154,8 @@ public class LeaguesConnector {
             );
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("region", region)).forType(League.class).readValue(apiCall.getJson());
+                    .addValue("region", region)
+                    .addValue("initialSetup", initialSetup)).forType(League.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {
@@ -158,16 +168,20 @@ public class LeaguesConnector {
     }
 
     public ArrayList<SummonerLeague> grandMasterLadderGlobal() {
+        return this.grandMasterLadderGlobal(false);
+    }
+
+    public ArrayList<SummonerLeague> grandMasterLadderGlobal(boolean initialSetup) {
         ArrayList<SummonerLeague> summonerLeagues = new ArrayList<>();
         for (Region region : this.regionRepository.findAll()) {
             for (GameQueueType gameQueueType : this.gameQueueTypeRepository.findAll()) {
-                summonerLeagues.addAll(this.grandMasterLadder(region, gameQueueType));
+                summonerLeagues.addAll(this.grandMasterLadder(region, gameQueueType, initialSetup));
             }
         }
         return summonerLeagues;
     }
 
-    public ArrayList<SummonerLeague> grandMasterLadder(Region region, GameQueueType gameQueueType) {
+    public ArrayList<SummonerLeague> grandMasterLadder(Region region, GameQueueType gameQueueType, boolean initialSetup) {
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_GRANDMASTER
@@ -177,7 +191,8 @@ public class LeaguesConnector {
             );
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("region", region)).forType(League.class).readValue(apiCall.getJson());
+                    .addValue("region", region)
+                    .addValue("initialSetup", initialSetup)).forType(League.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner lagues for challenger ladder on region: " + region.getHostName());
         } catch (Exception e) {

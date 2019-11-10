@@ -61,6 +61,7 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
         Iterator<JsonNode> summonerLeagueItr = summonerLeagueNode.get("entries").elements();
         ApiKey apiKey = (ApiKey) ctxt.findInjectableValue("apiKey", null, null);
         Region region = (Region) ctxt.findInjectableValue("region", null, null);
+        boolean initialSetup = (boolean) ctxt.findInjectableValue("initialSetup", null, null);
 
         /* Find and save league tier */
         String tier = summonerLeagueNode.get("tier").textValue();
@@ -123,26 +124,35 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
             } else {
                 summoner = summonerToken.getSummoner();
             }
-            List<SummonerToken> summonerTokens = this.summonerTokenRepository.findBySummoner(summoner);
-            if (summonerTokens.isEmpty()) { // Case 1
-                summonerToken = new SummonerToken();
-                summonerToken.setApiKey(apiKey);
-                summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());
-                summonerToken.setSummoner(summoner);
-                this.summonerTokenRepository.save(summonerToken);
-            } else {
-                SummonerToken byPassTokenPrev = summonerTokens.get(0); // Vale cualquiera, pero el 0 está siempre
-                SummonerToken byPassTokenUpdated = this.summonerConnector.updateSummoner(byPassTokenPrev.getSummoner());
-                if (byPassTokenPrev.getSummoner() != null && byPassTokenUpdated != null &&
-                        byPassTokenUpdated.getSummoner() != null &&
-                        byPassTokenPrev.getSummoner().getId().equals(byPassTokenUpdated.getSummoner().getId())) { // Case 2, with needed nullpointer checkers
-                    summonerToken = byPassTokenUpdated;
-                } else { // Case 3
+
+            // Check integrity, only needed if it's not initial setup, if not, initial setup would take so long
+            if (!initialSetup) {
+                List<SummonerToken> summonerTokens = this.summonerTokenRepository.findBySummoner(summoner);
+                if (summonerTokens.isEmpty()) { // Case 1
                     summonerToken = new SummonerToken();
                     summonerToken.setApiKey(apiKey);
                     summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());
                     summonerToken.setSummoner(summoner);
-                    // no se deberia guardar aqui?? pero peta xdd. new summoner not added =D
+                    this.summonerTokenRepository.save(summonerToken);
+                } else {
+                    SummonerToken byPassTokenPrev = summonerTokens.get(0); // Vale cualquiera, pero el 0 está siempre
+                    SummonerToken byPassTokenUpdated = this.summonerConnector.updateSummoner(byPassTokenPrev.getSummoner()); // Tarda más, pero nos da la integridad de datos.
+                    if (byPassTokenPrev.getSummoner() != null && byPassTokenUpdated != null &&
+                            byPassTokenUpdated.getSummoner() != null &&
+                            byPassTokenPrev.getSummoner().getId().equals(byPassTokenUpdated.getSummoner().getId())) { // Case 2, with needed nullpointer checkers
+                        summonerToken = byPassTokenUpdated;
+                        summoner = summonerToken.getSummoner();
+                    } else { // Case 3
+                        summonerToken = this.summonerTokenRepository.findBySummonerTokenId(currentLeagueItem.get("summonerId").textValue());
+                        if (summonerToken == null) {
+                            summonerToken = new SummonerToken();
+                        }
+                        summonerToken.setApiKey(apiKey);
+                        summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());
+                        summonerToken.setSummoner(summoner);
+                        this.summonerTokenRepository.save(summonerToken);
+                        // no se deberia guardar aqui?? pero peta xdd. new summoner not added =D
+                    }
                 }
             }
 
