@@ -146,7 +146,6 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
-    @PostConstruct //TODO: REMOVE, ONLY FOR TESTING
     public void getAllLeagues() {
 //TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas. guardar 1 registro por dia, aunque cambie... el primero que llegue se queda.
         this.logger.info("Scraping leagues by region, queue, tier and rank!");
