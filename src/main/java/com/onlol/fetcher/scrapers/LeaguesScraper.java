@@ -104,7 +104,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 500, initialDelay = 500)
+    @Scheduled(fixedRate = 3000, initialDelay = 500)
     public void getSummonerInfo() {
         League league = this.leagueRepository.findTopByRetrievingIsFalseAndDisabledIsFalseOrderByLastTimeUpdated();
         if (league == null) {
@@ -121,8 +121,8 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
         league = this.leagueRepository.save(league);
         this.logger.info("Updating league " + league.getRiotId());
         noLeaguesMessageShown = false;
-        League summonerToken = this.leaguesConnector.updateLeague(league);
-        if (summonerToken == null) {
+        league = this.leaguesConnector.updateLeague(league);
+        if (league == null) {
             return;
         }
 

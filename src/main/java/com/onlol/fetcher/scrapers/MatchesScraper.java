@@ -42,7 +42,7 @@ public class MatchesScraper {
     @Async
     @RequiresInitialSetup
     @Scheduled(fixedRate = 1000, initialDelay = 500)
-    public void getMatches() {
+    public void getMatches() {/*
         MatchGame matchGame = this.matchGameRepository.findTopByRetrievedIsFalseAndRetrievingIsFalse();
         if(matchGame == null) {
             if (!this.noMatchesMessageShown) {
@@ -58,7 +58,7 @@ public class MatchesScraper {
 
         matchGame = this.matchConnector.match(matchGame);
         MatchGame sampleMatchGame = this.matchConnector.match(matchGame);
-        this.matchConnector.matchGameTimeline(matchGame);
+        this.matchConnector.matchGameTimeline(matchGame);*/
     }
 
 }

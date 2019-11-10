@@ -48,7 +48,7 @@ public class SummonerScraper {
 
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 500, initialDelay = 500)
+    @Scheduled(fixedRate = 5000, initialDelay = 500)
     public void getSummonerInfo() {
         Summoner summoner = this.summonerRepository.findTopByRetrievingIsFalseAndDisabledIsFalseOrderByLastTimeUpdated();
         if (summoner == null) {
