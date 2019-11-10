@@ -91,12 +91,12 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
                 league.setRiotId(leagueId);
                 league.setGameQueueType(gameQueueType);
                 league.setLeagueTier(leagueTier);
-                league.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
                 league.setRegion(region);
                 league.setRetrieving(false);
                 this.leagueRepository.save(league);
             }
-
+            league.setLastTimeUpdated(LocalDateTime.now());
+            this.leagueRepository.save(league);
         }
 
         while (summonerLeagueItr.hasNext()) {
