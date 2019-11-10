@@ -86,7 +86,7 @@ public class FeaturedGameIntervalDeserializer extends StdDeserializer<FeaturedGa
         while (nodeItr.hasNext()) {
             JsonNode currentNode = nodeItr.next();
             Long gameId = currentNode.get("gameId").longValue();
-            FeaturedGame featuredGame = this.featuredGameRepository.findByGameId(gameId);
+            FeaturedGame featuredGame = this.featuredGameRepository.findByGameIdAndRegion(gameId, region);
             if (featuredGame != null) {
                 prevFeaturedGames.remove(featuredGame.getGameId());
                 continue;
@@ -156,7 +156,7 @@ public class FeaturedGameIntervalDeserializer extends StdDeserializer<FeaturedGa
          * and add it to MatchGames :)
          */
         for (Long endedFeaturedGameId : prevFeaturedGames) {
-            FeaturedGame endedFeaturedGame = this.featuredGameRepository.findByGameId(endedFeaturedGameId);
+            FeaturedGame endedFeaturedGame = this.featuredGameRepository.findByGameIdAndRegion(endedFeaturedGameId, region);
             if (endedFeaturedGame == null) {
                 continue;
             }

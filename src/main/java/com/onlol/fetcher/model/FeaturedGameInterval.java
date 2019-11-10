@@ -26,7 +26,7 @@ public class FeaturedGameInterval {
     @Column(nullable = false, unique = false)
     private Integer clientRefreshInterval = 0;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<FeaturedGame> featuredGames;
 
     public Integer getId() {
