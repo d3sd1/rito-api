@@ -15,6 +15,9 @@ public class LeagueTier {
     @Column(nullable = false, unique = true)
     private String keyName;
 
+    @Column(nullable = false, unique = false)
+    private boolean scrapeable = true;
+
     public String getKeyName() {
         return keyName;
     }
@@ -31,11 +34,20 @@ public class LeagueTier {
         this.id = id;
     }
 
+    public boolean isScrapeable() {
+        return scrapeable;
+    }
+
+    public void setScrapeable(boolean scrapeable) {
+        this.scrapeable = scrapeable;
+    }
+
     @Override
     public String toString() {
         return "LeagueTier{" +
                 "id=" + id +
                 ", keyName='" + keyName + '\'' +
+                ", scrapeable=" + scrapeable +
                 '}';
     }
 }

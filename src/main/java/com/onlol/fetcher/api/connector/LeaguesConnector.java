@@ -6,15 +6,13 @@ import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.model.ApiLeagueListDTO;
-import com.onlol.fetcher.exceptions.ApiBadRequestException;
-import com.onlol.fetcher.exceptions.ApiDownException;
-import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
-import com.onlol.fetcher.exceptions.DataNotfoundException;
+import com.onlol.fetcher.exceptions.*;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +82,8 @@ public class LeaguesConnector {
             );
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("summoner", summonerToken.getSummoner())).forType(SummonerLeague.class).readValue(apiCall.getJson());
+                    .addValue("summoner", summonerToken.getSummoner())
+                    .addValue("region", null)).forType(SummonerLeague.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             this.logger.warning("Summoner leagues not found: " + summonerToken.getSummoner().getName());
         } catch (Exception e) {
@@ -236,7 +235,10 @@ public class LeaguesConnector {
             this.logger.info("Disabled league " + league.getLeagueTier());
             this.leagueRepository.save(league);
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
             e.printStackTrace();
+        } catch (CannotCreateTransactionException e) {
+            this.logger.info("Could not complete transaction due to shutdown on updateLeague.");
         } catch (Exception e) {
             e.printStackTrace();
             if (e.getMessage() != null) {
@@ -246,5 +248,50 @@ public class LeaguesConnector {
         return this.leagueRepository.findByRiotId(league.getRiotId());
     }
 
+    public List<SummonerLeague> findLeague(Region region, GameQueueType gameQueueType, LeagueRank leagueRank, LeagueTier leagueTier) {
+        return this.findLeague(region, gameQueueType, leagueRank, leagueTier, 1);
+    }
+
+    public List<SummonerLeague> findLeague(Region region, GameQueueType gameQueueType, LeagueRank leagueRank, LeagueTier leagueTier, Integer pageNumber) {
+        try {
+            if (!leagueTier.isScrapeable()) { // CHALLENGER, MASTER AND GRANDMASTER ARE NOT AVAILABLE HERE, per example
+                return new ArrayList<>();
+            }
+            ApiCall apiCall = this.apiConnector.get(
+                    V4.LEAGUES_BY_QUEUE_TIER_DIVISION
+                            .replace("{{HOST}}", region.getHostName())
+                            .replace("{{PAGE_NUMBER}}", String.valueOf(pageNumber))
+                            .replace("{{LEAGUE_QUEUE}}", gameQueueType.getKeyName())
+                            .replace("{{LEAGUE_TIER}}", leagueTier.getKeyName())
+                            .replace("{{LEAGUE_DIVISION}}", leagueRank.getKeyName()),
+                    true
+            );
+            SummonerLeague summonerLeague = this.jacksonMapper.reader(new InjectableValues.Std()
+                    .addValue("apiKey", apiCall.getApiKey())
+                    .addValue("summoner", null)
+                    .addValue("region", region)).forType(SummonerLeague.class).readValue(apiCall.getJson());
+            if (summonerLeague == null) {
+                throw new ApiPageNumberInvalidException();
+            }
+        } catch (ApiInvalidTierException e) {
+            this.logger.info("Tier not scrapeable: " + leagueTier);
+            leagueTier.setScrapeable(false);
+            this.leagueTierRepository.save(leagueTier);
+            return null;
+        } catch (ApiPageNumberInvalidException e) {
+            // No more pages.
+            return null;
+        } catch (DataNotfoundException | ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            // Don't show stacktrace... It's scary lol.
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (e.getMessage() != null) {
+                this.logger.error("Got generic exception " + e.getMessage());
+            }
+        }
+        this.findLeague(region, gameQueueType, leagueRank, leagueTier, pageNumber + 1);
+        return null;
+    }
+
 }
-//TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

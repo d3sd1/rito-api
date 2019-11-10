@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 
 @Component
@@ -29,10 +29,16 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
     private LeagueRankRepository leagueRankRepository;
 
     @Autowired
-    private LeagueTierRepository leagueTierRepository;
+    private LeagueRepository leagueRepository;
 
     @Autowired
-    private SummonerConnector summonerConnector;
+    private SummonerRepository summonerRepository;
+
+    @Autowired
+    private SummonerTokenRepository summonerTokenRepository;
+
+    @Autowired
+    private LeagueTierRepository leagueTierRepository;
 
     public SummonerLeagueDeserializer() {
         this(null);
@@ -48,10 +54,45 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
         JsonNode summonerLeagueNode = jp.getCodec().readTree(jp);
         Iterator<JsonNode> summonerLeagueItr = summonerLeagueNode.elements();
 
+        ApiKey apiKey = (ApiKey) ctxt.findInjectableValue("apiKey", null, null);
         Summoner summoner = (Summoner) ctxt.findInjectableValue("summoner", null, null);
+        Region region = (Region) ctxt.findInjectableValue("region", null, null);
+        boolean fillSummoner = summoner == null;
+
+        boolean hasPages = false;
 
         while (summonerLeagueItr.hasNext()) {
+            hasPages = true;
             JsonNode currentLeague = summonerLeagueItr.next();
+            SummonerToken summonerToken;
+            if (fillSummoner) { // We need to fill summoner, since we don't have it on db
+                summonerToken = this.summonerTokenRepository.findBySummonerTokenId(currentLeague.get("summonerId").textValue());
+
+                if (summonerToken == null) { // Could not be reached by summoner id.
+                    summonerToken = new SummonerToken();
+                    summonerToken.setApiKey(apiKey);
+                    summonerToken.setSummonerTokenId(currentLeague.get("summonerId").textValue());
+                    summoner = this.summonerRepository.findOneByRegionAndName(region, currentLeague.get("summonerName").textValue());
+                    if (summoner == null) {
+                        summoner = new Summoner();
+                        summoner.setRegion(region);
+                        summoner.setName(currentLeague.get("summonerName").textValue());
+                        this.summonerRepository.save(summoner);
+                    } else {
+                        // Get summoner from database for a good linking
+                        SummonerToken summonerDbToken = this.summonerTokenRepository.findTopBySummoner(summoner);
+                        if (summonerDbToken != null) { // Summoner has tokens
+                            summoner = summonerDbToken.getSummoner();
+                        }
+                    }
+
+                    summonerToken.setSummoner(summoner);
+                    this.summonerTokenRepository.save(summonerToken);
+                } else {
+                    summoner = summonerToken.getSummoner();
+                }
+            }
+
             GameQueueType queuetype = this.gameQueueTypeRepository.findByKeyName(currentLeague.get("queueType").textValue());
             if (queuetype == null) {
                 queuetype = new GameQueueType();
@@ -74,6 +115,27 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
                 this.leagueRankRepository.save(leagueRank);
             }
             summonerLeague.setLeagueRank(leagueRank);
+
+            LeagueTier leagueTier = this.leagueTierRepository.findByKeyName(currentLeague.get("tier").textValue());
+            if (leagueTier == null) {
+                leagueTier = new LeagueTier();
+                leagueTier.setKeyName(currentLeague.get("tier").textValue());
+                this.leagueTierRepository.save(leagueTier);
+            }
+
+
+            League league = this.leagueRepository.findByRiotId(currentLeague.get("leagueId").textValue());
+            if (league == null) {
+                league = new League();
+                league.setRiotId(currentLeague.get("leagueId").textValue());
+                league.setRegion(region);
+                league.setRetrieving(false);
+                league.setDisabled(false);
+                league.setLastTimeUpdated(LocalDateTime.of(2010, 9, 9, 0, 0));
+                league.setLeagueTier(leagueTier);
+                league.setGameQueueType(queuetype);
+                this.leagueRepository.save(league);
+            }
 
 
             /* Check if player is playing miniseries */
@@ -104,6 +166,9 @@ public class SummonerLeagueDeserializer extends StdDeserializer<SummonerLeague> 
             summonerLeague.setInactive(currentLeague.get("inactive").booleanValue());
             this.summonerLeagueRepository.save(summonerLeague);
         }
-        return null;
+        if (!hasPages) {
+            return null; // Must be the unique null case.
+        }
+        return new SummonerLeague(); // We have to edit this in order to return official values
     }
 }

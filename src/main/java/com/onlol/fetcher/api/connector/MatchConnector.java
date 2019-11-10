@@ -107,6 +107,7 @@ public class MatchConnector {
             this.logger.info("Data not found, got exception");
             return matchLists;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
             return matchLists;
         } catch (Exception e) {
 
@@ -157,6 +158,7 @@ public class MatchConnector {
             }
             return matchGame;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
             return matchGame;
         } catch (Exception e) {
 

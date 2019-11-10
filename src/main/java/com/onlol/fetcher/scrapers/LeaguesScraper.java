@@ -3,11 +3,8 @@ package com.onlol.fetcher.scrapers;
 import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.FeaturedGameInterval;
-import com.onlol.fetcher.model.League;
-import com.onlol.fetcher.model.Region;
-import com.onlol.fetcher.repository.LeagueRepository;
-import com.onlol.fetcher.repository.RegionRepository;
+import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -36,6 +33,15 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
     @Autowired
     private LeagueRepository leagueRepository;
+
+    @Autowired
+    private LeagueRankRepository leagueRankRepository;
+
+    @Autowired
+    private LeagueTierRepository leagueTierRepository;
+
+    @Autowired
+    private GameQueueTypeRepository gameQueueTypeRepository;
 
     private boolean noLeaguesMessageShown = false;
 
@@ -142,7 +148,21 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     @Scheduled(cron = "0 1 1 * * ?")
     @PostConstruct //TODO: REMOVE, ONLY FOR TESTING
     public void getAllLeagues() {
-        //TODO: /lol/league/v4/entries/{queue}/{tier}/{division} + ALGUN TODO DE LIGAS Y PENDIENTESA
+//TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas. guardar 1 registro por dia, aunque cambie... el primero que llegue se queda.
+        this.logger.info("Scraping leagues by region, queue, tier and rank!");
+        List<Region> regions = this.regionRepository.findAll();
+        List<LeagueRank> leagueRanks = this.leagueRankRepository.findAll();
+        List<LeagueTier> leagueTiers = this.leagueTierRepository.findAll();
+        List<GameQueueType> gameQueueTypes = this.gameQueueTypeRepository.findAll();
+        for (Region region : regions) {
+            for (GameQueueType gameQueueType : gameQueueTypes) {
+                for (LeagueRank leagueRank : leagueRanks) {
+                    for (LeagueTier leagueTier : leagueTiers) {
+                        this.leaguesConnector.findLeague(region, gameQueueType, leagueRank, leagueTier);
+                    }
+                }
+            }
+        }
     }
 
 

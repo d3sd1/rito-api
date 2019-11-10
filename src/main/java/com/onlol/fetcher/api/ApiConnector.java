@@ -1,9 +1,6 @@
 package com.onlol.fetcher.api;
 
-import com.onlol.fetcher.exceptions.ApiBadRequestException;
-import com.onlol.fetcher.exceptions.ApiDownException;
-import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
-import com.onlol.fetcher.exceptions.DataNotfoundException;
+import com.onlol.fetcher.exceptions.*;
 import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.ApiCall;
 import com.onlol.fetcher.model.ApiKey;
@@ -36,19 +33,19 @@ public class ApiConnector {
     @Autowired
     private ApiCallRepository apiCallRepository;
 
-    public ApiCall get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+    public ApiCall get(String url) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException, ApiPageNumberInvalidException, ApiInvalidTierException {
         return this.get(url, false, Byte.decode("0"), null);
     }
 
-    public ApiCall get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException, ApiPageNumberInvalidException, ApiInvalidTierException {
         return this.get(url, needsApiKey, Byte.decode("0"), null);
     }
 
-    public ApiCall get(String url, boolean needsApiKey, ApiKey apiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey, ApiKey apiKey) throws DataNotfoundException, ApiUnauthorizedException, ApiBadRequestException, ApiDownException, ApiPageNumberInvalidException, ApiInvalidTierException {
         return this.get(url, needsApiKey, Byte.decode("0"), apiKey);
     }
 
-    public ApiCall get(String url, boolean needsApiKey, byte attempts, ApiKey apiKey) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException {
+    public ApiCall get(String url, boolean needsApiKey, byte attempts, ApiKey apiKey) throws DataNotfoundException, ApiBadRequestException, ApiUnauthorizedException, ApiDownException, ApiPageNumberInvalidException, ApiInvalidTierException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpEntity requestEntity = null;
@@ -84,7 +81,12 @@ public class ApiConnector {
                     A provided parameter is invalid (e.g., beginTime and startTime specify a time range that is too large).
                     A required parameter was not provided.
                      */
-                    this.logService.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. " + url + " with exception " + e.getMessage());
+                    if (e.getResponseBodyAsString().contains("Page number is invalid")) {
+                        throw new ApiPageNumberInvalidException();
+                    }
+                    if (e.getResponseBodyAsString().contains("Path parameter 'tier' must be one of")) {
+                        throw new ApiInvalidTierException();
+                    }
                     throw new ApiBadRequestException();
                 case 401:
                     /*
@@ -163,7 +165,7 @@ public class ApiConnector {
         return apiCall;
     }
 
-    public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, ApiKey apiKey, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException {
+    public ApiCall sleepGet(String url, boolean needsApiKey, Byte attempts, ApiKey apiKey, Exception e) throws ApiDownException, ApiUnauthorizedException, DataNotfoundException, ApiBadRequestException, ApiPageNumberInvalidException, ApiInvalidTierException {
         try {
             TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException ex) {

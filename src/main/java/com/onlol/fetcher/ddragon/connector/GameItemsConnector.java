@@ -89,6 +89,7 @@ public class GameItemsConnector {
             this.logger.info("Data not found, got exception");
             return;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
             return;
         } catch (Exception e) {
 
