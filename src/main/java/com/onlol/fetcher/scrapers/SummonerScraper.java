@@ -8,6 +8,7 @@ import com.onlol.fetcher.model.Summoner;
 import com.onlol.fetcher.model.SummonerToken;
 import com.onlol.fetcher.repository.SummonerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -47,6 +48,7 @@ public class SummonerScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 500)
     public void getSummonerInfo() {

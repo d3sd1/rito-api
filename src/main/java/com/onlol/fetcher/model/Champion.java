@@ -1,13 +1,11 @@
 package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Transactional
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Champion {
     @Id

@@ -220,21 +220,18 @@ public class LeaguesConnector {
     }
 
     public League updateLeague(League league, boolean forceDelete) {
-        League updatedLeague = null;
         try {
-
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_BY_ID
                             .replace("{{HOST}}", league.getRegion().getHostName())
                             .replace("{{LEAGUE_ID}}", league.getRiotId()),
                     true
             );
-            updatedLeague = this.jacksonMapper.reader(new InjectableValues.Std()
+            this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("region", league.getRegion())).forType(League.class).readValue(apiCall.getJson());
-
         } catch (DataNotfoundException e) {
-            // summoner not found (due to region or name change). Check it by summonerId if it's on DB, else, delete.
+            // league not found
             league.setDisabled(true);
             this.logger.info("Disabled league " + league.getLeagueTier());
             this.leagueRepository.save(league);
@@ -246,8 +243,8 @@ public class LeaguesConnector {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
-        return updatedLeague;
+        return this.leagueRepository.findByRiotId(league.getRiotId());
     }
 
 }
-// TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas
+//TODO: guardar top peak (liga actual) usuario y fecha en cada recarga para hacer graficas

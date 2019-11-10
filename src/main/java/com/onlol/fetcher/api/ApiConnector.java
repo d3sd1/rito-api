@@ -167,7 +167,7 @@ public class ApiConnector {
         try {
             TimeUnit.SECONDS.sleep(3);
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            // Not needed :), either, at shutdown, it may show unwanted errors.
         }
         // Prevent cycle. Retry only 3 times just in case.
         if (attempts < 3) {

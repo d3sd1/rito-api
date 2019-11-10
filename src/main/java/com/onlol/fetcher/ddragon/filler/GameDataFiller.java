@@ -6,6 +6,7 @@ import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -173,8 +174,13 @@ public class GameDataFiller {
             return matchGameTeam;
         }
 
-        matchGameTeam = new MatchGameTeam();
-        matchGameTeam.setTeamId(gameTeamId);
-        return this.matchGameTeamRepository.save(matchGameTeam);
+        try {
+            matchGameTeam = new MatchGameTeam();
+            matchGameTeam.setTeamId(gameTeamId);
+            this.matchGameTeamRepository.save(matchGameTeam);
+        } catch (DataIntegrityViolationException e) { // For concurrency
+
+        }
+        return matchGameTeam;
     }
 }

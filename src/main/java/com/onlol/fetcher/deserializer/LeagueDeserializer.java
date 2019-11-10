@@ -112,8 +112,6 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
             SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(currentLeagueItem.get("summonerId").textValue());
             Summoner summoner;
             if (summonerToken == null) { // Could not be reached by summoner id.
-
-
                 summonerToken = new SummonerToken();
                 summonerToken.setApiKey(apiKey);
                 summonerToken.setSummonerTokenId(currentLeagueItem.get("summonerId").textValue());

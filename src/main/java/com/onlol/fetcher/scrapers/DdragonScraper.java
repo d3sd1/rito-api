@@ -3,6 +3,7 @@ package com.onlol.fetcher.scrapers;
 import com.onlol.fetcher.ddragon.connector.*;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,6 +28,7 @@ public class DdragonScraper {
     private GameSummonerConnector gameSummonerConnector;
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameVersionsCron() {
@@ -34,6 +36,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameLanguagesCron() {
@@ -41,6 +44,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameChampionsCron() { // Used for retrieving all data
@@ -52,6 +56,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void championRotationCron() { // Used for retrieving all data
@@ -63,6 +68,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void seasonsCron() { // Used for retrieving all data
@@ -74,6 +80,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void queuesCron() { // Used for retrieving all data
@@ -84,6 +91,7 @@ public class DdragonScraper {
         }
     }
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void mapsCron() { // Used for retrieving all data
@@ -95,6 +103,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameModesQueue() { // Used for retrieving all data
@@ -106,6 +115,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void gameTypesQueue() { // Used for retrieving all data
@@ -117,6 +127,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void realmsCron() { // Used for retrieving all data
@@ -129,6 +140,7 @@ public class DdragonScraper {
 
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void itemsCron() { // Used for retrieving all data
@@ -141,6 +153,7 @@ public class DdragonScraper {
 
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void lolStatus() {
@@ -152,6 +165,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void summonerSpells() {
@@ -163,6 +177,7 @@ public class DdragonScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void summonerProfileImages() {

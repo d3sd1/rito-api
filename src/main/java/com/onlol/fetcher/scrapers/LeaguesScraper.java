@@ -11,6 +11,7 @@ import com.onlol.fetcher.repository.RegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,6 +40,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     private boolean noLeaguesMessageShown = false;
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void getChallengers() {
@@ -46,6 +48,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void getMasters() {
@@ -54,6 +57,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(cron = "0 1 1 * * ?")
     public void getGrandMasters() {
@@ -103,6 +107,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(fixedRate = 5000, initialDelay = 500)
     public void getSummonerInfo() {
@@ -129,5 +134,16 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
         league.setRetrieving(false);
         this.leagueRepository.save(league);
     }
+
+
+    @Async
+    @Lazy
+    @RequiresInitialSetup
+    @Scheduled(cron = "0 1 1 * * ?")
+    @PostConstruct //TODO: REMOVE, ONLY FOR TESTING
+    public void getAllLeagues() {
+        //TODO: /lol/league/v4/entries/{queue}/{tier}/{division} + ALGUN TODO DE LIGAS Y PENDIENTESA
+    }
+
 
 }

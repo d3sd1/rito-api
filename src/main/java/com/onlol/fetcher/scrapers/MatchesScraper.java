@@ -6,6 +6,7 @@ import com.onlol.fetcher.logger.LogService;
 import com.onlol.fetcher.model.MatchGame;
 import com.onlol.fetcher.repository.MatchGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,6 +41,7 @@ public class MatchesScraper {
     }
 
     @Async
+    @Lazy
     @RequiresInitialSetup
     @Scheduled(fixedRate = 1000, initialDelay = 500)
     public void getMatches() {/*
