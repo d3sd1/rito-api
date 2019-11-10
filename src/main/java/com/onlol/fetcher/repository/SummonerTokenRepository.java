@@ -14,5 +14,7 @@ public interface SummonerTokenRepository extends JpaRepository<SummonerToken, In
 
     List<SummonerToken> findBySummoner(Summoner summoner);
 
+    SummonerToken findTopBySummoner(Summoner summoner);
+
     SummonerToken findBySummonerTokenId(String summonerTokenId);
 }
