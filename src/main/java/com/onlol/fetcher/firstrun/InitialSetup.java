@@ -102,7 +102,7 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.gameInfoConnector.versions();
     }
     private void challengerLadderInit() {
-        this.leaguesConnector.challengerLadderGlobal(true);
+        this.leaguesConnector.challengerLadderGlobal();
     }
 
     private void gameLanguagesInit() {
@@ -153,10 +153,10 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
         this.gameDataConnector.gameTypes();
     }
     private void masterLadderInit() {
-        this.leaguesConnector.masterLadderGlobal(true);
+        this.leaguesConnector.masterLadderGlobal();
     }
     private void grandMasterLadderInit() {
-        this.leaguesConnector.grandMasterLadderGlobal(true);
+        this.leaguesConnector.grandMasterLadderGlobal();
     }
     private void lolStatusInit() {
         this.gameInfoConnector.statusShard();

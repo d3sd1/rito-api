@@ -60,7 +60,6 @@ public class LeagueDeserializer extends StdDeserializer<SummonerLeague> {
         Iterator<JsonNode> summonerLeagueItr = summonerLeagueNode.get("entries").elements();
         ApiKey apiKey = (ApiKey) ctxt.findInjectableValue("apiKey", null, null);
         Region region = (Region) ctxt.findInjectableValue("region", null, null);
-        boolean initialSetup = (boolean) ctxt.findInjectableValue("initialSetup", null, null);
 
         /* Find and save league tier */
         String tier = summonerLeagueNode.get("tier").textValue();
