@@ -220,6 +220,7 @@ public class LeaguesConnector {
     }
 
     public League updateLeague(League league, boolean forceDelete) {
+        League updatedLeague = null;
         try {
 
             ApiCall apiCall = this.apiConnector.get(
@@ -228,7 +229,7 @@ public class LeaguesConnector {
                             .replace("{{LEAGUE_ID}}", league.getRiotId()),
                     true
             );
-            this.jacksonMapper.reader(new InjectableValues.Std()
+            updatedLeague = this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("region", league.getRegion())).forType(League.class).readValue(apiCall.getJson());
 
@@ -245,7 +246,7 @@ public class LeaguesConnector {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
-        return league;
+        return updatedLeague;
     }
 
 }

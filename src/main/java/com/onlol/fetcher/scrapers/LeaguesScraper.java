@@ -104,7 +104,7 @@ public class LeaguesScraper implements ApplicationListener<ApplicationStartedEve
 
     @Async
     @RequiresInitialSetup
-    @Scheduled(fixedRate = 3000, initialDelay = 500)
+    @Scheduled(fixedRate = 5000, initialDelay = 500)
     public void getSummonerInfo() {
         League league = this.leagueRepository.findTopByRetrievingIsFalseAndDisabledIsFalseOrderByLastTimeUpdated();
         if (league == null) {
