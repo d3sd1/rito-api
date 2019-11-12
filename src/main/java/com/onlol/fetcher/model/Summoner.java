@@ -39,9 +39,6 @@ public class Summoner {
     @Column(nullable = false, unique = false)
     private Boolean inGame = false;
 
-    @Column(nullable = false, unique = false)
-    private LocalDateTime lastInGameCheck = LocalDateTime.of(2010, 9, 9, 0, 0);
-
     @OneToOne
     private Region region;
 
@@ -125,14 +122,6 @@ public class Summoner {
         this.inGame = inGame;
     }
 
-    public LocalDateTime getLastInGameCheck() {
-        return lastInGameCheck;
-    }
-
-    public void setLastInGameCheck(LocalDateTime lastInGameCheck) {
-        this.lastInGameCheck = lastInGameCheck;
-    }
-
     @Override
     public String toString() {
         return "Summoner{" +
@@ -145,7 +134,6 @@ public class Summoner {
                 ", lastTimeUpdated=" + lastTimeUpdated +
                 ", retrieving=" + retrieving +
                 ", inGame=" + inGame +
-                ", lastInGameCheck=" + lastInGameCheck +
                 ", region=" + region +
                 '}';
     }

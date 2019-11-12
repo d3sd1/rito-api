@@ -139,32 +139,33 @@ public class LiveGameDeserializer extends StdDeserializer<FeaturedGameInterval> 
             liveGameParticipant.setTeam(this.gameDataFiller.fillGameTeam(currentSummonerNode.get("teamId").intValue()));
 
 
-            Iterator<JsonNode> customizationObjects = currentNode.get("gameCustomizationObjects").elements();
-            ArrayList<LiveGameParticipantCustomization> liveGameParticipantCustomizations = new ArrayList<>();
-            while (customizationObjects.hasNext()) {
-                JsonNode currentObjectNode = customizationObjects.next();
-                LiveGameParticipantCustomization liveGameParticipantCustomization = this.liveGameParticipantCustomizationRepository.findTopByCategoryAndContent(currentObjectNode.get("category").textValue(), currentObjectNode.get("content").textValue());
-                if (liveGameParticipantCustomization == null) {
-                    liveGameParticipantCustomization = new LiveGameParticipantCustomization();
-                    liveGameParticipantCustomization.setCategory(currentObjectNode.get("category").textValue());
-                    liveGameParticipantCustomization.setContent(currentObjectNode.get("content").textValue());
-                    this.liveGameParticipantCustomizationRepository.save(liveGameParticipantCustomization);
+            if (currentSummonerNode.get("gameCustomizationObjects") != null) {
+                Iterator<JsonNode> customizationObjects = currentSummonerNode.get("gameCustomizationObjects").elements();
+                ArrayList<LiveGameParticipantCustomization> liveGameParticipantCustomizations = new ArrayList<>();
+                while (customizationObjects.hasNext()) {
+                    JsonNode currentObjectNode = customizationObjects.next();
+                    LiveGameParticipantCustomization liveGameParticipantCustomization = this.liveGameParticipantCustomizationRepository.findTopByCategoryAndContent(currentObjectNode.get("category").textValue(), currentObjectNode.get("content").textValue());
+                    if (liveGameParticipantCustomization == null) {
+                        liveGameParticipantCustomization = new LiveGameParticipantCustomization();
+                        liveGameParticipantCustomization.setCategory(currentObjectNode.get("category").textValue());
+                        liveGameParticipantCustomization.setContent(currentObjectNode.get("content").textValue());
+                        this.liveGameParticipantCustomizationRepository.save(liveGameParticipantCustomization);
+                    }
+                    liveGameParticipantCustomizations.add(liveGameParticipantCustomization);
                 }
-                liveGameParticipantCustomizations.add(liveGameParticipantCustomization);
+                liveGameParticipant.setGameCustomizationObjects(liveGameParticipantCustomizations);
             }
-            liveGameParticipant.setGameCustomizationObjects(liveGameParticipantCustomizations);
-
 
             //One time update only needed.
             LiveGameParticipantPerks liveGameParticipantPerks = liveGameParticipant.getLiveGameParticipantPerks();
             if (liveGameParticipantPerks == null) {
                 ArrayList<Perk> participantPerks = new ArrayList<>();
-                if (currentNode.get("perks").get("perkIds").isArray()) {
-                    for (final JsonNode objNode : currentNode.get("perks").get("perkIds")) {
+                liveGameParticipantPerks = new LiveGameParticipantPerks();
+                if (currentSummonerNode.get("perks").get("perkIds").isArray()) {
+                    for (final JsonNode objNode : currentSummonerNode.get("perks").get("perkIds")) {
                         Optional<Perk> foundPerk = this.perkRepository.findById(objNode.longValue());
                         Perk realPerk;
-                        if (!foundPerk.isPresent()) {
-
+                        if (foundPerk.isEmpty()) {
                             realPerk = new Perk();
                             realPerk.setId(objNode.longValue());
                             this.perkRepository.save(realPerk);
@@ -174,8 +175,8 @@ public class LiveGameDeserializer extends StdDeserializer<FeaturedGameInterval> 
                         participantPerks.add(realPerk);
                     }
                 }
-                liveGameParticipantPerks.setPerkStyle(currentNode.get("perks").get("perkStyle").longValue());
-                liveGameParticipantPerks.setPerkSubStyle(currentNode.get("perks").get("perkSubStyle").longValue());
+                liveGameParticipantPerks.setPerkStyle(currentSummonerNode.get("perks") != null ? currentSummonerNode.get("perks").get("perkStyle").longValue() : null);
+                liveGameParticipantPerks.setPerkSubStyle(currentSummonerNode.get("perks") != null ? currentSummonerNode.get("perks").get("perkSubStyle").longValue() : null);
                 this.liveGameParticipantPerksRepository.save(liveGameParticipantPerks);
             }
 

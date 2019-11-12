@@ -118,9 +118,11 @@ public class SummonerConnector {
                     true,
                     summonerToken.getApiKey()
             );
+            this.logger.info("Summoner INGAME: " + summonerToken.getSummoner().getName());
             this.jacksonMapper.reader(new InjectableValues.Std()
                     .addValue("apiKey", apiCall.getApiKey())
-                    .addValue("summoner", summonerToken.getSummoner())).forType(SummonerChampionMastery.class).readValue(apiCall.getJson());
+                    .addValue("region", summonerToken.getSummoner().getRegion())
+                    .addValue("summoner", summonerToken.getSummoner())).forType(LiveGame.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
             // Check if he had previous games...
             //TODO: remove game from liveGames if it exists, searched by summoner.
@@ -129,6 +131,7 @@ public class SummonerConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             if(e.getMessage() != null) {
                 this.logger.error("Got generic exception" + e.getMessage());
             }

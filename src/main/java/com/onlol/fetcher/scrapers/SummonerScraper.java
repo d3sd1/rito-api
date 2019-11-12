@@ -73,11 +73,7 @@ public class SummonerScraper {
         }
         this.leaguesConnector.summonerLeagues(summonerToken);
         this.summonerConnector.championMastery(summonerToken);
-
-        if (summoner.getLastInGameCheck().plusMinutes(3).isBefore(LocalDateTime.now())) {
-            this.summonerConnector.inGame(summonerToken);
-            summoner.setLastInGameCheck(LocalDateTime.now());
-        }
+        this.summonerConnector.inGame(summonerToken);
 
         summoner = summonerToken.getSummoner();
         summoner.setRetrieving(false);
