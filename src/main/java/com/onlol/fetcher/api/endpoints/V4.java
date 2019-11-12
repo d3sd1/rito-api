@@ -27,4 +27,5 @@ public class V4 {
     public static final String LEAGUES_MASTER = "https://{{HOST}}/lol/league/v4/masterleagues/by-queue/{{QUEUE}}";
     public static final String LEAGUES_BY_ID = "https://{{HOST}}/lol/league/v4/leagues/{{LEAGUE_ID}}";
     public static final String LEAGUES_BY_QUEUE_TIER_DIVISION = "https://{{HOST}}/lol/league/v4/entries/{{LEAGUE_QUEUE}}/{{LEAGUE_TIER}}/{{LEAGUE_DIVISION}}?page={{PAGE_NUMBER}}";
+    public static final String SUMMONER_ACTIVE_GAME = "https://{{HOST}}/lol/spectator/v4/active-games/by-summoner/{{SUMMONER_ID}";
 }

@@ -10,10 +10,7 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.ApiCall;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerChampionMastery;
-import com.onlol.fetcher.model.SummonerToken;
+import com.onlol.fetcher.model.*;
 import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
 import com.onlol.fetcher.repository.SummonerRepository;
 import com.onlol.fetcher.repository.SummonerTokenRepository;
@@ -105,10 +102,34 @@ public class SummonerConnector {
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
         } catch (Exception e) {
-            if(e.getMessage() != null) {
+            if (e.getMessage() != null) {
                 this.logger.error("Got generic exception" + e.getMessage());
             }
         }
         return this.summonerChampionMasteryRepository.findBySummoner(summonerToken.getSummoner());
+    }
+
+    public LiveGame inGame(SummonerToken summonerToken) {
+        try {
+            ApiCall apiCall = this.apiConnector.get(
+                    V4.SUMMONER_ACTIVE_GAME
+                            .replace("{{SUMMONER_ID}}", summonerToken.getSummonerTokenId())
+                            .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName()),
+                    true,
+                    summonerToken.getApiKey()
+            );
+            this.jacksonMapper.reader(new InjectableValues.Std()
+                    .addValue("apiKey", apiCall.getApiKey())
+                    .addValue("summoner", summonerToken.getSummoner())).forType(SummonerChampionMastery.class).readValue(apiCall.getJson());
+        } catch (DataNotfoundException e) {
+            this.logger.info("Data not found, got exception");
+        } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
+        } catch (Exception e) {
+            if(e.getMessage() != null) {
+                this.logger.error("Got generic exception" + e.getMessage());
+            }
+        }
+        return null;
     }
 }

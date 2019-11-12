@@ -179,7 +179,7 @@ public class GameDataFiller {
             matchGameTeam.setTeamId(gameTeamId);
             this.matchGameTeamRepository.save(matchGameTeam);
         } catch (DataIntegrityViolationException e) { // For concurrency
-
+            return this.matchGameTeamRepository.findByTeamId(gameTeamId);
         }
         return matchGameTeam;
     }
