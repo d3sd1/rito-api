@@ -122,7 +122,10 @@ public class SummonerConnector {
                     .addValue("apiKey", apiCall.getApiKey())
                     .addValue("summoner", summonerToken.getSummoner())).forType(SummonerChampionMastery.class).readValue(apiCall.getJson());
         } catch (DataNotfoundException e) {
-            this.logger.info("Data not found, got exception");
+            // Check if he had previous games...
+            //TODO: remove game from liveGames if it exists, searched by summoner.
+            //TODO: also link liveGame with summoners and/or participants
+            this.logger.info("Summoner is not in game: " + summonerToken.getSummoner().getName());
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
             this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
         } catch (Exception e) {

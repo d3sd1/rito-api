@@ -118,7 +118,7 @@ public class FeaturedGameIntervalDeserializer extends StdDeserializer<FeaturedGa
             this.featuredGameRepository.save(featuredGame);
 
 
-            ArrayList<FeaturedGameParticipant> gameParticipants = new ArrayList<>();
+            ArrayList<LiveGameParticipant> gameParticipants = new ArrayList<>();
             Iterator<JsonNode> participants = currentNode.get("participants").elements();
             while (participants.hasNext()) {
                 JsonNode currentSummonerNode = participants.next();
@@ -129,14 +129,14 @@ public class FeaturedGameIntervalDeserializer extends StdDeserializer<FeaturedGa
                     currentSummoner.setName(currentSummonerNode.get("summonerName").textValue());
                     this.summonerRepository.save(currentSummoner);
                 }
-                FeaturedGameParticipant featuredGameParticipant = new FeaturedGameParticipant(); // It's gonna be always null since we are ading game. Checking not needed.
-                featuredGameParticipant.setBot(currentSummonerNode.get("bot").booleanValue());
-                featuredGameParticipant.setChampion(this.gameDataFiller.fillChampion(currentSummonerNode.get("championId").longValue()));
-                featuredGameParticipant.setSummoner(currentSummoner);
-                featuredGameParticipant.setSummonerSpell1(this.gameSummonerFiller.fillSummonerSpell(currentSummonerNode.get("spell1Id").intValue()));
-                featuredGameParticipant.setSummonerSpell2(this.gameSummonerFiller.fillSummonerSpell(currentSummonerNode.get("spell2Id").intValue()));
-                featuredGameParticipant.setTeam(this.gameDataFiller.fillGameTeam(currentSummonerNode.get("teamId").intValue()));
-                this.featuredGameParticipantRepository.save(featuredGameParticipant);
+                LiveGameParticipant liveGameParticipant = new LiveGameParticipant(); // It's gonna be always null since we are ading game. Checking not needed.
+                liveGameParticipant.setBot(currentSummonerNode.get("bot").booleanValue());
+                liveGameParticipant.setChampion(this.gameDataFiller.fillChampion(currentSummonerNode.get("championId").longValue()));
+                liveGameParticipant.setSummoner(currentSummoner);
+                liveGameParticipant.setSummonerSpell1(this.gameSummonerFiller.fillSummonerSpell(currentSummonerNode.get("spell1Id").intValue()));
+                liveGameParticipant.setSummonerSpell2(this.gameSummonerFiller.fillSummonerSpell(currentSummonerNode.get("spell2Id").intValue()));
+                liveGameParticipant.setTeam(this.gameDataFiller.fillGameTeam(currentSummonerNode.get("teamId").intValue()));
+                this.featuredGameParticipantRepository.save(liveGameParticipant);
             }
             featuredGame.setPlayers(gameParticipants);
             this.featuredGameRepository.save(featuredGame);

@@ -76,6 +76,7 @@ public class SummonerScraper {
 
         if (summoner.getLastInGameCheck().plusMinutes(3).isBefore(LocalDateTime.now())) {
             this.summonerConnector.inGame(summonerToken);
+            summoner.setLastInGameCheck(LocalDateTime.now());
         }
 
         summoner = summonerToken.getSummoner();

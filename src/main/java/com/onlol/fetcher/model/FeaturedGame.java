@@ -46,7 +46,7 @@ public class FeaturedGame {
     private String observerKey;
 
     @ManyToMany
-    private List<FeaturedGameParticipant> players;
+    private List<LiveGameParticipant> players;
 
     @ManyToMany
     private List<ChampionBan> bans;
@@ -131,11 +131,11 @@ public class FeaturedGame {
         this.observerKey = observerKey;
     }
 
-    public List<FeaturedGameParticipant> getPlayers() {
+    public List<LiveGameParticipant> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ArrayList<FeaturedGameParticipant> players) {
+    public void setPlayers(ArrayList<LiveGameParticipant> players) {
         this.players = players;
     }
 

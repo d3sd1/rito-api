@@ -1,10 +1,9 @@
 package com.onlol.fetcher.repository;
 
-import com.onlol.fetcher.model.LiveGameParticipant;
+import com.onlol.fetcher.model.LiveGameParticipantPerks;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FeaturedGameParticipantRepository extends JpaRepository<LiveGameParticipant, Integer> {
-
+public interface LiveGameParticipantPerksRepository extends JpaRepository<LiveGameParticipantPerks, Long> {
 }

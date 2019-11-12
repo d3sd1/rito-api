@@ -2,7 +2,7 @@ package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.onlol.fetcher.deserializer.FeaturedGameIntervalDeserializer;
+import com.onlol.fetcher.deserializer.LiveGameDeserializer;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,12 +11,12 @@ import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(using = FeaturedGameIntervalDeserializer.class)
+@JsonDeserialize(using = LiveGameDeserializer.class)
 public class LiveGame {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, unique = false)
     private Long gameId; // TEMPORAL GAME ID. DO NOT USE @ONETOONE!!!!!
@@ -46,16 +46,16 @@ public class LiveGame {
     private String observerKey;
 
     @ManyToMany
-    private List<FeaturedGameParticipant> players;
+    private List<LiveGameParticipant> players;
 
     @ManyToMany
     private List<ChampionBan> bans;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -131,11 +131,11 @@ public class LiveGame {
         this.observerKey = observerKey;
     }
 
-    public List<FeaturedGameParticipant> getPlayers() {
+    public List<LiveGameParticipant> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ArrayList<FeaturedGameParticipant> players) {
+    public void setPlayers(ArrayList<LiveGameParticipant> players) {
         this.players = players;
     }
 

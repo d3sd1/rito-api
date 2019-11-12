@@ -220,6 +220,11 @@ public class LeaguesConnector {
 
     public League updateLeague(League league, boolean forceDelete) {
         try {
+            //TODO: solve region nullpointer...
+            if (league.getRegion() == null) {
+                System.out.println("//TODO: solve nullpointer on leagues.");
+                return null;
+            }
             ApiCall apiCall = this.apiConnector.get(
                     V4.LEAGUES_BY_ID
                             .replace("{{HOST}}", league.getRegion().getHostName())

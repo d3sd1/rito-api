@@ -3,6 +3,7 @@ package com.onlol.fetcher.ddragon.filler;
 import com.onlol.fetcher.ddragon.model.DDSummonerImageDTO;
 import com.onlol.fetcher.ddragon.model.DDSummonerSpellDTO;
 import com.onlol.fetcher.model.*;
+import com.onlol.fetcher.repository.GameVersionRepository;
 import com.onlol.fetcher.repository.SummonerProfileImageRepository;
 import com.onlol.fetcher.repository.SummonerSpellLanguageRepository;
 import com.onlol.fetcher.repository.SummonerSpellRepository;
@@ -26,6 +27,9 @@ public class GameSummonerFiller {
 
     @Autowired
     private SummonerProfileImageRepository summonerProfileImageRepository;
+
+    @Autowired
+    private GameVersionRepository gameVersionRepository;
 
     /* Fill only by ID here */
     public SummonerSpell fillSummonerSpell(Integer id) {
@@ -96,6 +100,9 @@ public class GameSummonerFiller {
         return this.summonerSpellLanguageRepository.save(summonerSpellLanguage);
     }
 
+    public SummonerProfileImage fillSummonerProfileImage(Integer summonerIconId) {
+        return this.summonerProfileImageRepository.findByIdAndGameVersion(summonerIconId, this.gameVersionRepository.findTopByOrderByIdDesc());
+    }
     public SummonerProfileImage fillSummonerProfileImage(DDSummonerImageDTO sampleSummonerImage, GameVersion gameVersion) {
         SummonerProfileImage summonerProfileImage = this.summonerProfileImageRepository.findByIdAndGameVersion(sampleSummonerImage.getId(), gameVersion);
         if (summonerProfileImage != null) {

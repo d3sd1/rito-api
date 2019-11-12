@@ -1,19 +1,17 @@
 package com.onlol.fetcher.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.onlol.fetcher.deserializer.FeaturedGameIntervalDeserializer;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonDeserialize(using = FeaturedGameIntervalDeserializer.class)
-public class FeaturedGameParticipant {
+public class LiveGameParticipant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private Integer id;
+    private Long id;
 
     @OneToOne
     private Summoner summoner;
@@ -33,11 +31,20 @@ public class FeaturedGameParticipant {
     @OneToOne
     private MatchGameTeam team;
 
-    public Integer getId() {
+    @OneToOne
+    private SummonerProfileImage summonerIcon;
+
+    @ManyToMany
+    private List<LiveGameParticipantCustomization> gameCustomizationObjects;
+
+    @OneToOne
+    private LiveGameParticipantPerks liveGameParticipantPerks;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -89,16 +96,27 @@ public class FeaturedGameParticipant {
         this.team = team;
     }
 
-    @Override
-    public String toString() {
-        return "FeaturedGameParticipant{" +
-                "id=" + id +
-                ", summoner=" + summoner +
-                ", champion=" + champion +
-                ", bot=" + bot +
-                ", summonerSpell1=" + summonerSpell1 +
-                ", summonerSpell2=" + summonerSpell2 +
-                ", team=" + team +
-                '}';
+    public SummonerProfileImage getSummonerIcon() {
+        return summonerIcon;
+    }
+
+    public void setSummonerIcon(SummonerProfileImage summonerIcon) {
+        this.summonerIcon = summonerIcon;
+    }
+
+    public List<LiveGameParticipantCustomization> getGameCustomizationObjects() {
+        return gameCustomizationObjects;
+    }
+
+    public void setGameCustomizationObjects(List<LiveGameParticipantCustomization> gameCustomizationObjects) {
+        this.gameCustomizationObjects = gameCustomizationObjects;
+    }
+
+    public LiveGameParticipantPerks getLiveGameParticipantPerks() {
+        return liveGameParticipantPerks;
+    }
+
+    public void setLiveGameParticipantPerks(LiveGameParticipantPerks liveGameParticipantPerks) {
+        this.liveGameParticipantPerks = liveGameParticipantPerks;
     }
 }
