@@ -5,7 +5,7 @@ package com.onlol.fetcher.api.model;
  */
 public class ApiTeamBansDTO {
     private Integer pickTurn = 0; // Turn during which the champion was banned.
-    private Integer championId = 0; // Banned championId.
+    private Long championId = 0L; // Banned championId.
 
     public Integer getPickTurn() {
         return pickTurn;
@@ -15,11 +15,11 @@ public class ApiTeamBansDTO {
         this.pickTurn = pickTurn;
     }
 
-    public Integer getChampionId() {
+    public Long getChampionId() {
         return championId;
     }
 
-    public void setChampionId(Integer championId) {
+    public void setChampionId(Long championId) {
         this.championId = championId;
     }
 

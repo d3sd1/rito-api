@@ -60,6 +60,9 @@ public class MatchGame {
     @OneToMany
     private List<MatchGameParticipant> matchGameParticipants;
 
+    @OneToMany
+    private List<MatchGameTeamStats> matchGameTeamStats;
+
     public Long getId() {
         return id;
     }
@@ -188,15 +191,24 @@ public class MatchGame {
         this.matchGameParticipants = matchGameParticipants;
     }
 
+    public List<MatchGameTeamStats> getMatchGameTeamStats() {
+        return matchGameTeamStats;
+    }
+
+    public void setMatchGameTeamStats(List<MatchGameTeamStats> matchGameTeamStats) {
+        this.matchGameTeamStats = matchGameTeamStats;
+    }
+
     @Override
     public String toString() {
         return "MatchGame{" +
-                "gameId=" + gameId +
+                "id=" + id +
+                ", gameId=" + gameId +
                 ", retrieved=" + retrieved +
                 ", retrieving=" + retrieving +
                 ", expired=" + expired +
-                ", season=" + gameSeason +
-                ", queue=" + gameQueue +
+                ", gameSeason=" + gameSeason +
+                ", gameQueue=" + gameQueue +
                 ", gameVersion='" + gameVersion + '\'' +
                 ", region=" + region +
                 ", gameMap=" + gameMap +
@@ -206,6 +218,7 @@ public class MatchGame {
                 ", gameCreation=" + gameCreation +
                 ", matchGameTeam=" + matchGameTeam +
                 ", matchGameParticipants=" + matchGameParticipants +
+                ", matchGameTeamStats=" + matchGameTeamStats +
                 '}';
     }
 }

@@ -146,7 +146,7 @@ public class MatchConnector {
                             .replace("{{HOST}}", matchGame.getRegion().getHostName()),
                     true
             );
-            apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchlistDto>() {
+            apiMatchDTO = this.jacksonMapper.readValue(apiCall.getJson(), new TypeReference<ApiMatchDTO>() {
             });
         } catch (DataNotfoundException e) {
             this.logger.info("El match no existe..." + matchGame.getGameId().toString());

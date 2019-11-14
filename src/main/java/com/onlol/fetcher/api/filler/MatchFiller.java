@@ -1,19 +1,16 @@
 package com.onlol.fetcher.api.filler;
 
-import com.onlol.fetcher.api.model.ApiMatchDTO;
-import com.onlol.fetcher.api.model.ApiMatchReferenceDTO;
-import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
+import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.ddragon.filler.GameDataFiller;
 import com.onlol.fetcher.ddragon.filler.GameInfoFiller;
 import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.MatchGameRepository;
-import com.onlol.fetcher.repository.MatchListRepository;
-import com.onlol.fetcher.repository.RegionRepository;
-import com.onlol.fetcher.repository.SummonerRepository;
+import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MatchFiller {
@@ -27,6 +24,12 @@ public class MatchFiller {
     private MatchListRepository matchListRepository;
 
     @Autowired
+    private MatchGameTeamRepository matchGameTeamRepository;
+
+    @Autowired
+    private MatchGameTeamStatsRepository matchGameTeamStatsRepository;
+
+    @Autowired
     private GameDataFiller gameDataFiller;
 
     @Autowired
@@ -36,7 +39,16 @@ public class MatchFiller {
     private RegionRepository regionRepository;
 
     @Autowired
-    private SummonerFiller summonerFiller;
+    private SummonerTokenRepository summonerTokenRepository;
+
+    @Autowired
+    private MatchGameParticipantRepository matchGameParticipantRepository;
+
+    @Autowired
+    private ChampionRepository championRepository;
+
+    @Autowired
+    private MatchGameTeamBanRepository matchGameTeamBanRepository;
 
 
     public MatchList fillMatchListGame(ApiMatchReferenceDTO apiMatchReferenceDto, SummonerToken summonerToken) {
@@ -122,14 +134,49 @@ public class MatchFiller {
         /* Add summoners to update */
         for (
                 ApiParticipantIdentityDTO apiParticipantIdentityDTO : apiMatchDTO.getParticipantIdentities()) {
-            /* If the same summoner to update, return riot real id. */
-            String[] riotIdSplitted = apiParticipantIdentityDTO.getPlayer().getMatchHistoryUri().split("/");
-            Long currentRiotRealId = Long.parseLong(riotIdSplitted[riotIdSplitted.length - 1]);
+            String summonerId = apiParticipantIdentityDTO.getPlayer().getSummonerId();
+            String summonerName = apiParticipantIdentityDTO.getPlayer().getSummonerName();
 
-            //TODO this.summonerFiller.fillSummoner(apiParticipantIdentityDTO, region, apiKey, currentRiotRealId);
+            /*
+            First try to reach summoner by id. If null, by name and region.
+
+            Check if user has previous tokens. Use cases:
+            1. Hasn't got -> New summoner.
+            2. Has >= 1, and internal summoner ID matchs -> update summoner, since it's the same
+            3. Has >= 1, and internal summoner ID does not match -> new summoner
+             */
+            SummonerToken summonerToken = this.summonerTokenRepository.findBySummonerTokenId(summonerId);
+            Summoner summoner;
+            if (summonerToken == null) { // Could not be reached by summoner id.
+                summonerToken = new SummonerToken();
+                summonerToken.setApiKey(apiKey);
+                summonerToken.setSummonerTokenId(summonerId);
+                summoner = this.summonerRepository.findOneByRegionAndName(region, summonerName);
+                if (summoner == null) {
+                    summoner = new Summoner();
+                    summoner.setRegion(region);
+                    summoner.setName(summonerName);
+                    this.summonerRepository.save(summoner);
+                } else {
+                    // Get summoner from database for a good linking
+                    SummonerToken summonerDbToken = this.summonerTokenRepository.findTopBySummoner(summoner);
+                    if (summonerDbToken != null) { // Summoner has tokens
+                        summoner = summonerDbToken.getSummoner();
+                    }
+                }
+
+                summonerToken.setSummoner(summoner);
+                this.summonerTokenRepository.save(summonerToken);
+            } else {
+                summoner = summonerToken.getSummoner();
+            }
         }
 
-        /* Match game stats * TODO
+        /*Match game stats */
+        List<MatchGameTeamStats> matchGameTeamStatsList = matchGame.getMatchGameTeamStats();
+        if (matchGameTeamStatsList == null) {
+            matchGameTeamStatsList = new ArrayList<>();
+        }
 
         for (ApiTeamStatsDTO apiTeamStatsDto : apiMatchDTO.getTeams()) {
             MatchGameTeam matchGameTeam = this.matchGameTeamRepository.findByTeamId(apiTeamStatsDto.getTeamId());
@@ -138,12 +185,10 @@ public class MatchFiller {
                 matchGameTeam.setTeamId(apiTeamStatsDto.getTeamId());
                 matchGameTeam = this.matchGameTeamRepository.save(matchGameTeam);
             }
-            MatchGameTeamStats matchGameTeamStats = this.matchGameTeamStatsRepository.
-                    findByGameIdAndTeam(apiMatchDTO.getGameId(), matchGameTeam);
+            MatchGameTeamStats matchGameTeamStats = new MatchGameTeamStats();
 
             if (matchGameTeamStats == null) {
                 MatchGameTeamStats dbMatchGameTeamStats = new MatchGameTeamStats();
-                dbMatchGameTeamStats.setGameId(apiMatchDTO.getGameId());
                 dbMatchGameTeamStats.setTeam(matchGameTeam);
 
                 matchGameTeamStats = this.matchGameTeamStatsRepository.save(dbMatchGameTeamStats);
@@ -163,7 +208,7 @@ public class MatchFiller {
             matchGameTeamStats.setDominionVictoryScore(apiTeamStatsDto.getDominionVictoryScore());
             matchGameTeamStats.setWon(apiTeamStatsDto.getWin().equalsIgnoreCase("Win"));
 
-            /* Fill bans for team just if not set (IMPORTANT) *
+            /* Fill bans for team just if not set (IMPORTANT) */
 
             if (matchGameTeamStats.getBans() == null) {
                 ArrayList<MatchGameTeamBan> matchGameTeamBans = new ArrayList<>();
@@ -180,34 +225,14 @@ public class MatchFiller {
 
             this.matchGameTeamStatsRepository.save(matchGameTeamStats);
         }
+        matchGame.setMatchGameTeamStats(matchGameTeamStatsList);
 
-        /* Fill participants *
+        /* Fill participants */
         for (
                 ApiParticipantIdentityDTO apiParticipantIdentityDto : apiMatchDTO.getParticipantIdentities()) {
-            Optional<Summoner> opsummoner = this.summonerRepository.findById(apiParticipantIdentityDto.getPlayer().getSummonerId());
-            Summoner summoner;
-            if (opsummoner.isEmpty()) {
-                summoner = new Summoner();
-                summoner.setRegion(matchGame.getRegion());
-                summoner.setId(apiParticipantIdentityDto.getPlayer().getSummonerId());
-                summoner = this.summonerRepository.save(summoner);
-            } else {
-                summoner = opsummoner.get();
-            }
-            MatchGameParticipant matchGameParticipant = this.matchGameParticipantRepository.
-                    findBySummonerAndMatchGame(summoner, matchGame);
-            if (matchGameParticipant == null) {
-                matchGameParticipant = new MatchGameParticipant();
-                matchGameParticipant.setSummoner(summoner);
-                apiMatchDTO.get
-                matchGameParticipant.setMatchGame(matchGame);
-                //TODO: agregar todos los setter de matchGameParticipant
-                matchGameParticipant = this.matchGameParticipantRepository.save(matchGameParticipant);
-            }
-            //matchGameParticipant.set
-
-            this.matchGameParticipantRepository.save(matchGameParticipant);
-        }*/
+            // TODO
+            //this.matchGameParticipantRepository.save(matchGameParticipant);
+        }
         return null;
     }
 }
