@@ -110,6 +110,7 @@ public class SummonerConnector {
     }
 
     public LiveGame inGame(SummonerToken summonerToken) {
+        //TODO: optimizar esto... si ya esta en partida porque esta asociado a un livegame, devolverlo directamente en lugar de mandar request
         try {
             ApiCall apiCall = this.apiConnector.get(
                     V4.SUMMONER_ACTIVE_GAME

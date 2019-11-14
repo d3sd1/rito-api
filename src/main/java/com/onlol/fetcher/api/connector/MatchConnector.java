@@ -95,7 +95,7 @@ public class MatchConnector {
         try {
             apiCall = this.apiConnector.get(
                     V4.MATCHLIST_BY_ACCOUNT
-                            .replace("{{SUMMONER_ACCOUNT}}", summonerToken.getSummonerTokenId())
+                            .replace("{{SUMMONER_ACCOUNT}}", summonerToken.getAccountTokenId())
                             .replace("{{HOST}}", summonerToken.getSummoner().getRegion().getHostName())
                             .replace("{{BEGIN_INDEX}}", beginIndex.toString()),
                     true,
@@ -107,6 +107,7 @@ public class MatchConnector {
             this.logger.info("Data not found, got exception");
             return matchLists;
         } catch (ApiBadRequestException | ApiUnauthorizedException | ApiDownException e) {
+            e.printStackTrace();
             this.logger.error("ACTION REQUIRED. Malformed URL has thrown a 400 BAD REQUEST CODE. With exception " + e.getMessage());
             return matchLists;
         } catch (Exception e) {

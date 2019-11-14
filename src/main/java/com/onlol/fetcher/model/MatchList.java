@@ -26,9 +26,6 @@ public class MatchList {
     private Champion champ; // champion int
 
     @OneToOne
-    private Region region; // platformId string
-
-    @OneToOne
     private GameSeason gameSeason; // season int
 
     @OneToOne
@@ -80,14 +77,6 @@ public class MatchList {
         this.champ = champ;
     }
 
-    public Region getRegion() {
-        return region;
-    }
-
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-
     public GameSeason getGameSeason() {
         return gameSeason;
     }
@@ -128,7 +117,6 @@ public class MatchList {
                 ", match=" + match +
                 ", summoner=" + summoner +
                 ", champ=" + champ +
-                ", region=" + region +
                 ", season=" + gameSeason +
                 ", queue=" + gameQueue +
                 ", role=" + gameRole +

@@ -81,6 +81,8 @@ public class ApiConnector {
                     A provided parameter is invalid (e.g., beginTime and startTime specify a time range that is too large).
                     A required parameter was not provided.
                      */
+                    System.out.println(e.getResponseBodyAsString());
+                    e.printStackTrace();
                     if (e.getResponseBodyAsString().contains("Page number is invalid")) {
                         throw new ApiPageNumberInvalidException();
                     }

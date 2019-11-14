@@ -1,6 +1,7 @@
 package com.onlol.fetcher.scrapers;
 
 import com.onlol.fetcher.api.connector.LeaguesConnector;
+import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.api.connector.SummonerConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
@@ -33,6 +34,9 @@ public class SummonerScraper {
 
     @Autowired
     private LogService logger;
+
+    @Autowired
+    private MatchConnector matchConnector;
 
     private boolean noSummonersMessageShown;
 
@@ -74,6 +78,7 @@ public class SummonerScraper {
         this.leaguesConnector.summonerLeagues(summonerToken);
         this.summonerConnector.championMastery(summonerToken);
         this.summonerConnector.inGame(summonerToken);
+        this.matchConnector.matchListByAccount(summonerToken);
 
         summoner = summonerToken.getSummoner();
         summoner.setRetrieving(false);

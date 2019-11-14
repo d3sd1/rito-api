@@ -55,7 +55,6 @@ public class MatchFiller {
             }
 
             matchList.setMatch(matchGame);
-            matchList.setRegion(this.regionRepository.findByServicePlatform(apiMatchReferenceDto.getPlatformId()));
 
             /* Get queue */
             matchList.setGameQueue(this.gameDataFiller.fillGameQueue(apiMatchReferenceDto.getQueue()));
