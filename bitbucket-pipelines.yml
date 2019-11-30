@@ -21,4 +21,13 @@ pipelines:
         name: Deploy
         image: alpacadb/docker-lftp
         script:
-          - lftp sftp://$SFTP_USER:$SFTP_PWD@$SFTP_HOST:$SFTP_PORT  -e "put /var/www; bye"
+          - pipe: atlassian/sftp-deploy:0.5.2
+            variables:
+              USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              REMOTE_PATH: '/var/www'
+              LOCAL_PATH: 'target' # Optional.
+              # SSH_KEY: '<string>' # Optional.
+              PASSWORD: $SFTP_PWD # Optional.
+              # EXTRA_ARGS: '<string>' # Optional.
+              # DEBUG: '<boolean>' # Optional.
