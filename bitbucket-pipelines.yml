@@ -18,6 +18,7 @@ pipelines:
           - target/**
           
     - step:
+        deployment: TEST
         name: Deploy
         image: alpacadb/docker-lftp
         script:
