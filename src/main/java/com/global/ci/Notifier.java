@@ -4,7 +4,6 @@ import com.global.services.Mailer;
 import com.global.services.Network;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -22,8 +21,10 @@ public class Notifier {
     private Network network;
 
     @PostConstruct
-    @Profile({"test", "prod"})
     public void notifyLoad() {
+        if (!envName.equalsIgnoreCase("dev") && !envName.equalsIgnoreCase("prod")) {
+            return; // Don't send message on other profiles...
+        }
         this.mailer.sendInternalMail(String.format("Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
     }
 }
