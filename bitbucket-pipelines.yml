@@ -11,9 +11,9 @@ pipelines:
         caches:
           - maven
         script:
-          - mvn -B verify
-          - mvn -B compile
-          - mvn -B package
+          - mvn -Dspring.profiles.active=bitbucketpipeline -B verify
+          - mvn -Dspring.profiles.active=bitbucketpipeline -B compile
+          - mvn -Dspring.profiles.active=bitbucketpipeline -B package
         artifacts:
           - target/**
 
