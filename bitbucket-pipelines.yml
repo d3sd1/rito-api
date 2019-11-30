@@ -23,12 +23,12 @@ pipelines:
         image: atlassian/default-image:2
         script:
           - "apt-get update -y && apt-get install -y ssh"
-          - "ssh $SFTP_USER@$SFTP_HOST \!pkill -9 java\""
+          - "ssh $SFTP_USER@$SFTP_HOST \"pkill -9 java\""
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'target/*.jar' # Optional ->
+              LOCAL_PATH: 'target/*.jar' # Optional
               DEBUG: 'true'
           - "ssh $SFTP_USER@$SFTP_HOST \"java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar && disown\""
