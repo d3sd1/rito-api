@@ -16,14 +16,13 @@ pipelines:
           - mvn -Dspring.profiles.active=bitbucketpipeline -B package
         artifacts:
           - target/**
+          - src/main/resources/scripts/update.sh
 
     - step:
         deployment: TEST
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - "apt-get update -y && apt-get install -y ssh"
-          - "ssh root@167.86.78.132 \"pkill -9 java\""
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
@@ -31,4 +30,3 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar' # Optional
               DEBUG: 'true'
-          - "ssh root@167.86.78.132 \"java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar && disown\""
