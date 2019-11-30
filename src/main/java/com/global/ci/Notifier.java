@@ -24,6 +24,6 @@ public class Notifier {
     @PostConstruct
     @Profile({"test", "prod"})
     public void notifyLoad() {
-        this.mailer.sendInternalMail(String.format("Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
+        this.mailer.sendInternalMail(String.format("v1 Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
     }
 }
