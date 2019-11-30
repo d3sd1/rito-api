@@ -16,24 +16,47 @@ pipelines:
           - mvn -Dspring.profiles.active=bitbucketpipeline -B package
         artifacts:
           - target/**
-          - src/main/resources/scripts/update.sh
+          - src/main/resources/scripts/update-test.sh
+          - src/main/resources/scripts/update-prod.sh
 
-    - step:
-        deployment: TEST
-        name: Deploy to test
-        image: atlassian/default-image:2
-        script:
-          - pipe: atlassian/sftp-deploy:0.5.2
-            variables:
-              USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'target/*.jar'
-              DEBUG: 'true'
-          - pipe: atlassian/sftp-deploy:0.5.2
-            variables:
-              USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'src/main/resources/scripts/update.sh'
-              DEBUG: 'true'
+            - step:
+                deployment: TEST
+                name: Deploy to test
+                image: atlassian/default-image:2
+                script:
+                  - pipe: atlassian/sftp-deploy:0.5.2
+                    variables:
+                      USER: $SFTP_USER
+                      SERVER: $SFTP_HOST
+                      REMOTE_PATH: '/var/www'
+                      LOCAL_PATH: 'target/*.jar'
+                      DEBUG: 'true'
+                  - pipe: atlassian/sftp-deploy:0.5.2
+                    variables:
+                      USER: $SFTP_USER
+                      SERVER: $SFTP_HOST
+                      REMOTE_PATH: '/var/www'
+                      LOCAL_PATH: 'src/main/resources/scripts/update-test.sh'
+                      DEBUG: 'true'
+
+
+                  - step:
+                      deployment: PROD
+                      name: Deploy to prod
+                      trigger: manual
+                      image: atlassian/default-image:2
+                      script:
+                        - pipe: atlassian/sftp-deploy:0.5.2
+                          variables:
+                            USER: $SFTP_USER
+                            SERVER: $SFTP_HOST
+                            REMOTE_PATH: '/var/www'
+                            LOCAL_PATH: 'target/*.jar'
+                            DEBUG: 'true'
+                        - pipe: atlassian/sftp-deploy:0.5.2
+                          variables:
+                            USER: $SFTP_USER
+                            SERVER: $SFTP_HOST
+                            REMOTE_PATH: '/var/www'
+                            LOCAL_PATH: 'src/main/resources/scripts/update-prod.sh'
+                            DEBUG: 'false'
