@@ -29,6 +29,6 @@ pipelines:
               USER: $SFTP_USER
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'target/*.jar' # Optional.
+              LOCAL_PATH: 'target/*.jar' # Optional ->
               DEBUG: 'true'
           - "ssh $SFTP_USER@$SFTP_HOST \"java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar && disown\""
