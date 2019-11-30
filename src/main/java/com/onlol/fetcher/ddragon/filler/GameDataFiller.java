@@ -1,10 +1,10 @@
 package com.onlol.fetcher.ddragon.filler;
 
+import com.onlol.database.model.*;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.ddragon.connector.GameChampionConnector;
 import com.onlol.fetcher.ddragon.model.*;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

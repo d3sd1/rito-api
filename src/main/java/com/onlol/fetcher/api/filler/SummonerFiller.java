@@ -1,16 +1,16 @@
 package com.onlol.fetcher.api.filler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.database.model.ApiKey;
+import com.onlol.database.model.Summoner;
+import com.onlol.database.model.SummonerNameHistorical;
+import com.onlol.database.model.SummonerToken;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.model.ApiLeagueItemDTO;
 import com.onlol.fetcher.api.model.ApiParticipantIdentityDTO;
 import com.onlol.fetcher.api.model.ApiSummonerDTO;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.ApiKey;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerNameHistorical;
-import com.onlol.fetcher.model.SummonerToken;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

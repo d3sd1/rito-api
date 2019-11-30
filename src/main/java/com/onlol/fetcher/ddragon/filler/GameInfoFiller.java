@@ -1,10 +1,10 @@
 package com.onlol.fetcher.ddragon.filler;
 
+import com.onlol.database.model.*;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.ddragon.model.DDGameSeasonDTO;
 import com.onlol.fetcher.ddragon.model.DDRealmDTO;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

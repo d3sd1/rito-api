@@ -1,10 +1,10 @@
 package com.onlol.fetcher.api.filler;
 
+import com.onlol.database.model.*;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.model.*;
 import com.onlol.fetcher.ddragon.filler.GameDataFiller;
 import com.onlol.fetcher.ddragon.filler.GameInfoFiller;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

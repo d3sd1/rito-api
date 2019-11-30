@@ -2,6 +2,11 @@ package com.onlol.fetcher.ddragon.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.database.model.GameVersion;
+import com.onlol.database.model.Language;
+import com.onlol.database.model.SummonerProfileImage;
+import com.onlol.database.model.SummonerSpell;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.ddragon.filler.GameSummonerFiller;
@@ -13,11 +18,6 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.GameVersion;
-import com.onlol.fetcher.model.Language;
-import com.onlol.fetcher.model.SummonerProfileImage;
-import com.onlol.fetcher.model.SummonerSpell;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

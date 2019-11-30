@@ -2,14 +2,14 @@ package com.onlol.fetcher.api.connector;
 
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.database.model.*;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
 import com.onlol.fetcher.api.model.ApiLeagueListDTO;
 import com.onlol.fetcher.exceptions.*;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.CannotCreateTransactionException;

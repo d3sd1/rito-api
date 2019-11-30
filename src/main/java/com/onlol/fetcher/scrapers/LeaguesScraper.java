@@ -1,10 +1,10 @@
 package com.onlol.fetcher.scrapers;
 
+import com.onlol.database.model.*;
+import com.onlol.database.repository.*;
 import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;

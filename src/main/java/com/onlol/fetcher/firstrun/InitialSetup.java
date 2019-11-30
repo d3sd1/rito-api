@@ -1,10 +1,10 @@
 package com.onlol.fetcher.firstrun;
 
+import com.onlol.database.model.RunLog;
+import com.onlol.database.repository.RunLogRepository;
 import com.onlol.fetcher.api.connector.LeaguesConnector;
 import com.onlol.fetcher.ddragon.connector.*;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.RunLog;
-import com.onlol.fetcher.repository.RunLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;

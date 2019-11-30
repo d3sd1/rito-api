@@ -2,6 +2,10 @@ package com.onlol.fetcher.api.connector;
 
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlol.database.model.*;
+import com.onlol.database.repository.SummonerChampionMasteryRepository;
+import com.onlol.database.repository.SummonerRepository;
+import com.onlol.database.repository.SummonerTokenRepository;
 import com.onlol.fetcher.api.ApiConnector;
 import com.onlol.fetcher.api.endpoints.V4;
 import com.onlol.fetcher.api.filler.SummonerFiller;
@@ -10,10 +14,6 @@ import com.onlol.fetcher.exceptions.ApiDownException;
 import com.onlol.fetcher.exceptions.ApiUnauthorizedException;
 import com.onlol.fetcher.exceptions.DataNotfoundException;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.SummonerChampionMasteryRepository;
-import com.onlol.fetcher.repository.SummonerRepository;
-import com.onlol.fetcher.repository.SummonerTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

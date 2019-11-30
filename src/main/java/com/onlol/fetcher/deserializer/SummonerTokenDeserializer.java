@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.onlol.database.model.ApiKey;
+import com.onlol.database.model.Summoner;
+import com.onlol.database.model.SummonerToken;
+import com.onlol.database.repository.SummonerRepository;
+import com.onlol.database.repository.SummonerTokenRepository;
 import com.onlol.fetcher.api.connector.SummonerConnector;
-import com.onlol.fetcher.model.ApiKey;
-import com.onlol.fetcher.model.Summoner;
-import com.onlol.fetcher.model.SummonerToken;
-import com.onlol.fetcher.repository.SummonerRepository;
-import com.onlol.fetcher.repository.SummonerTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

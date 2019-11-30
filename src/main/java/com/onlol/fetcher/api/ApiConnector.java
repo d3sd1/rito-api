@@ -1,11 +1,11 @@
 package com.onlol.fetcher.api;
 
+import com.onlol.database.model.ApiCall;
+import com.onlol.database.model.ApiKey;
+import com.onlol.database.repository.ApiCallRepository;
+import com.onlol.database.repository.ApiKeyRepository;
 import com.onlol.fetcher.exceptions.*;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.ApiCall;
-import com.onlol.fetcher.model.ApiKey;
-import com.onlol.fetcher.repository.ApiCallRepository;
-import com.onlol.fetcher.repository.ApiKeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

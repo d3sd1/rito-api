@@ -1,12 +1,12 @@
 package com.onlol.fetcher.ddragon.filler;
 
+import com.onlol.database.model.*;
+import com.onlol.database.repository.GameVersionRepository;
+import com.onlol.database.repository.SummonerProfileImageRepository;
+import com.onlol.database.repository.SummonerSpellLanguageRepository;
+import com.onlol.database.repository.SummonerSpellRepository;
 import com.onlol.fetcher.ddragon.model.DDSummonerImageDTO;
 import com.onlol.fetcher.ddragon.model.DDSummonerSpellDTO;
-import com.onlol.fetcher.model.*;
-import com.onlol.fetcher.repository.GameVersionRepository;
-import com.onlol.fetcher.repository.SummonerProfileImageRepository;
-import com.onlol.fetcher.repository.SummonerSpellLanguageRepository;
-import com.onlol.fetcher.repository.SummonerSpellRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

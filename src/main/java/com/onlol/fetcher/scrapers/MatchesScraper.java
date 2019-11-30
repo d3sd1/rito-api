@@ -1,10 +1,10 @@
 package com.onlol.fetcher.scrapers;
 
+import com.onlol.database.model.MatchGame;
+import com.onlol.database.repository.MatchGameRepository;
 import com.onlol.fetcher.api.connector.MatchConnector;
 import com.onlol.fetcher.firstrun.RequiresInitialSetup;
 import com.onlol.fetcher.logger.LogService;
-import com.onlol.fetcher.model.MatchGame;
-import com.onlol.fetcher.repository.MatchGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;

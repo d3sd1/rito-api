@@ -8,6 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+
 
 @Service("LogService")
 @Transactional
@@ -38,11 +40,29 @@ public class LogService {
         }
     }
 
+    @PostConstruct
+    public void test() {
+
+
+        try {
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setFrom("scraper@dev.onriot.net");
+            msg.setTo("andreigarciacuadra@gmail.com");
+
+            msg.setSubject("TEST");
+            msg.setText("TEST DEV");
+
+            javaMailSender.send(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     void sendEmail(String type, String log) {
 
         try {
             SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setFrom("bugs@onlol.net");
+            msg.setFrom("bugs@dev.onriot.net");
             msg.setTo("andreigarciacuadra@gmail.com");
 
             msg.setSubject("[" + type + "] OnLOL Scraper");
