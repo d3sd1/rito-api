@@ -19,7 +19,7 @@ pipelines:
 
     - step:
         deployment: TEST
-        name: Deploy
+        name: Deploy to test
         image: atlassian/default-image:2
         script:
           - "apt-get update -y && apt-get install -y ssh"
@@ -31,4 +31,4 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar' # Optional.
               DEBUG: 'true'
-          - "ssh $SFTP_USER@$SFTP_HOST javaw -Dspring.profiles.active=test -jar /var/www/*.jar && disown"
+          - "ssh $SFTP_USER@$SFTP_HOST java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar && disown"
