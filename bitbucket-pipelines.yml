@@ -29,6 +29,5 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar' # Optional.
               # SSH_KEY: '<string>' # Optional.
-              PASSWORD: $SFTP_PWD # Optional.
-              # EXTRA_ARGS: '<string>' # Optional.
-              # DEBUG: '<boolean>' # Optional.
+              # PASSWORD: $SFTP_PWD # Optional.
+              DEBUG: 'true'
