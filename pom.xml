@@ -8,16 +8,11 @@
         <version>2.1.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.onlol</groupId>
+    <groupId>status.disabled.onlol</groupId>
     <artifactId>fetcher</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>fetcher</name>
     <description>Spring massive data fetcher for LoL Api</description>
-
-    <properties>
-        <java.version>12</java.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,6 +63,11 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
         </dependency>
     </dependencies>
 
