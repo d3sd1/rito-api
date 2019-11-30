@@ -22,7 +22,7 @@ public class Notifier {
 
     @PostConstruct
     public void notifyLoad() {
-        if (!envName.equalsIgnoreCase("dev") && !envName.equalsIgnoreCase("prod")) {
+        if (!envName.equalsIgnoreCase("test") && !envName.equalsIgnoreCase("prod")) {
             return; // Don't send message on other profiles...
         }
         this.mailer.sendInternalMail(String.format("Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
