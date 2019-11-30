@@ -16,7 +16,7 @@ pipelines:
           - mvn -B package
         artifacts:
           - target/**
-          
+
     - step:
         deployment: TEST
         name: Deploy
@@ -29,10 +29,10 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar' # Optional.
               DEBUG: 'true'
-    - step:
-        - pipe: atlassian/ssh-run:0.2.2
-          variables:
-            SSH_USER: $SFTP_USER
-            SERVER: $SFTP_HOST
-            COMMAND: 'pkill -9 java && javaw -Dspring.profiles.active=test -jar /var/www/*.jar && disown'
-            DEBUG: 'true'
+
+          - pipe: atlassian/ssh-run:0.2.2
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'pkill -9 java && javaw -Dspring.profiles.active=test -jar /var/www/*.jar && disown'
+              DEBUG: 'true'
