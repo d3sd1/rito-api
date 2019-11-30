@@ -22,14 +22,7 @@ pipelines:
         name: Deploy
         image: alpacadb/docker-lftp
         script:
-          - pipe: atlassian/ssh-run:0.2.2
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              MODE: 'command'
-              SSH_KEY: $SFTP_KEY
-              COMMAND: 'pkill -9 java'
-              DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST pkill -9 java"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
@@ -37,11 +30,4 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar' # Optional.
               DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.2
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              MODE: 'command'
-              SSH_KEY: $SFTP_KEY
-              COMMAND: 'javaw -Dspring.profiles.active=test -jar /var/www/*.jar && disown'
-              DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST javaw -Dspring.profiles.active=test -jar /var/www/*.jar && disown"
