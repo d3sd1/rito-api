@@ -41,7 +41,7 @@ pipelines:
 
     - step:
         deployment: PROD
-        name: Deploy to prod
+        name: Deploy to all prod servers
         trigger: manual
         image: atlassian/default-image:2
         script:
