@@ -45,17 +45,20 @@ pipelines:
         trigger: manual
         image: atlassian/default-image:2
         script:
+          # PROD SERVER 1
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
-              SERVER: $SFTP_HOST
+              SERVER: $SFTP_HOST_1
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
-              SERVER: $SFTP_HOST
+              SERVER: $SFTP_HOST_1
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/update-prod.sh'
               DEBUG: 'false'
+
+          # PROD SERVER 2 HERE
