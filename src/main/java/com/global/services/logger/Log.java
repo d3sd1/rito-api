@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 
 @Entity
+@Table(schema = "logging")
 public class Log {
 
     @Id

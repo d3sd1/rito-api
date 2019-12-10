@@ -9,15 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableScheduling
 public class FetcherApplication {
-
-    /*
-    INFORMACIÓN IMPORTANTE FIRST TIME RUNNING:
-    1. Se deben importar el contenido de los data ddragon.
-    2. Se deben ejecutar las migraciones.
-    3. Deben empezar a correr los scrappers en paralelo.
-     */
     public static void main(String[] args) {
         SpringApplication.run(FetcherApplication.class, args);
     }
-
 }
