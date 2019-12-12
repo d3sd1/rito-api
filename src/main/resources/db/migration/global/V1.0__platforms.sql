@@ -1,4 +1,5 @@
-INSERT INTO platform (service_region, service_platform, host_name)
+SET search_path TO global,logging,onriot,onlol,ontft,onlor,onlwr;
+INSERT INTO global.platform (serviceregion, serviceplatform, hostname)
 VALUES ('br', 'br1', 'br1.api.riotgames.com'),
        ('eune', 'eun1', 'eun1.api.riotgames.com'),
        ('euw', 'euw1', 'euw1.api.riotgames.com'),
