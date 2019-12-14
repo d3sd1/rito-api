@@ -72,6 +72,11 @@
       "name": "onriot.error.level",
       "type": "java.lang.Enum<ERROR>",
       "description": "Define error level for current execution."
+    },
+    {
+      "name": "onriot.db.poolsize",
+      "type": "java.lang.String",
+      "description": "Size of pool connection for database."
     }
   ]
 }

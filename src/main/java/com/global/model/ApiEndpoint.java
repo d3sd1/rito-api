@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(schema = "global")
+@Table(schema = "common")
 public class ApiEndpoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

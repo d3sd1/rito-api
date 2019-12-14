@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 
 @Entity
-@Table(schema = "global")
+@Table(schema = "common")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Platform {
     @Id
