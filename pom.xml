@@ -94,6 +94,13 @@
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>test</id>
