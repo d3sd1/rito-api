@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class Mailer {
 
-    @Value("${mail.send.from}")
+    @Value("${onriot.mail.send.from}")
     private String mailAddress;
 
-    @Value("${mail.admin.addresses}")
+    @Value("${onriot.mail.admin.addresses}")
     private String[] adminAdresses;
 
     @Autowired

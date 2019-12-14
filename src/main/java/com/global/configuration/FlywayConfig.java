@@ -37,15 +37,7 @@ public class FlywayConfig implements ApplicationListener<ApplicationStartedEvent
         return new FlywayMigrationInitializer(flyway, null);
     }
 
-    void generateSchemas() {
-        //this.entityManager.createQuery("CREATE SCHEMA IF NOT EXISTS global;").executeUpdate();
-    }
-
-
     public void onApplicationEvent(ApplicationStartedEvent contextRefreshedEvent) {
-        if (activeProfile.equalsIgnoreCase("dev")) {
-
-        }
         this.flyway.migrate();
     }
 

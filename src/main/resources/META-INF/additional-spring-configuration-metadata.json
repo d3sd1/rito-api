@@ -1,0 +1,77 @@
+{
+  "properties": [
+    {
+      "name": "onriot.mail.send.from",
+      "type": "java.lang.String",
+      "description": "Sender of the email."
+    },
+    {
+      "name": "onriot.mail.admin.addresses",
+      "type": [
+        "java.util.ArrayList<java.lang.String>",
+        "java.lang.String"
+      ],
+      "description": "Comma separated email addresses from site admins."
+    },
+    {
+      "name": "onriot.db.migration.table",
+      "type": "java.lang.String",
+      "description": "Database table name where migrations are managed."
+    },
+    {
+      "name": "onriot.db.init.sqls",
+      "type": "java.lang.String",
+      "description": "SQL's to execute right after database connection is stabilised."
+    },
+    {
+      "name": "onriot.migration.init.sqls",
+      "type": "java.lang.String",
+      "description": "SQL's to execute right before migration manager."
+    },
+    {
+      "name": "onriot.debug.enable",
+      "type": "java.lang.Boolean",
+      "description": "Enable debug for all application."
+    },
+    {
+      "name": "onriot.db.port",
+      "type": "java.lang.Integer",
+      "description": "Database connection port."
+    },
+    {
+      "name": "onriot.db.host",
+      "type": "java.lang.String",
+      "description": "Database connection host."
+    },
+    {
+      "name": "onriot.db.dbname",
+      "type": "java.lang.String",
+      "description": "Database connection database name"
+    },
+    {
+      "name": "onriot.db.user",
+      "type": "java.lang.String",
+      "description": "Database connection user."
+    },
+    {
+      "name": "onriot.db.pass",
+      "type": "java.lang.String",
+      "description": "Database connection password."
+    },
+    {
+      "name": "onriot.server.port",
+      "type": "java.lang.String",
+      "description": "Process id when executing the scraper."
+    },
+    {
+      "name": "onriot.db.schemas",
+      "type": "java.util.ArrayList<java.lang.String>",
+      "description": "Schemas used by the scraper."
+    },
+    {
+      "name": "onriot.error.level",
+      "type": "java.lang.Enum<ERROR>",
+      "description": "Define error level for current execution."
+    }
+  ]
+}
