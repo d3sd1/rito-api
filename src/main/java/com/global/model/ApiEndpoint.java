@@ -36,4 +36,7 @@ public class ApiEndpoint {
     @OneToOne
     private RiotGame riotGame;
 
+    @Column(nullable = false, unique = false)
+    private boolean countsForRateLimit;
+
 }
