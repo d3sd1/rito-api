@@ -1,5 +1,9 @@
 package com.global.api;
 
+import com.global.model.ApiKey;
+import com.global.repository.ApiKeyRepository;
+import com.global.services.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /*
@@ -7,11 +11,11 @@ Esto se podría optimizar haciendo los rate limit por cada método en lugar de l
  */
 @Service
 public class ApiKeyManager {
-    /*
+
     @Autowired
     private ApiKeyRepository apiKeyRepository;
     @Autowired
-    private LogService logger;
+    private Logger logger;
 
     public ApiKey getKey() {
         ApiKey apiKey = this.apiKeyRepository.findTopByBannedIsFalseAndValidIsTrueOrderByLastTimestampUsedAsc();
@@ -29,5 +33,5 @@ public class ApiKeyManager {
             this.apiKeyRepository.save(apiKey);
         }
         return apiKey;
-    }*/
+    }
 }

@@ -2,6 +2,7 @@ package com.global.configuration;
 
 import org.hibernate.dialect.PostgreSQL10Dialect;
 
+/* Used on ENV dev for preventing constraint-cascade error. */
 public class OnriotDatabaseDialect extends PostgreSQL10Dialect {
 
     @Override

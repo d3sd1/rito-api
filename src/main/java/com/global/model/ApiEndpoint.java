@@ -38,4 +38,81 @@ public class ApiEndpoint {
     @Column(nullable = true, unique = false)
     private String stub;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public ApiMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(ApiMethod method) {
+        this.method = method;
+    }
+
+    public boolean isRequiresApiKey() {
+        return requiresApiKey;
+    }
+
+    public void setRequiresApiKey(boolean requiresApiKey) {
+        this.requiresApiKey = requiresApiKey;
+    }
+
+    public RiotGame getRiotGame() {
+        return riotGame;
+    }
+
+    public void setRiotGame(RiotGame riotGame) {
+        this.riotGame = riotGame;
+    }
+
+    public boolean isCountsForRateLimit() {
+        return countsForRateLimit;
+    }
+
+    public void setCountsForRateLimit(boolean countsForRateLimit) {
+        this.countsForRateLimit = countsForRateLimit;
+    }
+
+    public String getStub() {
+        return stub;
+    }
+
+    public void setStub(String stub) {
+        this.stub = stub;
+    }
+
+    @Override
+    public String toString() {
+        return "ApiEndpoint{" +
+                "id=" + id +
+                ", endpoint='" + endpoint + '\'' +
+                ", disabled=" + disabled +
+                ", method=" + method +
+                ", requiresApiKey=" + requiresApiKey +
+                ", riotGame=" + riotGame +
+                ", countsForRateLimit=" + countsForRateLimit +
+                ", stub='" + stub + '\'' +
+                '}';
+    }
 }
