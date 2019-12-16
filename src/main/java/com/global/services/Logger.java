@@ -60,7 +60,7 @@ public class Logger {
         Log log = new Log();
         log.setLevel(LogLevel.WARNING);
         log.setText(msg);
-        this.mailer.sendErrorMail(LogLevel.WARNING, msg);
+        this.mailer.queueErrorMail(log);
         this.logRepository.save(log);
     }
 
@@ -74,7 +74,7 @@ public class Logger {
         Log log = new Log();
         log.setLevel(LogLevel.ERROR);
         log.setText(msg);
-        this.mailer.sendErrorMail(LogLevel.ERROR, msg);
+        this.mailer.queueErrorMail(log);
         this.logRepository.save(log);
     }
 
