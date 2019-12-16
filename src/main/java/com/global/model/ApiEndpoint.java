@@ -1,7 +1,6 @@
 package com.global.model;
 
 import javax.persistence.*;
-import java.util.List;
 
 
 @Entity
@@ -14,10 +13,6 @@ public class ApiEndpoint {
 
     @Column(nullable = false, unique = false)
     private String endpoint;
-
-    @OneToMany
-    private
-    List<Platform> platforms;
 
     @Column(nullable = false, unique = false)
     private boolean disabled;
