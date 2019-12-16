@@ -13,7 +13,7 @@ public class MailNotification {
     @Column(nullable = false, unique = true)
     private long id;
 
-    @OneToOne
+    @OneToOne()
     private Log log;
 
     public long getId() {

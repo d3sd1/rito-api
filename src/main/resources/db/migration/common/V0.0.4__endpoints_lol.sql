@@ -1,5 +1,5 @@
 SET search_path TO common,logging,onriot,onlol,ontft,onlor,onlwr;
-INSERT INTO apiendpoint (disabled, endpoint, method, requiresapikey, riotgame_id, countsforratelimit, stuburl)
+INSERT INTO apiendpoint (disabled, endpoint, method, requiresapikey, riotgame_id, countsforratelimit, stub)
 VALUES (false, '/lol/champion-mastery/v4/champion-masteries/by-summoner/{{encryptedSummonerId}}', 0, true, 1, true,
         null),
        (false, '/lol/platform/v3/champion-rotations', 0, true, 1, true, null),
