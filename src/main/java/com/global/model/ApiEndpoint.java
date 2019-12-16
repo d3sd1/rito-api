@@ -39,4 +39,8 @@ public class ApiEndpoint {
     @Column(nullable = false, unique = false)
     private boolean countsForRateLimit;
 
+    // URL for the same endpoint on stub (test) mode. Used for tournaments.
+    @Column(nullable = false, unique = false)
+    private String stub;
+
 }
