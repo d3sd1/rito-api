@@ -15,11 +15,20 @@ public class ApiCall {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false, unique = false, columnDefinition = "text")
+    @Column(nullable = true, unique = false, columnDefinition = "text")
     private String json;
 
     @OneToOne
     private ApiKey apiKey;
+
+    @OneToOne
+    private ApiEndpoint apiEndpoint;
+
+    @OneToOne
+    private Platform platform;
+
+    @OneToOne
+    private RiotGame riotGame;
 
     @Column(nullable = true, unique = false)
     private Constants.CALL_TYPE callType = Constants.CALL_TYPE.GET;
@@ -78,12 +87,39 @@ public class ApiCall {
         this.responseCode = responseCode;
     }
 
+    public ApiEndpoint getApiEndpoint() {
+        return apiEndpoint;
+    }
+
+    public void setApiEndpoint(ApiEndpoint apiEndpoint) {
+        this.apiEndpoint = apiEndpoint;
+    }
+
+    public Platform getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
+    public RiotGame getRiotGame() {
+        return riotGame;
+    }
+
+    public void setRiotGame(RiotGame riotGame) {
+        this.riotGame = riotGame;
+    }
+
     @Override
     public String toString() {
         return "ApiCall{" +
                 "id=" + id +
                 ", json='" + json + '\'' +
                 ", apiKey=" + apiKey +
+                ", apiEndpoint=" + apiEndpoint +
+                ", platform=" + platform +
+                ", riotGame=" + riotGame +
                 ", callType=" + callType +
                 ", elapsedMilliseconds=" + elapsedMilliseconds +
                 ", responseCode=" + responseCode +

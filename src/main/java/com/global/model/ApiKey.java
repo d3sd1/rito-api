@@ -1,12 +1,18 @@
 package com.global.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(schema = "common")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Transactional
 public class ApiKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,20 +22,26 @@ public class ApiKey {
     @Column(nullable = false, unique = true)
     private String apiKey;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany
+    private List<Platform> platforms;
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany
+    private List<RiotGame> riotGames;
+
+    @OneToOne
+    private ApiKeyRateLimits apiKeyRateLimits = new ApiKeyRateLimits();
+
+    @Column(nullable = false, unique = false)
+    private boolean configured = false;
+
+    @Column(nullable = false, unique = false)
+    private boolean disabled = false;
+
     @Column(nullable = true, unique = false)
-    private Integer retryAfter = 0;
+    private LocalDateTime lastTimeUsed;
 
-    @Column(nullable = false, unique = false)
-    private Integer invalidCalls = 0;
-
-    @Column(nullable = false, unique = false)
-    private boolean banned = false; // 429 err too  many requests handler
-
-    @Column(nullable = false, unique = false)
-    private boolean valid = true; // api key is not usable.
-
-    @Column(nullable = false, unique = false)
-    private Long lastTimestampUsed;
 
     public Integer getId() {
         return id;
@@ -47,44 +59,52 @@ public class ApiKey {
         this.apiKey = apiKey;
     }
 
-    public Integer getRetryAfter() {
-        return retryAfter;
+    public List<Platform> getPlatforms() {
+        return platforms;
     }
 
-    public void setRetryAfter(Integer retryAfter) {
-        this.retryAfter = retryAfter;
+    public void setPlatforms(List<Platform> platforms) {
+        this.platforms = platforms;
     }
 
-    public boolean isBanned() {
-        return banned;
+    public boolean isConfigured() {
+        return configured;
     }
 
-    public void setBanned(boolean banned) {
-        this.banned = banned;
+    public void setConfigured(boolean configured) {
+        this.configured = configured;
     }
 
-    public boolean isValid() {
-        return valid;
+    public boolean isDisabled() {
+        return disabled;
     }
 
-    public void setValid(boolean valid) {
-        this.valid = valid;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
-    public Long getLastTimestampUsed() {
-        return lastTimestampUsed;
+    public List<RiotGame> getRiotGames() {
+        return riotGames;
     }
 
-    public void setLastTimestampUsed(Long lastTimestampUsed) {
-        this.lastTimestampUsed = lastTimestampUsed;
+    public void setRiotGames(List<RiotGame> riotGames) {
+        this.riotGames = riotGames;
     }
 
-    public Integer getInvalidCalls() {
-        return invalidCalls;
+    public ApiKeyRateLimits getApiKeyRateLimits() {
+        return apiKeyRateLimits;
     }
 
-    public void setInvalidCalls(Integer invalidCalls) {
-        this.invalidCalls = invalidCalls;
+    public void setApiKeyRateLimits(ApiKeyRateLimits apiKeyRateLimits) {
+        this.apiKeyRateLimits = apiKeyRateLimits;
+    }
+
+    public LocalDateTime getLastTimeUsed() {
+        return lastTimeUsed;
+    }
+
+    public void setLastTimeUsed(LocalDateTime lastTimeUsed) {
+        this.lastTimeUsed = lastTimeUsed;
     }
 
     @Override
@@ -92,11 +112,12 @@ public class ApiKey {
         return "ApiKey{" +
                 "id=" + id +
                 ", apiKey='" + apiKey + '\'' +
-                ", retryAfter=" + retryAfter +
-                ", invalidCalls=" + invalidCalls +
-                ", banned=" + banned +
-                ", valid=" + valid +
-                ", lastTimestampUsed=" + lastTimestampUsed +
+                ", platforms=" + platforms +
+                ", riotGames=" + riotGames +
+                ", apiKeyRateLimits=" + apiKeyRateLimits +
+                ", configured=" + configured +
+                ", disabled=" + disabled +
+                ", lastTimeUsed=" + lastTimeUsed +
                 '}';
     }
 }

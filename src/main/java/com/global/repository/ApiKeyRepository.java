@@ -4,9 +4,11 @@ import com.global.model.ApiKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ApiKeyRepository extends JpaRepository<ApiKey, String> {
-    ApiKey findTopByBannedIsFalseAndValidIsTrueOrderByLastTimestampUsedAsc();
+import java.util.List;
 
-    ApiKey findTopByBannedIsTrueOrderByRetryAfter();
+@Repository
+public interface ApiKeyRepository extends JpaRepository<ApiKey, Integer> {
+    List<ApiKey> findAllByConfiguredIsFalse();
+
+    List<ApiKey> findAllByDisabledIsFalseAndConfiguredIsTrue();
 }

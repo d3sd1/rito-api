@@ -56,11 +56,31 @@ public class Platform {
 
     @Override
     public String toString() {
-        return "Region{" +
+        return "Platform{" +
                 "id=" + id +
                 ", serviceRegion='" + serviceRegion + '\'' +
                 ", servicePlatform='" + servicePlatform + '\'' +
-                ", host='" + hostName + '\'' +
+                ", hostName='" + hostName + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object platform) {
+        boolean retVal = false;
+
+        if (platform instanceof Platform) {
+            Platform ptr = (Platform) platform;
+            retVal = ptr.getId() == this.id;
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
 }

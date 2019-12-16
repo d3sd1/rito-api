@@ -40,4 +40,25 @@ public class RiotGame {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "RiotGame{" +
+                "id=" + id +
+                ", gameName='" + gameName + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object riotGame) {
+        boolean retVal = false;
+
+        if (riotGame instanceof RiotGame) {
+            RiotGame ptr = (RiotGame) riotGame;
+            retVal = ptr.getId() == this.id;
+        }
+
+        return retVal;
+    }
 }

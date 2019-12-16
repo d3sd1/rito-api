@@ -11,14 +11,16 @@ public class ApiEndpoint {
     @Column(nullable = false, unique = true)
     private long id;
 
+    @Column(nullable = false, unique = true)
+    private String keyName;
+
     @Column(nullable = false, unique = false)
     private String endpoint;
 
     @Column(nullable = false, unique = false)
     private boolean disabled;
 
-    enum ApiMethod
-    {
+    enum ApiMethod {
         GET, POST, PUT, DELETE
     }
 
@@ -102,10 +104,19 @@ public class ApiEndpoint {
         this.stub = stub;
     }
 
+    public String getKeyName() {
+        return keyName;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
+    }
+
     @Override
     public String toString() {
         return "ApiEndpoint{" +
                 "id=" + id +
+                ", keyName='" + keyName + '\'' +
                 ", endpoint='" + endpoint + '\'' +
                 ", disabled=" + disabled +
                 ", method=" + method +
