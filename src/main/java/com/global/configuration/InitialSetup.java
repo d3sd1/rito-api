@@ -1,4 +1,4 @@
-package com.global;
+package com.global.configuration;
 
 import com.global.model.*;
 import com.global.repository.*;
@@ -71,12 +71,17 @@ public class InitialSetup implements ApplicationListener<ApplicationStartedEvent
             apiKey.setConfigured(true);
             apiKey.setDisabled(false);
             apiKey.setApiKeyRateLimits(this.apiKeyRateLimitsRepository.save(new ApiKeyRateLimits()));
-            //TODO: handle disable api key per game?
-            //TODO: handle disable api key per platform?
 
-            apiKey.setRiotGames(riotGames);
-            // By default every api key is enabled for all platforms.
-            apiKey.setPlatforms(platforms);
+
+            // By default key is enabled for all regions and platforms.
+            for (RiotGame riotGame : riotGames) {
+                for (Platform platform : platforms) {
+                    ApiKeyAvailability availability = new ApiKeyAvailability();
+                    availability.setPlatform(platform);
+                    availability.setRiotGame(riotGame);
+                    apiKey.getAvailability().add(availability);
+                }
+            }
             this.apiKeyRepository.save(apiKey);
         }
     }

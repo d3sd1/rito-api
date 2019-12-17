@@ -1,8 +1,10 @@
 package com.global.api;
 
 import com.global.model.ApiKey;
+import com.global.model.ApiKeyAvailability;
 import com.global.model.Platform;
 import com.global.model.RiotGame;
+import com.global.repository.ApiKeyAvailabilityRepository;
 import com.global.repository.ApiKeyRateLimitsRepository;
 import com.global.repository.ApiKeyRepository;
 import com.global.services.Logger;
@@ -23,6 +25,9 @@ public class ApiKeyManager {
 
     @Autowired
     private ApiKeyRepository apiKeyRepository;
+
+    @Autowired
+    private ApiKeyAvailabilityRepository apiKeyAvailabilityRepository;
 
     @Autowired
     private ApiKeyRateLimitsRepository apiKeyRateLimitsRepository;
@@ -65,12 +70,14 @@ public class ApiKeyManager {
 
         // It doesn't has method level  Rate Limiting. Although we can track it, and implement if needed.
         for (ApiKey apiKey : this.apiKeys) {
-            // Not suitable for this platform
-            if (!apiKey.getPlatforms().contains(platform)) {
-                continue;
+            // Not suitable for this platform nor Not suitable for this game
+            boolean available = false;
+            for (ApiKeyAvailability apiKeyAvailability : apiKey.getAvailability()) {
+                if (apiKeyAvailability.getPlatform().equals(platform) && apiKeyAvailability.getRiotGame().equals(riotGame)) {
+                    available = true;
+                }
             }
-            // Not suitable for this game
-            if (!apiKey.getRiotGames().contains(riotGame)) {
+            if (!available) {
                 continue;
             }
 
@@ -147,13 +154,19 @@ public class ApiKeyManager {
             validApiKey.setLastTimeUsed(LocalDateTime.now());
             this.apiKeyRepository.save(validApiKey);
         }
-        // TODO: es posible que aqui haya ciclos que no paren de llamar, en ese casom, barajar que hacer en futuras versiones.
         return validApiKey;
     }
 
-    public void banKey(ApiKey apiKey, Platform platform) {
-        apiKey.getPlatforms().remove(platform);
-        if (apiKey.getPlatforms().isEmpty()) {
+    public void banKey(ApiKey apiKey, Platform platform, RiotGame riotGame) {
+        // Ban key for current game and platform
+        for (ApiKeyAvailability apiKeyAvailability : apiKey.getAvailability()) {
+            if (apiKeyAvailability.getPlatform().equals(platform) && apiKeyAvailability.getRiotGame().equals(riotGame)) {
+                apiKeyAvailability:
+                apiKey.getAvailability().remove(apiKeyAvailability);
+            }
+        }
+
+        if (apiKey.getAvailability().isEmpty()) {
             apiKey.setDisabled(true);
         }
         this.apiKeyRepository.save(apiKey);

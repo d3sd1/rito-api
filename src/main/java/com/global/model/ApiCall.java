@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.global.configuration.Constants;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(schema = "logging")
@@ -38,6 +40,13 @@ public class ApiCall {
 
     @Column(nullable = false, unique = false)
     private Integer responseCode;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable()
+    @MapKeyColumn()
+    @Column()
+    private Map<String, String> parameters = new HashMap<String, String>();
+
 
     public Long getId() {
         return id;
@@ -111,6 +120,14 @@ public class ApiCall {
         this.riotGame = riotGame;
     }
 
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
+
     @Override
     public String toString() {
         return "ApiCall{" +
@@ -123,6 +140,7 @@ public class ApiCall {
                 ", callType=" + callType +
                 ", elapsedMilliseconds=" + elapsedMilliseconds +
                 ", responseCode=" + responseCode +
+                ", parameters=" + parameters +
                 '}';
     }
 }

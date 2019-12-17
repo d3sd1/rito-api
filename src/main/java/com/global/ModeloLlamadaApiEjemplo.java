@@ -33,6 +33,7 @@ public class ModeloLlamadaApiEjemplo {
         apiCall.setApiEndpoint(this.apiEndpointRepository.findByKeyName("lol-summoner-byname"));
         apiCall.setPlatform(this.platformRepository.findByServiceRegion("euw"));
         apiCall.setRiotGame(this.riotGameRepository.findByGameName("LoL"));
+        apiCall.getParameters().put("summonerName", "nova desdi");
         System.out.println(this.apiConnector.get(apiCall));
     }
 

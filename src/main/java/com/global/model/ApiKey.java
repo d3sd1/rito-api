@@ -1,12 +1,11 @@
 package com.global.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,13 +21,8 @@ public class ApiKey {
     @Column(nullable = false, unique = true)
     private String apiKey;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToMany
-    private List<Platform> platforms;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToMany
-    private List<RiotGame> riotGames;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<ApiKeyAvailability> availability = new ArrayList<>();
 
     @OneToOne
     private ApiKeyRateLimits apiKeyRateLimits = new ApiKeyRateLimits();
@@ -59,14 +53,6 @@ public class ApiKey {
         this.apiKey = apiKey;
     }
 
-    public List<Platform> getPlatforms() {
-        return platforms;
-    }
-
-    public void setPlatforms(List<Platform> platforms) {
-        this.platforms = platforms;
-    }
-
     public boolean isConfigured() {
         return configured;
     }
@@ -81,14 +67,6 @@ public class ApiKey {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
-    }
-
-    public List<RiotGame> getRiotGames() {
-        return riotGames;
-    }
-
-    public void setRiotGames(List<RiotGame> riotGames) {
-        this.riotGames = riotGames;
     }
 
     public ApiKeyRateLimits getApiKeyRateLimits() {
@@ -107,13 +85,20 @@ public class ApiKey {
         this.lastTimeUsed = lastTimeUsed;
     }
 
+    public List<ApiKeyAvailability> getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(List<ApiKeyAvailability> availability) {
+        this.availability = availability;
+    }
+
     @Override
     public String toString() {
         return "ApiKey{" +
                 "id=" + id +
                 ", apiKey='" + apiKey + '\'' +
-                ", platforms=" + platforms +
-                ", riotGames=" + riotGames +
+                ", availability=" + availability +
                 ", apiKeyRateLimits=" + apiKeyRateLimits +
                 ", configured=" + configured +
                 ", disabled=" + disabled +

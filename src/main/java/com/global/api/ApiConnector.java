@@ -14,6 +14,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class ApiConnector {
@@ -34,7 +35,8 @@ public class ApiConnector {
     @Autowired
     private ApiCallRepository apiCallRepository;
 
-    private ResponseEntity<String> call(ApiEndpoint apiEndpoint, ApiKey apiKey, Platform platform, HttpMethod httpMethod, Object body) {
+    private ResponseEntity<String> call(ApiEndpoint apiEndpoint, ApiKey apiKey, Platform platform, HttpMethod httpMethod,
+                                        Map<String, String> parameters, Object body) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> resp = new ResponseEntity<String>(HttpStatus.SEE_OTHER);
         if (apiKey == null || apiEndpoint == null || platform == null) {
@@ -50,9 +52,14 @@ public class ApiConnector {
             requestEntity = new HttpEntity<>(body);
         }
         try {
-            //TODO: pass path parameters right to here
+            String finalUrl = apiEndpoint.getEndpoint().replace("{{hostUrl}}", platform.getHostName());
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                finalUrl = finalUrl.replace(String.format("{{%s}}", key), value);
+            }
             resp = restTemplate.exchange(
-                    apiEndpoint.getEndpoint().replace("{{hostUrl}}", platform.getHostName()).replace("{{summonerName}}", "nova desdi"),
+                    finalUrl,
                     httpMethod, requestEntity,
                     String.class);
             /* Fill Api Key params */
@@ -65,10 +72,12 @@ public class ApiConnector {
             this.apiKeyRateLimitsRepository.save(apiKeyRateLimits);
 
 
+        } catch (IllegalArgumentException e) {
+            this.logger.error(String.format("Api call failured due to misconfiguration: Endpoint [%s] with parameter error [%s]. Parameters provided: %s", apiEndpoint.getEndpoint(), e.getLocalizedMessage(), parameters));
         } catch (HttpClientErrorException e) {
             Integer statusCode = e.getStatusCode().value();
             if (statusCode == 403) {
-                this.apiKeyManager.banKey(apiKey, platform);
+                this.apiKeyManager.banKey(apiKey, platform, apiEndpoint.getRiotGame());
             }
 
             ApiKeyRateLimits apiKeyRateLimits = apiKey.getApiKeyRateLimits();
@@ -96,7 +105,8 @@ public class ApiConnector {
         Long startTime = System.currentTimeMillis();
         apiCall.setApiKey(apiKey);
         apiCall.setCallType(Constants.CALL_TYPE.GET);
-        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.GET, null);
+        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.GET,
+                apiCall.getParameters(), null);
         apiCall.setJson(resp.getBody());
         apiCall.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
@@ -117,7 +127,8 @@ public class ApiConnector {
         Long startTime = System.currentTimeMillis();
         apiCall.setApiKey(apiKey);
         apiCall.setCallType(Constants.CALL_TYPE.POST);
-        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.POST, body);
+        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.POST,
+                apiCall.getParameters(), body);
         apiCall.setJson(resp.getBody());
         apiCall.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
@@ -138,7 +149,8 @@ public class ApiConnector {
         Long startTime = System.currentTimeMillis();
         apiCall.setApiKey(apiKey);
         apiCall.setCallType(Constants.CALL_TYPE.PUT);
-        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.PUT, body);
+        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.PUT,
+                apiCall.getParameters(), body);
         apiCall.setJson(resp.getBody());
         apiCall.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
@@ -155,7 +167,8 @@ public class ApiConnector {
         Long startTime = System.currentTimeMillis();
         apiCall.setApiKey(apiKey);
         apiCall.setCallType(Constants.CALL_TYPE.DELETE);
-        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.DELETE, null);
+        ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.DELETE,
+                apiCall.getParameters(), null);
         apiCall.setJson(resp.getBody());
         apiCall.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
