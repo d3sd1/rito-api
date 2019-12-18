@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+//prueba
 @Entity
 @Table(schema = "common")
 @JsonIgnoreProperties(ignoreUnknown = true)
