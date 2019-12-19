@@ -24,12 +24,18 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - "apt-get update -y"
-          - "apt-get install -y ssh"
-          - "ssh -v -o StrictHostKeyChecking=no -t $SFTP_USER@$SFTP_HOST 'ls'"
-          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
-          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
-          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'disown'"
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: '$SFTP_USER'
+              SERVER: '$SFTP_HOST'
+              COMMAND: 'pkill -9 java'
+              #MODE: '<string>' # Optional
+              #PORT: '<string>' # Optional
+              #SSH_KEY: '<string>' # Optional
+              # EXTRA_ARGS: '<string>' # Optional
+              #DEBUG: '<string>' # Optional
+          # - "ssh -v -t $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
+          # - "ssh -v -t $SFTP_USER@$SFTP_HOST 'disown'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USERK
