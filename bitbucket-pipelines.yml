@@ -27,8 +27,8 @@ pipelines:
           - "apt-get update -y"
           - "apt-get install -y ssh"
           - "apt-get install -y sudo"
-          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'ls'"
-          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh -t $SFTP_USER@$SFTP_HOST 'ls'"
+          - "ssh -t $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USERK
