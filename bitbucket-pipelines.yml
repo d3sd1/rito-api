@@ -28,6 +28,12 @@ pipelines:
             variables:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
+              COMMAND: "killall PROCESS || echo 'Process was not running.'"
+              DEBUG: 'true'
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
               COMMAND: "rm -rf /var/www/*"
               DEBUG: 'true'
           - pipe: atlassian/sftp-deploy:0.5.2
@@ -43,12 +49,7 @@ pipelines:
               SERVER: $SFTP_HOST
               COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
               DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: 'disown'
-              DEBUG: 'true'
+
 
     - step:
         deployment: PROD
