@@ -39,7 +39,7 @@ pipelines:
               USER: $SFTP_USER
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'src/main/resources/scripts'
+              LOCAL_PATH: 'src/main/resources/scripts/*'
               DEBUG: 'true'
           - "ssh $SFTP_USER@$SFTP_HOST 'nohup /var/www/run-scraper.sh &> /dev/null &'"
 
