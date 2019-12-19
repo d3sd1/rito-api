@@ -77,6 +77,11 @@
       "name": "onriot.db.poolsize",
       "type": "java.lang.String",
       "description": "Size of pool connection for database."
+    },
+    {
+      "name": "onriot.mail.sender.pass",
+      "type": "java.lang.String",
+      "description": "Mail sender password for SMTP access."
     }
   ]
 }
