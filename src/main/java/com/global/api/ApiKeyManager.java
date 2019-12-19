@@ -190,13 +190,11 @@ public class ApiKeyManager {
      * @param riotGame the riot game
      */
     public void banKey(ApiKey apiKey, Platform platform, RiotGame riotGame) {
-        // Ban key for current game and platform
-        for (ApiKeyAvailability apiKeyAvailability : apiKey.getAvailability()) {
-            if (apiKeyAvailability.getPlatform().equals(platform) && apiKeyAvailability.getRiotGame().equals(riotGame)) {
-                apiKeyAvailability:
-                apiKey.getAvailability().remove(apiKeyAvailability);
-            }
-        }
+        apiKey.getAvailability().removeIf(
+                apiKeyAvailability ->
+                        apiKeyAvailability.getPlatform().equals(platform)
+                                && apiKeyAvailability.getRiotGame().equals(riotGame)
+        );
 
         if (apiKey.getAvailability().isEmpty()) {
             apiKey.setDisabled(true);

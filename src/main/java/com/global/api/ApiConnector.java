@@ -13,6 +13,7 @@ import com.global.repository.ApiCallRepository;
 import com.global.repository.ApiKeyRateLimitsRepository;
 import com.global.repository.ApiResponseRepository;
 import com.global.services.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +31,10 @@ import java.util.Map;
  */
 @Service
 public class ApiConnector {
+
+    @Value("${spring.profiles.active}")
+    private String envName;
+
     private ApiKeyManager apiKeyManager;
     private ApiResponseRepository apiResponseRepository;
     private Logger logger;
@@ -51,14 +56,14 @@ public class ApiConnector {
     /**
      * Internal call for this class. Used to communicate scraper with remote apis.
      *
-     * @author d3sd1
-     * @param  apiEndpoint The endpoint to trigger.
-     * @param  apiKey The apiKey selected to use.
-     * @param  platform The platform of the object call.
-     * @param  httpMethod Call type (GET, POST, PUT, DELETE)
-     * @param  parameters Parameters to replace on the uri.
-     * @param  body Body to use on selected calls (POST, PUT)-
+     * @param apiEndpoint The endpoint to trigger.
+     * @param apiKey      The apiKey selected to use.
+     * @param platform    The platform of the object call.
+     * @param httpMethod  Call type (GET, POST, PUT, DELETE)
+     * @param parameters  Parameters to replace on the uri.
+     * @param body        Body to use on selected calls (POST, PUT)-
      * @return the api response.
+     * @author d3sd1
      */
     private ResponseEntity<String> call(ApiEndpoint apiEndpoint, ApiKey apiKey, Platform platform, HttpMethod httpMethod,
                                         Map<String, String> parameters, Object body) {
@@ -77,7 +82,11 @@ public class ApiConnector {
             requestEntity = new HttpEntity<>(body);
         }
         try {
-            String finalUrl = apiEndpoint.getEndpoint().replace("{{hostUrl}}", platform.getHostName());
+            String envUrl = apiEndpoint.getEndpoint();
+            if (this.envName.equalsIgnoreCase("dev") && apiEndpoint.getStub() != null) {
+                envUrl = apiEndpoint.getStub();
+            }
+            String finalUrl = envUrl.replace("{{hostUrl}}", platform.getHostName());
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();

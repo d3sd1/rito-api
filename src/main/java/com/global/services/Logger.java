@@ -32,13 +32,11 @@ import java.util.List;
 public class Logger {
     private LogRepository logRepository;
     private Mailer mailer;
-    private Logger logger;
     private MailNotificationRepository mailNotificationRepository;
 
-    public Logger(LogRepository logRepository, Mailer mailer, Logger logger, MailNotificationRepository mailNotificationRepository) {
+    public Logger(LogRepository logRepository, Mailer mailer, MailNotificationRepository mailNotificationRepository) {
         this.logRepository = logRepository;
         this.mailer = mailer;
-        this.logger = logger;
         this.mailNotificationRepository = mailNotificationRepository;
     }
 
@@ -136,11 +134,12 @@ public class Logger {
 
     /**
      * Send mails every 60s, to prevent spamming when app starts to fail.
+     *
      * @author d3sd1
      */
 
     @Scheduled(initialDelay = 60000, fixedDelay = 60000)
-    private void sendQueuedErrorMails() {
+    protected void sendQueuedErrorMails() {
         List<MailNotification> mailNotifications = this.mailNotificationRepository.findAll();
         this.mailNotificationRepository.deleteAll();
 
