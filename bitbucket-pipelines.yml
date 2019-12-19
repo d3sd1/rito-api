@@ -26,10 +26,10 @@ pipelines:
         script:
           - "apt-get update -y"
           - "apt-get install -y ssh"
-          - "ssh -v -T $SFTP_USER@$SFTP_HOST 'ls'"
-          - "ssh -v -T $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
-          - "ssh -v -T $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
-          - "ssh -v -T $SFTP_USER@$SFTP_HOST 'disown'"
+          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'ls'"
+          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
+          - "ssh -v -t $SFTP_USER@$SFTP_HOST 'disown'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USERK
