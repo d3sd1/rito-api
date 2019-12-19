@@ -47,7 +47,7 @@ pipelines:
             variables:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
-              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
+              COMMAND: "(nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/onriot-scraper.jar &> /dev/null &) && disown"
               DEBUG: 'true'
 
 
