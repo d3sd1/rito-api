@@ -24,10 +24,6 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - "apt-get update -y"
-          - "apt-get install -y ssh"
-          - "ssh -tt $SFTP_USER@$SFTP_HOST 'ls'"
-          - "ssh -tt $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USERK
@@ -35,6 +31,10 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
+          - "apt-get update -y"
+          - "apt-get install -y ssh"
+          - "ssh -tt $SFTP_USER@$SFTP_HOST 'ls'"
+          - "ssh -tt $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
 
     - step:
         deployment: PROD
