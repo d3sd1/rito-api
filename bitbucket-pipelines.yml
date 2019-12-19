@@ -38,6 +38,8 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/update-test.sh'
               DEBUG: 'true'
+        services:
+          - postgres
 
     - step:
         deployment: PROD
@@ -62,3 +64,11 @@ pipelines:
               DEBUG: 'false'
 
           # PROD SERVER 2 HERE
+definitions:
+  services:
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_DB: 'dev_onriot'
+        POSTGRES_USER: 'postgres'
+        POSTGRES_PASSWORD: 'postgres'
