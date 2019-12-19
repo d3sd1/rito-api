@@ -26,7 +26,7 @@ pipelines:
         script:
           - "apt-get update -y"
           - "apt-get install -y ssh"
-          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh onriot@167.86.78.132 'pkill -9 java'"
           - "ssh $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
           - "ssh $SFTP_USER@$SFTP_HOST 'disown'"
           - pipe: atlassian/sftp-deploy:0.5.2
