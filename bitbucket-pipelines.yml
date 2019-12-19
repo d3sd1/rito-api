@@ -28,7 +28,7 @@ pipelines:
             variables:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
-              COMMAND: 'pkill -9 java'
+              COMMAND: "'pkill -9 java'"
               DEBUG: 'true'
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
