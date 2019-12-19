@@ -11,9 +11,11 @@ pipelines:
         caches:
           - maven
         script:
-          - mvn -Dspring.profiles.active=bitbucketpipeline -B verify
-          - mvn -Dspring.profiles.active=bitbucketpipeline -B compile
-          - mvn -Dspring.profiles.active=bitbucketpipeline -B package
+          - mvn -B verify
+          - mvn -B compile
+          - mvn -B package
+        services:
+          - postgres
         artifacts:
           - target/**
           - src/main/resources/scripts/update-test.sh
@@ -38,8 +40,6 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/update-test.sh'
               DEBUG: 'true'
-        services:
-          - postgres
 
     - step:
         deployment: PROD
