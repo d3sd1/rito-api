@@ -18,8 +18,6 @@ pipelines:
           - postgres
         artifacts:
           - target/**
-          - src/main/resources/scripts/update-test.sh
-          - src/main/resources/scripts/update-prod.sh
 
     - step:
         deployment: TEST
