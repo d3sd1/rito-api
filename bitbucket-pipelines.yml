@@ -26,19 +26,17 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
+          - "apt-get update -y"
+          - "apt-get install -y ssh"
+          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'disown'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
-              DEBUG: 'true'
-          - pipe: atlassian/sftp-deploy:0.5.2
-            variables:
-              USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'src/main/resources/scripts/update-test.sh'
               DEBUG: 'true'
 
     - step:
@@ -47,6 +45,11 @@ pipelines:
         trigger: manual
         image: atlassian/default-image:2
         script:
+          - "apt-get update -y"
+          - "apt-get install -y ssh"
+          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'disown'"
           # PROD SERVER 1
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
@@ -55,13 +58,6 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
-          - pipe: atlassian/sftp-deploy:0.5.2
-            variables:
-              USER: $SFTP_USER
-              SERVER: $SFTP_HOST_1
-              REMOTE_PATH: '/var/www'
-              LOCAL_PATH: 'src/main/resources/scripts/update-prod.sh'
-              DEBUG: 'false'
 
           # PROD SERVER 2 HERE
 definitions:
