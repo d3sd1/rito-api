@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global;
 
 import com.global.api.ApiConnector;
@@ -6,26 +13,37 @@ import com.global.repository.ApiEndpointRepository;
 import com.global.repository.PlatformRepository;
 import com.global.repository.RiotGameRepository;
 import com.global.setup.RequiresInitialSetup;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 
+/**
+ * The type Modelo llamada api ejemplo.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Component
 public class ModeloLlamadaApiEjemplo {
-
-    @Autowired
     private ApiConnector apiConnector;
-
-    @Autowired
     private RiotGameRepository riotGameRepository;
-
-    @Autowired
     private PlatformRepository platformRepository;
-
-    @Autowired
     private ApiEndpointRepository apiEndpointRepository;
 
+    public ModeloLlamadaApiEjemplo(ApiConnector apiConnector,
+                                   RiotGameRepository riotGameRepository,
+                                   PlatformRepository platformRepository,
+                                   ApiEndpointRepository apiEndpointRepository) {
+        this.apiConnector = apiConnector;
+        this.riotGameRepository = riotGameRepository;
+        this.platformRepository = platformRepository;
+        this.apiEndpointRepository = apiEndpointRepository;
+    }
+
+    /**
+     * TEST
+     * @deprecated
+     */
     @RequiresInitialSetup
     @Scheduled(fixedDelay = 5000)
     public void test() {

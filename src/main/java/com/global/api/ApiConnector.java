@@ -1,12 +1,18 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.api;
 
 import com.global.configuration.Constants;
 import com.global.model.*;
 import com.global.repository.ApiCallRepository;
 import com.global.repository.ApiKeyRateLimitsRepository;
-import com.global.repository.ApiKeyRepository;
+import com.global.repository.ApiResponseRepository;
 import com.global.services.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -16,25 +22,44 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Api caller. Used to communicate with Riot Games Api.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Service
 public class ApiConnector {
-
-    @Autowired
     private ApiKeyManager apiKeyManager;
-
-    @Autowired
-    private ApiKeyRepository apiKeyRepository;
-
-    @Autowired
+    private ApiResponseRepository apiResponseRepository;
     private Logger logger;
-
-
-    @Autowired
     private ApiKeyRateLimitsRepository apiKeyRateLimitsRepository;
-
-    @Autowired
     private ApiCallRepository apiCallRepository;
 
+    public ApiConnector(ApiKeyManager apiKeyManager,
+                        ApiResponseRepository apiResponseRepository,
+                        Logger logger,
+                        ApiKeyRateLimitsRepository apiKeyRateLimitsRepository,
+                        ApiCallRepository apiCallRepository) {
+        this.apiKeyManager = apiKeyManager;
+        this.apiResponseRepository = apiResponseRepository;
+        this.logger = logger;
+        this.apiKeyRateLimitsRepository = apiKeyRateLimitsRepository;
+        this.apiCallRepository = apiCallRepository;
+    }
+
+    /**
+     * Internal call for this class. Used to communicate scraper with remote apis.
+     *
+     * @author d3sd1
+     * @param  apiEndpoint The endpoint to trigger.
+     * @param  apiKey The apiKey selected to use.
+     * @param  platform The platform of the object call.
+     * @param  httpMethod Call type (GET, POST, PUT, DELETE)
+     * @param  parameters Parameters to replace on the uri.
+     * @param  body Body to use on selected calls (POST, PUT)-
+     * @return the api response.
+     */
     private ResponseEntity<String> call(ApiEndpoint apiEndpoint, ApiKey apiKey, Platform platform, HttpMethod httpMethod,
                                         Map<String, String> parameters, Object body) {
         RestTemplate restTemplate = new RestTemplate();
@@ -70,8 +95,6 @@ public class ApiConnector {
             apiKeyRateLimits.setMethodRateLimitMax(resp.getHeaders().get("X-Method-Rate-Limit").get(0));
 
             this.apiKeyRateLimitsRepository.save(apiKeyRateLimits);
-
-
         } catch (IllegalArgumentException e) {
             this.logger.error(String.format("Api call failured due to misconfiguration: Endpoint [%s] with parameter error [%s]. Parameters provided: %s", apiEndpoint.getEndpoint(), e.getLocalizedMessage(), parameters));
         } catch (HttpClientErrorException e) {
@@ -97,84 +120,140 @@ public class ApiConnector {
         return resp;
     }
 
-    public ApiCall get(ApiCall apiCall) {
+    /**
+     * GET type api call.
+     *
+     * @param apiCall the api call
+     * @return the api response
+     * @author d3sd1
+     */
+    public ApiResponse get(ApiCall apiCall) {
         ApiKey apiKey = null;
+        ApiResponse apiResponse = new ApiResponse();
+
         if (apiCall.getApiEndpoint().isRequiresApiKey()) {
             apiKey = this.apiKeyManager.getKey(apiCall.getPlatform(), apiCall.getRiotGame());
         }
         Long startTime = System.currentTimeMillis();
-        apiCall.setApiKey(apiKey);
-        apiCall.setCallType(Constants.CALL_TYPE.GET);
+        apiResponse.setApiKey(apiKey);
+        apiResponse.setCallType(Constants.CALL_TYPE.GET);
         ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.GET,
                 apiCall.getParameters(), null);
-        apiCall.setJson(resp.getBody());
-        apiCall.setResponseCode(resp.getStatusCodeValue());
+        apiResponse.setJson(resp.getBody());
+        apiResponse.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
-        apiCall.setElapsedMilliseconds((int) (currentTime - startTime));
+        apiResponse.setElapsedMilliseconds((int) (currentTime - startTime));
         this.apiCallRepository.save(apiCall);
-        return apiCall;
+        this.apiResponseRepository.save(apiResponse);
+        return apiResponse;
     }
 
-    public ApiCall post(ApiCall apiCall) {
+    /**
+     * Post api call.
+     *
+     * @param apiCall the api call
+     * @return the api call
+     * @author d3sd1
+     */
+    public ApiResponse post(ApiCall apiCall) {
         return this.post(apiCall, null);
     }
 
-    public ApiCall post(ApiCall apiCall, Object body) {
+    /**
+     * POST type api call.
+     *
+     * @param apiCall the api call
+     * @param body    the body
+     * @return the api response
+     * @author d3sd1
+     */
+    public ApiResponse post(ApiCall apiCall, Object body) {
         ApiKey apiKey = null;
+        ApiResponse apiResponse = new ApiResponse();
+
         if (apiCall.getApiEndpoint().isRequiresApiKey()) {
             apiKey = this.apiKeyManager.getKey(apiCall.getPlatform(), apiCall.getRiotGame());
         }
         Long startTime = System.currentTimeMillis();
-        apiCall.setApiKey(apiKey);
-        apiCall.setCallType(Constants.CALL_TYPE.POST);
+        apiResponse.setApiKey(apiKey);
+        apiResponse.setCallType(Constants.CALL_TYPE.POST);
         ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.POST,
                 apiCall.getParameters(), body);
-        apiCall.setJson(resp.getBody());
-        apiCall.setResponseCode(resp.getStatusCodeValue());
+        apiResponse.setJson(resp.getBody());
+        apiResponse.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
-        apiCall.setElapsedMilliseconds((int) (currentTime - startTime));
+        apiResponse.setElapsedMilliseconds((int) (currentTime - startTime));
         this.apiCallRepository.save(apiCall);
-        return apiCall;
+        this.apiResponseRepository.save(apiResponse);
+        return apiResponse;
     }
 
-    public ApiCall put(ApiCall apiCall) {
+    /**
+     * PUT type api call without body.
+     *
+     * @param apiCall the api call
+     * @return the api response
+     * @author d3sd1
+     */
+    public ApiResponse put(ApiCall apiCall) {
         return this.put(apiCall, null);
     }
 
-    public ApiCall put(ApiCall apiCall, Object body) {
+    /**
+     * PUT type api call.
+     *
+     * @param apiCall the api call
+     * @param body    the body
+     * @return the api response
+     * @author d3sd1
+     */
+    public ApiResponse put(ApiCall apiCall, Object body) {
         ApiKey apiKey = null;
+        ApiResponse apiResponse = new ApiResponse();
+
         if (apiCall.getApiEndpoint().isRequiresApiKey()) {
             apiKey = this.apiKeyManager.getKey(apiCall.getPlatform(), apiCall.getRiotGame());
         }
         Long startTime = System.currentTimeMillis();
-        apiCall.setApiKey(apiKey);
-        apiCall.setCallType(Constants.CALL_TYPE.PUT);
+        apiResponse.setApiKey(apiKey);
+        apiResponse.setCallType(Constants.CALL_TYPE.PUT);
         ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.PUT,
                 apiCall.getParameters(), body);
-        apiCall.setJson(resp.getBody());
-        apiCall.setResponseCode(resp.getStatusCodeValue());
+        apiResponse.setJson(resp.getBody());
+        apiResponse.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
-        apiCall.setElapsedMilliseconds((int) (currentTime - startTime));
+        apiResponse.setElapsedMilliseconds((int) (currentTime - startTime));
         this.apiCallRepository.save(apiCall);
-        return apiCall;
+        this.apiResponseRepository.save(apiResponse);
+        return apiResponse;
     }
 
-    public ApiCall delete(ApiCall apiCall) {
+    /**
+     * DELETE type api call.
+     *
+     * @param apiCall the api call
+     * @return the api response
+     * @author d3sd1
+     */
+    public ApiResponse delete(ApiCall apiCall) {
         ApiKey apiKey = null;
+        ApiResponse apiResponse = new ApiResponse();
+
         if (apiCall.getApiEndpoint().isRequiresApiKey()) {
             apiKey = this.apiKeyManager.getKey(apiCall.getPlatform(), apiCall.getRiotGame());
         }
         Long startTime = System.currentTimeMillis();
-        apiCall.setApiKey(apiKey);
-        apiCall.setCallType(Constants.CALL_TYPE.DELETE);
+        apiResponse.setApiKey(apiKey);
+        apiResponse.setCallType(Constants.CALL_TYPE.DELETE);
         ResponseEntity<String> resp = this.call(apiCall.getApiEndpoint(), apiKey, apiCall.getPlatform(), HttpMethod.DELETE,
                 apiCall.getParameters(), null);
-        apiCall.setJson(resp.getBody());
-        apiCall.setResponseCode(resp.getStatusCodeValue());
+        apiResponse.setJson(resp.getBody());
+        apiResponse.setResponseCode(resp.getStatusCodeValue());
         Long currentTime = System.currentTimeMillis();
-        apiCall.setElapsedMilliseconds((int) (currentTime - startTime));
+        apiResponse.setElapsedMilliseconds((int) (currentTime - startTime));
         this.apiCallRepository.save(apiCall);
-        return apiCall;
+        this.apiResponseRepository.save(apiResponse);
+        return apiResponse;
     }
 
 }

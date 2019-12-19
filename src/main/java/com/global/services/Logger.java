@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.services;
 
 import com.global.model.MailNotification;
@@ -7,7 +14,6 @@ import com.global.services.logger.LogLevel;
 import com.global.services.logger.LogRepository;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,21 +21,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 
+/**
+ * The type Logger.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Service("LogService")
 @Transactional
 public class Logger {
-    @Autowired
     private LogRepository logRepository;
-
-    @Autowired
     private Mailer mailer;
-
-    @Autowired
     private Logger logger;
-
-    @Autowired
     private MailNotificationRepository mailNotificationRepository;
 
+    public Logger(LogRepository logRepository, Mailer mailer, Logger logger, MailNotificationRepository mailNotificationRepository) {
+        this.logRepository = logRepository;
+        this.mailer = mailer;
+        this.logger = logger;
+        this.mailNotificationRepository = mailNotificationRepository;
+    }
 
     private Class<?> getCaller() {
         try {
@@ -49,11 +60,21 @@ public class Logger {
         }
     }
 
+    /**
+     * Debug.
+     *
+     * @param msg the msg
+     */
     public void debug(String msg) {
         org.slf4j.Logger consoleLogger = LoggerFactory.getLogger(this.getCaller());
         consoleLogger.info(msg);
     }
 
+    /**
+     * Info.
+     *
+     * @param msg the msg
+     */
     public void info(String msg) {
         org.slf4j.Logger consoleLogger = LoggerFactory.getLogger(this.getCaller());
         consoleLogger.info(msg);
@@ -63,6 +84,11 @@ public class Logger {
         this.logRepository.save(log);
     }
 
+    /**
+     * Warning.
+     *
+     * @param msg the msg
+     */
     public void warning(String msg) {
         org.slf4j.Logger consoleLogger = LoggerFactory.getLogger(this.getCaller());
         consoleLogger.warn(msg);
@@ -73,10 +99,20 @@ public class Logger {
         this.logRepository.save(log);
     }
 
+    /**
+     * Error.
+     *
+     * @param e the e
+     */
     public void error(Exception e) {
         this.error(ExceptionUtils.getStackTrace(e));
     }
 
+    /**
+     * Error.
+     *
+     * @param msg the msg
+     */
     public void error(String msg) {
         org.slf4j.Logger consoleLogger = LoggerFactory.getLogger(this.getCaller());
         consoleLogger.error(msg);
@@ -87,11 +123,21 @@ public class Logger {
         this.logRepository.save(log);
     }
 
+    /**
+     * Queue error mail.
+     *
+     * @param log the log
+     */
     public void queueErrorMail(Log log) {
         MailNotification mailNotification = new MailNotification();
         mailNotification.setLog(log);
         this.mailNotificationRepository.save(mailNotification);
     }
+
+    /**
+     * Send mails every 60s, to prevent spamming when app starts to fail.
+     * @author d3sd1
+     */
 
     @Scheduled(initialDelay = 60000, fixedDelay = 60000)
     private void sendQueuedErrorMails() {

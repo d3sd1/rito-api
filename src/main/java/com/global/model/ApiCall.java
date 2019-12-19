@@ -1,12 +1,24 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.global.configuration.Constants;
 
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * API Call model.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Entity
 @Table(schema = "logging")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,12 +29,6 @@ public class ApiCall {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = true, unique = false, columnDefinition = "text")
-    private String json;
-
-    @OneToOne
-    private ApiKey apiKey;
-
     @OneToOne
     private ApiEndpoint apiEndpoint;
 
@@ -32,115 +38,99 @@ public class ApiCall {
     @OneToOne
     private RiotGame riotGame;
 
-    @Column(nullable = true, unique = false)
-    private Constants.CALL_TYPE callType = Constants.CALL_TYPE.GET;
-
-    @Column(nullable = false, unique = false, columnDefinition = "text")
-    private Integer elapsedMilliseconds;
-
-    @Column(nullable = false, unique = false)
-    private Integer responseCode;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable()
     @MapKeyColumn()
     @Column()
     private Map<String, String> parameters = new HashMap<String, String>();
 
-
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public ApiKey getApiKey() {
-        return apiKey;
-    }
-
-    public void setApiKey(ApiKey apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    public Integer getElapsedMilliseconds() {
-        return elapsedMilliseconds;
-    }
-
-    public void setElapsedMilliseconds(Integer elapsedMilliseconds) {
-        this.elapsedMilliseconds = elapsedMilliseconds;
-    }
-
-    public Constants.CALL_TYPE getCallType() {
-        return callType;
-    }
-
-    public void setCallType(Constants.CALL_TYPE callType) {
-        this.callType = callType;
-    }
-
-    public Integer getResponseCode() {
-        return responseCode;
-    }
-
-    public void setResponseCode(Integer responseCode) {
-        this.responseCode = responseCode;
-    }
-
+    /**
+     * Gets api endpoint.
+     *
+     * @return the api endpoint
+     */
     public ApiEndpoint getApiEndpoint() {
         return apiEndpoint;
     }
 
+    /**
+     * Sets api endpoint.
+     *
+     * @param apiEndpoint the api endpoint
+     */
     public void setApiEndpoint(ApiEndpoint apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
     }
 
+    /**
+     * Gets platform.
+     *
+     * @return the platform
+     */
     public Platform getPlatform() {
         return platform;
     }
 
+    /**
+     * Sets platform.
+     *
+     * @param platform the platform
+     */
     public void setPlatform(Platform platform) {
         this.platform = platform;
     }
 
+    /**
+     * Gets riot game.
+     *
+     * @return the riot game
+     */
     public RiotGame getRiotGame() {
         return riotGame;
     }
 
+    /**
+     * Sets riot game.
+     *
+     * @param riotGame the riot game
+     */
     public void setRiotGame(RiotGame riotGame) {
         this.riotGame = riotGame;
     }
 
+    /**
+     * Gets parameters.
+     *
+     * @return the parameters
+     */
     public Map<String, String> getParameters() {
         return parameters;
     }
 
+    /**
+     * Sets parameters.
+     *
+     * @param parameters the parameters
+     */
     public void setParameters(Map<String, String> parameters) {
         this.parameters = parameters;
-    }
-
-    @Override
-    public String toString() {
-        return "ApiCall{" +
-                "id=" + id +
-                ", json='" + json + '\'' +
-                ", apiKey=" + apiKey +
-                ", apiEndpoint=" + apiEndpoint +
-                ", platform=" + platform +
-                ", riotGame=" + riotGame +
-                ", callType=" + callType +
-                ", elapsedMilliseconds=" + elapsedMilliseconds +
-                ", responseCode=" + responseCode +
-                ", parameters=" + parameters +
-                '}';
     }
 }

@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -8,12 +14,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+/**
+ * Network manager. Used for retrieving server information.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Service
 public class Network {
 
-    @Autowired
     private Logger logger;
 
+    public Network(Logger logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * Gets public ip.
+     *
+     * @return the public ip
+     */
     public String getPublicIp() {
         String publicIp = "0.0.0.0";
         try {

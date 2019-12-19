@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.api;
 
 import com.global.model.ApiKey;
@@ -8,7 +15,6 @@ import com.global.repository.ApiKeyAvailabilityRepository;
 import com.global.repository.ApiKeyRateLimitsRepository;
 import com.global.repository.ApiKeyRepository;
 import com.global.services.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,27 +23,38 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The type Api key manager.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 /*
 Esto se podría optimizar haciendo los rate limit por cada método en lugar de la app en general.
  */
 @Service
 public class ApiKeyManager {
 
-    @Autowired
     private ApiKeyRepository apiKeyRepository;
-
-    @Autowired
     private ApiKeyAvailabilityRepository apiKeyAvailabilityRepository;
-
-    @Autowired
     private ApiKeyRateLimitsRepository apiKeyRateLimitsRepository;
-
-    @Autowired
     private Logger logger;
+    private List<ApiKey> apiKeys;
 
-    private List<ApiKey> apiKeys = new ArrayList<>();
+    public ApiKeyManager(ApiKeyRepository apiKeyRepository, ApiKeyAvailabilityRepository apiKeyAvailabilityRepository, ApiKeyRateLimitsRepository apiKeyRateLimitsRepository, Logger logger) {
+        this.apiKeyRepository = apiKeyRepository;
+        this.apiKeyAvailabilityRepository = apiKeyAvailabilityRepository;
+        this.apiKeyRateLimitsRepository = apiKeyRateLimitsRepository;
+        this.logger = logger;
+        this.apiKeys = new ArrayList<>();
+    }
 
-    // Cache api keys so we lower the database calls so badly
+    /**
+     * Regenerate api keys, preventing them to get stuck on rate limit.
+     *
+     * @author d3sd1
+     */
+// Cache api keys so we lower the database calls so badly
     @Scheduled(fixedDelay = 60000)
     public void regenerateApiKeys() {
         this.apiKeys = this.apiKeyRepository.findAllByDisabledIsFalseAndConfiguredIsTrue();
@@ -55,6 +72,14 @@ public class ApiKeyManager {
         }
     }
 
+    /**
+     * Gets key.
+     *
+     * @param platform the platform
+     * @param riotGame the riot game
+     * @return the key
+     * @author d3sd1
+     */
     public ApiKey getKey(Platform platform, RiotGame riotGame) {
         // OK Tiene que ser para la plataforma (region) dada
         // OK no puede estar deshabilurada
@@ -157,6 +182,13 @@ public class ApiKeyManager {
         return validApiKey;
     }
 
+    /**
+     * Ban key based on platform and riot game.
+     *
+     * @param apiKey   the api key to ban
+     * @param platform the platform
+     * @param riotGame the riot game
+     */
     public void banKey(ApiKey apiKey, Platform platform, RiotGame riotGame) {
         // Ban key for current game and platform
         for (ApiKeyAvailability apiKeyAvailability : apiKey.getAvailability()) {

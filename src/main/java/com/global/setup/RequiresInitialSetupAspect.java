@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 package com.global.setup;
 
 import com.global.repository.RunLogRepository;
@@ -5,20 +12,34 @@ import com.global.services.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Initial setup label logic.
+ *
+ * @author d3sd1
+ * @version 0.0.9
+ */
 @Aspect
 @Component
 public class RequiresInitialSetupAspect {
-    @Autowired
     private Logger logger;
-
-    @Autowired
     private RunLogRepository runLogRepository;
+
+    public RequiresInitialSetupAspect(Logger logger, RunLogRepository runLogRepository) {
+        this.logger = logger;
+        this.runLogRepository = runLogRepository;
+    }
 
     private boolean messageShown = true;
 
+    /**
+     * Log execution time object.
+     *
+     * @param joinPoint the join point
+     * @return the object
+     * @throws Throwable the throwable
+     */
     @Around("@annotation(RequiresInitialSetup)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         if (this.runLogRepository.findAll().isEmpty()) {
