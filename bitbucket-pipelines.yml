@@ -26,6 +26,7 @@ pipelines:
         script:
           - "apt-get update -y"
           - "apt-get install -y ssh"
+          - "ssh -t $SFTP_USER@$SFTP_HOST ls"
           - "ssh -t $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
           - "ssh -T $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
           - "ssh -T $SFTP_USER@$SFTP_HOST 'disown'"
