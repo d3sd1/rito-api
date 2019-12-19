@@ -24,6 +24,12 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'pkill -9 java && rm -rf /var/www/*'
+              DEBUG: 'true'
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
@@ -35,10 +41,14 @@ pipelines:
             variables:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
-              COMMAND: 'ls'
-              DEBUG: 'true' # Optional
-          #- "ssh -ttv $SFTP_USER@$SFTP_HOST 'ls'"
-          #- "ssh -ttv $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
+              DEBUG: 'true'
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'disown'
+              DEBUG: 'true'
 
     - step:
         deployment: PROD
@@ -46,18 +56,31 @@ pipelines:
         trigger: manual
         image: atlassian/default-image:2
         script:
-          - "apt-get update -y"
-          - "apt-get install -y ssh"
-          - "ssh -T $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
-          - "ssh -T $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
-          - "ssh -T $SFTP_USER@$SFTP_HOST 'disown'"
-          # PROD SERVER 1
+          - # PROD SERVER 1
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'pkill -9 java && rm -rf /var/www/*'
+              DEBUG: 'true'
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
-              SERVER: $SFTP_HOST_1
+              SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
+              DEBUG: 'true'
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
+              DEBUG: 'true'
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'disown'
               DEBUG: 'true'
 
           # PROD SERVER 2 HERE
