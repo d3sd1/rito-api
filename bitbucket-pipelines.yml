@@ -31,7 +31,7 @@ pipelines:
               COMMAND: 'pkill -9 java'
               #MODE: '<string>' # Optional
               #PORT: '<string>' # Optional
-              #SSH_KEY: '<string>' # Optional
+              SSH_KEY: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6iOzqEPSnbbgDC5sV30Bxll8KgYxlVIMBLo1wwM8/ytyvThkaFLo3vC/m6MqiL6U9QRos0IGvBEul83agWDwcHXJdVkayY3mjTln4CsfZFO4BMB/EmU6JGl8Obgmej/QFNre0zV2zDWDurmK62S9SPAmnfUUh/hIs/Mg2E/8AnzjxseotVZLUnxxjUSsCDA1FYO8Vu9rnhvcx9ElcmWavmZ2bDwzq9CSOyrpkHrnpUt4+oIjaU4MzO+LCLnGzujH3yv6vClRelGjlKBIfd8HjOr6BeXvAKZN/Y1wMaTCu25uyCdPI+2XLO1CExuYJOuRvb1TnQDseWF3vlws20x8t root@mx.onriot.net' # Optional
               # EXTRA_ARGS: '<string>' # Optional
               #DEBUG: '<string>' # Optional
           # - "ssh -v -t $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=test -jar /var/www/*.jar &> /dev/null &'"
