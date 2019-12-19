@@ -18,24 +18,15 @@ pipelines:
           - postgres
         artifacts:
           - target/**
+          - src/main/resources/scripts/run-scraper.sh
 
     - step:
         deployment: TEST
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: "killall PROCESS || echo 'Process was not running.'"
-              DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: "rm -rf /var/www/*"
-              DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST 'killall PROCESS || echo PROCESS_WAS_NOT_RUNNING'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
@@ -43,13 +34,14 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
-          - "ssh $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null & disown'"
-          - pipe: atlassian/ssh-run:0.2.3
+          - pipe: atlassian/sftp-deploy:0.5.2
             variables:
-              SSH_USER: $SFTP_USER
+              USER: $SFTP_USER
               SERVER: $SFTP_HOST
-              COMMAND: "(nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/onriot-scraper.jar> /dev/null 2>&1 & disown)"
+              REMOTE_PATH: '/var/www'
+              LOCAL_PATH: 'src/main/resources/scripts'
               DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST 'nohup /var/www/run-scraper.sh &> /dev/null &'"
 
 
     - step:
