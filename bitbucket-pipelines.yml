@@ -47,13 +47,7 @@ pipelines:
             variables:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
-              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/onriot-scraper.jar &> /dev/null &"
-              DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: "disown"
+              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/onriot-scraper.jar> /dev/null 2>&1 &"
               DEBUG: 'true'
 
 
@@ -82,12 +76,6 @@ pipelines:
               SSH_USER: $SFTP_USER
               SERVER: $SFTP_HOST
               COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
-              DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: 'disown'
               DEBUG: 'true'
 
           # PROD SERVER 2 HERE
