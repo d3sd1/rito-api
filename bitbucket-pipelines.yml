@@ -31,10 +31,14 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
-          - "apt-get update -y"
-          - "apt-get install -y ssh"
-          - "ssh -tt $SFTP_USER@$SFTP_HOST 'ls'"
-          - "ssh -tt $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - pipe: atlassian/ssh-run:0.2.3
+            variables:
+              SSH_USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              COMMAND: 'ls'
+              DEBUG: 'true' # Optional
+          #- "ssh -ttv $SFTP_USER@$SFTP_HOST 'ls'"
+          #- "ssh -ttv $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
 
     - step:
         deployment: PROD
