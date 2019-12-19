@@ -43,6 +43,7 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
               DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST 'nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null & disown'"
           - pipe: atlassian/ssh-run:0.2.3
             variables:
               SSH_USER: $SFTP_USER
@@ -70,12 +71,6 @@ pipelines:
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
-              DEBUG: 'true'
-          - pipe: atlassian/ssh-run:0.2.3
-            variables:
-              SSH_USER: $SFTP_USER
-              SERVER: $SFTP_HOST
-              COMMAND: "nohup java -Dspring.profiles.active=$SFTP_ENV -jar /var/www/*.jar &> /dev/null &"
               DEBUG: 'true'
 
           # PROD SERVER 2 HERE
