@@ -32,7 +32,7 @@ pipelines:
           - "ssh -v -T $SFTP_USER@$SFTP_HOST 'disown'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
-              USER: $SFTP_USER
+              USER: $SFTP_USERK
               SERVER: $SFTP_HOST
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'target/*.jar'
