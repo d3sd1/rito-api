@@ -53,8 +53,8 @@ pipelines:
         image: atlassian/default-image:2
         script:
           # PROD SERVER 1
-          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java || echo IT_WAS_OK'"
-          - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
+          - "ssh $SFTP_USER@SFTP_HOST_1 'pkill -9 java || echo IT_WAS_OK'"
+          - "ssh $SFTP_USER@SFTP_HOST_1 'rm -rf /var/www/*'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
               USER: $SFTP_USER
@@ -69,9 +69,9 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/*'
               DEBUG: 'true'
-          - "ssh $SFTP_USER@$SFTP_HOST touch /var/www/env.conf"
-          - "ssh $SFTP_USER@$SFTP_HOST \"echo -e $SFTP_ENV >> /var/www/env.conf\""
-          - "ssh $SFTP_USER@$SFTP_HOST 'chmod +x /var/www/run-scraper.sh && sh /var/www/run-scraper.sh &> /dev/null & disown'"
+          - "ssh $SFTP_USER@SFTP_HOST_1 touch /var/www/env.conf"
+          - "ssh $SFTP_USER@SFTP_HOST_1 \"echo -e $SFTP_ENV >> /var/www/env.conf\""
+          - "ssh $SFTP_USER@SFTP_HOST_1 'chmod +x /var/www/run-scraper.sh && sh /var/www/run-scraper.sh &> /dev/null & disown'"
 
           # PROD SERVER 2 HERE
 definitions:
