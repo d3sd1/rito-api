@@ -25,7 +25,7 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java || echo IT_WAS_OK'"
           - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
