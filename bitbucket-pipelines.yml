@@ -41,6 +41,7 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/*'
               DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST touch /var/www/env"
           - "ssh $SFTP_USER@$SFTP_HOST echo $SFTP_ENV > /var/www/env"
           - "ssh $SFTP_USER@$SFTP_HOST 'chmod +x /var/www/run-scraper.sh && sh /var/www/run-scraper.sh &> /var/www/deploy.log & disown'"
 
