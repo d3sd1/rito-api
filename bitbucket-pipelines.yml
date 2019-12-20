@@ -50,24 +50,24 @@ pipelines:
         trigger: manual
         image: atlassian/default-image:2
         script:
-          - # PROD SERVER 1
-            - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
-            - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
-            - pipe: atlassian/sftp-deploy:0.5.2
-              variables:
-                USER: $SFTP_USER
-                SERVER: $SFTP_HOST
-                REMOTE_PATH: '/var/www'
-                LOCAL_PATH: 'target/*.jar'
-                DEBUG: 'true'
-            - pipe: atlassian/sftp-deploy:0.5.2
-              variables:
-                USER: $SFTP_USER
-                SERVER: $SFTP_HOST
-                REMOTE_PATH: '/var/www'
-                LOCAL_PATH: 'src/main/resources/scripts/*'
-                DEBUG: 'true'
-            - "ssh $SFTP_USER@$SFTP_HOST 'chmod +x /var/www/run-scraper.sh && nohup /var/www/run-scraper.sh $SFTP_ENV &> /dev/null & disown'"
+          # PROD SERVER 1
+          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
+          - pipe: atlassian/sftp-deploy:0.5.2
+            variables:
+              USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              REMOTE_PATH: '/var/www'
+              LOCAL_PATH: 'target/*.jar'
+              DEBUG: 'true'
+          - pipe: atlassian/sftp-deploy:0.5.2
+            variables:
+              USER: $SFTP_USER
+              SERVER: $SFTP_HOST
+              REMOTE_PATH: '/var/www'
+              LOCAL_PATH: 'src/main/resources/scripts/*'
+              DEBUG: 'true'
+          - "ssh $SFTP_USER@$SFTP_HOST 'chmod +x /var/www/run-scraper.sh && nohup /var/www/run-scraper.sh $SFTP_ENV &> /dev/null & disown'"
 
           # PROD SERVER 2 HERE
 definitions:
