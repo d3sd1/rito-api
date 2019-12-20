@@ -7,6 +7,7 @@
 
 package com.global.ci;
 
+import com.global.services.Logger;
 import com.global.services.Mailer;
 import com.global.services.Network;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +27,16 @@ public class Notifier {
     @Value("${spring.profiles.active}")
     private String envName;
 
-    public Notifier(Mailer mailer, Network network) {
-        this.mailer = mailer;
-        this.network = network;
-    }
+    private Logger logger;
 
     private Mailer mailer;
     private Network network;
 
+    public Notifier(Mailer mailer, Network network, Logger logger) {
+        this.mailer = mailer;
+        this.network = network;
+        this.logger = logger;
+    }
 
     /**
      * Notify that app has been loaded successfully.
@@ -43,8 +46,9 @@ public class Notifier {
      */
     @PostConstruct
     public void notifyLoad() {
+        this.logger.info("EnvName detected: " + this.envName);
         if (envName.equalsIgnoreCase("test") || envName.equalsIgnoreCase("prod")) {
-            this.mailer.sendInternalMail("PROD Scrapper init", String.format("Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
+            this.mailer.sendInternalMail(String.format("[%s] Scraper init", envName), String.format("Initialized scraper on server %s with environment [%s]", this.network.getPublicIp(), envName));
         }
     }
 }
