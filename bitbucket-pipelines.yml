@@ -25,7 +25,7 @@ pipelines:
         name: Deploy to test
         image: atlassian/default-image:2
         script:
-          - "ssh $SFTP_USER@$SFTP_HOST 'killall PROCESS || echo PROCESS_WAS_NOT_RUNNING'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'pkill -9 java'"
           - "ssh $SFTP_USER@$SFTP_HOST 'rm -rf /var/www/*'"
           - pipe: atlassian/sftp-deploy:0.5.2
             variables:
@@ -41,7 +41,7 @@ pipelines:
               REMOTE_PATH: '/var/www'
               LOCAL_PATH: 'src/main/resources/scripts/*'
               DEBUG: 'true'
-          - "ssh $SFTP_USER@$SFTP_HOST 'nohup /var/www/run-scraper.sh &> /dev/null &'"
+          - "ssh $SFTP_USER@$SFTP_HOST 'chmod +x /var/www/run-scraper.sh && nohup /var/www/run-scraper.sh &> /dev/null & disown'"
 
 
     - step:
