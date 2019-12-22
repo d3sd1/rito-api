@@ -93,6 +93,11 @@ public class LeagueExpScraper implements Runnable {
                     morePages = false;
                     continue;
                 }
+                // Riot api struggling... Wait a bit, so we get no deserialization errors.
+                if (apiResponse.getResponseCode() == 503) {
+                    Thread.sleep(2000);
+                    continue;
+                }
                 InjectableValues.Std injectable = new InjectableValues.Std();
                 injectable.addValue("apiKey", apiResponse.getApiKey())
                         .addValue("platform", apiCall.getPlatform())
