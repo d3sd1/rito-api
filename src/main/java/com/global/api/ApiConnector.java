@@ -107,6 +107,7 @@ public class ApiConnector {
         } catch (IllegalArgumentException e) {
             this.logger.error(String.format("Api call failured due to misconfiguration: Endpoint [%s] with parameter error [%s]. Parameters provided: %s", apiEndpoint.getEndpoint(), e.getLocalizedMessage(), parameters));
         } catch (HttpClientErrorException e) {
+            resp = new ResponseEntity<String>(HttpStatus.valueOf(e.getStatusCode().value()));
             Integer statusCode = e.getStatusCode().value();
             if (statusCode == 403) {
                 this.apiKeyManager.banKey(apiKey, platform, apiEndpoint.getRiotGame());

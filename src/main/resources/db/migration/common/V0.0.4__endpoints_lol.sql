@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2019.
+ * d3sd1.
+ * All right reserved.
+ * Do not re-distribute this file nor project without permission.
+ */
+
 SET search_path TO common,logging,onriot,onlol,ontft,onlor,onlwr;
 INSERT INTO apiendpoint (keyname, disabled, endpoint, method, requiresapikey, riotgame_id, countsforratelimit, stub)
 VALUES ('lol-champ-mastery', false,
@@ -6,7 +13,8 @@ VALUES ('lol-champ-mastery', false,
         true,
         null),
        ('lol-champ-rotations', false, 'https://{{hostUrl}}/lol/platform/v3/champion-rotations', 0, true, 1, true, null),
-       ('lol-leagues-scraper', false, 'https://{{hostUrl}}/lol/league-exp/v4/entries/{{queue}}/{{tier}}/{{division}}',
+       ('lol-leagues-scraper', false,
+        'https://{{hostUrl}}/lol/league-exp/v4/entries/{{queue}}/{{tier}}/{{division}}?page={{page}}',
         0, true, 1, true, null),
        ('lol-summoner-leagues', false, 'https://{{hostUrl}}/lol/league/v4/entries/by-summoner/{{encryptedSummonerId}}',
         0, true, 1, true, null),
