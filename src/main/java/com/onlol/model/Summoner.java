@@ -27,7 +27,7 @@ public class Summoner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
-    private short id;
+    private long id;
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -40,7 +40,7 @@ public class Summoner {
      *
      * @return the id
      */
-    public short getId() {
+    public long getId() {
         return id;
     }
 
@@ -49,7 +49,7 @@ public class Summoner {
      *
      * @param id the id
      */
-    public void setId(short id) {
+    public void setId(long id) {
         this.id = id;
     }
 
