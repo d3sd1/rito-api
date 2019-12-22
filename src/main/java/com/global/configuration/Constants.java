@@ -22,10 +22,12 @@ public class Constants {
      */
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
+    public static boolean APP_BEING_CLOSED = false;
+
     /**
      * The enum Call type.
      */
-    public enum CALL_TYPE {
+    public static enum CALL_TYPE {
         /**
          * GET call type.
          */

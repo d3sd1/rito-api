@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.global.api.ApiConnector;
+import com.global.configuration.Constants;
 import com.global.model.ApiCall;
 import com.global.model.ApiResponse;
 import com.global.model.Platform;
@@ -38,7 +39,6 @@ public class LeagueExpScraper implements Runnable {
     private Queue queue;
     private LeagueTier leagueTier;
     private LeagueDivision leagueDivision;
-    private boolean appClosing;
 
     public LeagueExpScraper(ApiEndpointRepository apiEndpointRepository, ObjectMapper objectMapper, Logger logger, ApiConnector apiConnector, RiotGameRepository riotGameRepository) {
         this.apiEndpointRepository = apiEndpointRepository;
@@ -46,9 +46,7 @@ public class LeagueExpScraper implements Runnable {
         this.logger = logger;
         this.apiConnector = apiConnector;
         this.riotGameRepository = riotGameRepository;
-        this.appClosing = false;
     }
-
 
     public void setPlatform(Platform platform) {
         this.platform = platform;
@@ -66,12 +64,13 @@ public class LeagueExpScraper implements Runnable {
         this.leagueDivision = leagueDivision;
     }
 
+
     @Override
     public void run() {
         int currentPage = 1;
         boolean morePages = true;
         while (morePages) {
-            if (this.appClosing) {
+            if (Constants.APP_BEING_CLOSED) {
                 this.logger.info("Async scraper forced to end due to app shutdown.");
                 morePages = false;
                 continue;
@@ -116,8 +115,8 @@ public class LeagueExpScraper implements Runnable {
                         continue;
                     }
                 }
-
-                currentPage++;
+                System.out.println("Curr page: " + currentPage);
+                ++currentPage;
             } catch (Exception e) {
                 e.printStackTrace();
                 this.logger.error(e);
