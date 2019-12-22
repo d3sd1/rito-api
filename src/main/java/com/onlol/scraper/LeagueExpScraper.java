@@ -115,7 +115,6 @@ public class LeagueExpScraper implements Runnable {
                         continue;
                     }
                 }
-                System.out.println("Curr page: " + currentPage);
                 ++currentPage;
             } catch (Exception e) {
                 e.printStackTrace();
