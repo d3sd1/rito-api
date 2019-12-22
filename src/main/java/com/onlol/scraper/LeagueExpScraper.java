@@ -98,21 +98,25 @@ public class LeagueExpScraper implements Runnable {
                     Thread.sleep(2000);
                     continue;
                 }
-                InjectableValues.Std injectable = new InjectableValues.Std();
-                injectable.addValue("apiKey", apiResponse.getApiKey())
-                        .addValue("platform", apiCall.getPlatform())
-                        .addValue("leagueDivision", leagueDivision)
-                        .addValue("queue", queue)
-                        .addValue("leagueTier", leagueTier);
-                objectMapper.setInjectableValues(injectable);
-                final List<LeagueEntry> entries = objectMapper.readValue(apiResponse.getJson(), new TypeReference<List<LeagueEntry>>() {
-                });
 
-                // no more data - prevent infinite loop
-                if (entries.size() == 0) {
-                    morePages = false;
-                    continue;
+                // Prevent null content exception, but keep execution (mostly 503...).
+                if (apiResponse.getJson() != null) {
+                    InjectableValues.Std injectable = new InjectableValues.Std();
+                    injectable.addValue("apiKey", apiResponse.getApiKey())
+                            .addValue("platform", apiCall.getPlatform())
+                            .addValue("leagueDivision", leagueDivision)
+                            .addValue("queue", queue)
+                            .addValue("leagueTier", leagueTier);
+                    objectMapper.setInjectableValues(injectable);
+                    final List<LeagueEntry> entries = objectMapper.readValue(apiResponse.getJson(), new TypeReference<List<LeagueEntry>>() {
+                    });
+                    // no more data - prevent infinite loop
+                    if (entries.size() == 0) {
+                        morePages = false;
+                        continue;
+                    }
                 }
+
                 currentPage++;
             } catch (Exception e) {
                 e.printStackTrace();
