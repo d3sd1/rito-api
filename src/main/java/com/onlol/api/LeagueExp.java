@@ -23,6 +23,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
+
 /**
  * The type League exp.
  */
@@ -57,6 +59,11 @@ public class LeagueExp implements ApplicationListener<ApplicationStartedEvent> {
      */
     public void onApplicationEvent(ApplicationStartedEvent contextRefreshedEvent) {
         this.scraper();
+    }
+
+    @PreDestroy
+    public void testme() {
+        System.out.println("SHUUUTDOWNMNNNNNNNN");
     }
 
     /**
