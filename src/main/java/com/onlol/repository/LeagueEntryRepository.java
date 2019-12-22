@@ -8,6 +8,7 @@
 package com.onlol.repository;
 
 import com.onlol.model.LeagueEntry;
+import com.onlol.model.Queue;
 import com.onlol.model.Summoner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -23,4 +24,6 @@ import java.util.Optional;
 @Repository
 public interface LeagueEntryRepository extends JpaRepository<LeagueEntry, Long> {
     Optional<LeagueEntry> findBySummoner(Summoner summoner);
+
+    Optional<LeagueEntry> findBySummonerAndQueue(Summoner summoner, Queue queue);
 }

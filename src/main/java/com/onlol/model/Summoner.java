@@ -20,7 +20,7 @@ import javax.persistence.*;
  * @version 0.0.9
  */
 @Entity
-@Table(schema = "onlol")
+@Table(schema = "onlol", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "platform_id"}))
 @JsonDeserialize(using = LeagueEntryDeserializer.class)
 public class Summoner {
 
@@ -29,7 +29,7 @@ public class Summoner {
     @Column(nullable = false, unique = true)
     private long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String name;
 
     @OneToOne(orphanRemoval = false)

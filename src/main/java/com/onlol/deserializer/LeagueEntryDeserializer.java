@@ -90,7 +90,7 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
         // FILL LEAGUE ENTRY
         LeagueEntry leagueEntry = null;
         if (summonerIdentity != null) {
-            Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummoner(summonerIdentity.getSummoner());
+            Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummonerAndQueue(summonerIdentity.getSummoner(), queue);
             if (leagueEntryOpt.isPresent()) {
                 leagueEntry = leagueEntryOpt.get();
             }
@@ -183,7 +183,7 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
                 miniSeries = this.leagueEntryMiniSeriesRepository.save(miniSeries);
             } catch (DataIntegrityViolationException e) { // Triggered due to async requests
 
-                Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummoner(summonerIdentity.getSummoner());
+                Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummonerAndQueue(summonerIdentity.getSummoner(), queue);
                 if (leagueEntryOpt.isPresent()) {
                     leagueEntry = leagueEntryOpt.get();
                 }
@@ -210,7 +210,7 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
         try {
             leagueEntry = this.leagueEntryRepository.save(leagueEntry);
         } catch (DataIntegrityViolationException e) { // Triggered due to async requests
-            Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummoner(summonerIdentity.getSummoner());
+            Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummonerAndQueue(summonerIdentity.getSummoner(), queue);
             if (leagueEntryOpt.isPresent()) {
                 leagueEntry = leagueEntryOpt.get();
             } else {
