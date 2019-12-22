@@ -74,7 +74,7 @@
       "description": "Define error level for current execution."
     },
     {
-      "name": "onriot.db.poolsize",
+      "name": "onriot.db.pool.size",
       "type": "java.lang.String",
       "description": "Size of pool connection for database."
     },
