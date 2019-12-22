@@ -38,6 +38,7 @@ public class LeagueExpScraper implements Runnable {
     private Queue queue;
     private LeagueTier leagueTier;
     private LeagueDivision leagueDivision;
+    private boolean appClosing;
 
     public LeagueExpScraper(ApiEndpointRepository apiEndpointRepository, ObjectMapper objectMapper, Logger logger, ApiConnector apiConnector, RiotGameRepository riotGameRepository) {
         this.apiEndpointRepository = apiEndpointRepository;
@@ -45,34 +46,20 @@ public class LeagueExpScraper implements Runnable {
         this.logger = logger;
         this.apiConnector = apiConnector;
         this.riotGameRepository = riotGameRepository;
+        this.appClosing = false;
     }
 
-    public Platform getPlatform() {
-        return platform;
-    }
 
     public void setPlatform(Platform platform) {
         this.platform = platform;
-    }
-
-    public Queue getQueue() {
-        return queue;
     }
 
     public void setQueue(Queue queue) {
         this.queue = queue;
     }
 
-    public LeagueTier getLeagueTier() {
-        return leagueTier;
-    }
-
     public void setLeagueTier(LeagueTier leagueTier) {
         this.leagueTier = leagueTier;
-    }
-
-    public LeagueDivision getLeagueDivision() {
-        return leagueDivision;
     }
 
     public void setLeagueDivision(LeagueDivision leagueDivision) {
@@ -84,6 +71,11 @@ public class LeagueExpScraper implements Runnable {
         int currentPage = 1;
         boolean morePages = true;
         while (morePages) {
+            if (this.appClosing) {
+                this.logger.info("Async scraper forced to end due to app shutdown.");
+                morePages = false;
+                continue;
+            }
             this.logger.info(String.format("Executing league scraper (%s) for page %s of queue %s and tier %s and division %s",
                     platform.getServiceRegion(), currentPage, queue.getKeyName(), leagueTier.getKeyName(), leagueDivision.getKeyName()));
             ApiCall apiCall = new ApiCall();

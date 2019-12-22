@@ -179,7 +179,17 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
                 miniSeriesProgress = miniSeriesNodes.get("progress").asText();
             }
             miniSeries.setProgress(miniSeriesProgress);
-            this.leagueEntryMiniSeriesRepository.save(miniSeries);
+            try {
+                miniSeries = this.leagueEntryMiniSeriesRepository.save(miniSeries);
+            } catch (DataIntegrityViolationException e) { // Triggered due to async requests
+
+                Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummoner(summonerIdentity.getSummoner());
+                if (leagueEntryOpt.isPresent()) {
+                    leagueEntry = leagueEntryOpt.get();
+                }
+                miniSeries = leagueEntry.getMiniSeries();
+            }
+
         } else if (miniSeries != null) {
             this.leagueEntryMiniSeriesRepository.delete(miniSeries);
             leagueEntry.setMiniSeries(null);
@@ -197,8 +207,16 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
         leagueEntry.setQueue(queue);
 
         // Just add tier, we already knew it, so it's already on DB.
-
-        this.leagueEntryRepository.save(leagueEntry);
+        try {
+            leagueEntry = this.leagueEntryRepository.save(leagueEntry);
+        } catch (DataIntegrityViolationException e) { // Triggered due to async requests
+            Optional<LeagueEntry> leagueEntryOpt = this.leagueEntryRepository.findBySummoner(summonerIdentity.getSummoner());
+            if (leagueEntryOpt.isPresent()) {
+                leagueEntry = leagueEntryOpt.get();
+            } else {
+                this.logger.error("Async logger error while saving LeagueEntry. This should never happen.");
+            }
+        }
 
         return leagueEntry;
     }

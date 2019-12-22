@@ -9,10 +9,12 @@ package com.onlol.util;
 
 import com.global.model.ApiKey;
 import com.global.model.Platform;
+import com.global.services.Logger;
 import com.onlol.model.Summoner;
 import com.onlol.model.SummonerIdentity;
 import com.onlol.repository.SummonerIdentityRepository;
 import com.onlol.repository.SummonerRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,10 +23,12 @@ import java.util.Optional;
 public class SummonerHash {
     private SummonerIdentityRepository summonerIdentityRepository;
     private SummonerRepository summonerRepository;
+    private Logger logger;
 
-    public SummonerHash(SummonerIdentityRepository summonerIdentityRepository, SummonerRepository summonerRepository) {
+    public SummonerHash(SummonerIdentityRepository summonerIdentityRepository, SummonerRepository summonerRepository, Logger logger) {
         this.summonerIdentityRepository = summonerIdentityRepository;
         this.summonerRepository = summonerRepository;
+        this.logger = logger;
     }
 
     public SummonerIdentity addOrUpdateSummoner(String summonerId, String summonerName, ApiKey apiKey, Platform platform) {
@@ -46,10 +50,30 @@ public class SummonerHash {
                 summoner = new Summoner();
                 summoner.setName(summonerName);
                 summoner.setPlatform(platform);
-                this.summonerRepository.save(summoner);
+                try {
+                    summoner = this.summonerRepository.save(summoner);
+                } catch (DataIntegrityViolationException e) { // Triggered due to async requests
+                    summonerOpt = this.summonerRepository.findByNameAndPlatform(summonerName, platform);
+                    if (summonerOpt.isPresent()) {
+                        summoner = summonerOpt.get();
+                    } else {
+                        this.logger.error("Async error while saving summoner. This shouls never happen.");
+                    }
+                }
+
             }
             summonerIdentity.setSummoner(summoner);
-            this.summonerIdentityRepository.save(summonerIdentity);
+            try {
+                summonerIdentity = this.summonerIdentityRepository.save(summonerIdentity);
+            } catch (DataIntegrityViolationException e) { // Triggered due to async requests
+                summonerIdentityOpt = this.summonerIdentityRepository.findBySummonerId(summonerId);
+                if (summonerIdentityOpt.isPresent()) {
+                    summonerIdentity = summonerIdentityOpt.get();
+                } else {
+                    this.logger.error("Async error while saving summoner identity. This shouls never happen.");
+                }
+            }
+
         }
         return summonerIdentity;
     }

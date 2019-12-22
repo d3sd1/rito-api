@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
@@ -18,16 +19,26 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class ScraperConfig {
     @Value("${onriot.thread.core.pool.size}")
     private short corePoolSize;
-    @Value("${onriot.thread.max.pool.size}")
-    private short maxPoolSize;
 
     @Bean
-    public ThreadPoolTaskExecutor taskExecutor() {
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();
         pool.setCorePoolSize(this.corePoolSize);
-        pool.setMaxPoolSize(this.maxPoolSize);
+        pool.setMaxPoolSize(this.corePoolSize * 2);
         pool.setWaitForTasksToCompleteOnShutdown(true);
+        pool.setAwaitTerminationSeconds(30);
         return pool;
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(this.corePoolSize);
+        taskExecutor.setMaxPoolSize(this.corePoolSize * 2);
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        taskExecutor.setAwaitTerminationSeconds(30);
+        taskExecutor.initialize();
+        return taskExecutor;
     }
 
 }
