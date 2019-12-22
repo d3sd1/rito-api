@@ -89,6 +89,7 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
 
         if (leagueEntry == null) {
             leagueEntry = new LeagueEntry();
+            leagueEntry.setSummoner(summonerIdentity.getSummoner());
         }
         leagueEntry.setLeague(league);
 
