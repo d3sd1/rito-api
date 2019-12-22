@@ -6,8 +6,8 @@
  */
 
 SET search_path TO common,logging,onriot,onlol,ontft,onlor,onlwr;
-INSERT INTO leaguedivision (keyname)
-VALUES ('I'),
-       ('II'),
-       ('III'),
-       ('IV');
+INSERT INTO leaguedivision (id, keyname)
+VALUES (1, 'I'),
+       (2, 'II'),
+       (3, 'III'),
+       (4, 'IV');

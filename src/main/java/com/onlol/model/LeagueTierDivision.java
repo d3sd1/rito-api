@@ -13,23 +13,26 @@ import com.onlol.deserializer.LeagueEntryDeserializer;
 import javax.persistence.*;
 
 /**
- * League Entry model.
+ * League Tier Division model.
  *
  * @author d3sd1
- * @version 0.0.9
+ * @version 1.0.5
  */
 @Entity
 @Table(schema = "onlol")
 @JsonDeserialize(using = LeagueEntryDeserializer.class)
-public class LeagueTier {
+public class LeagueTierDivision {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private short id;
 
-    @Column(nullable = false, unique = true)
-    private String keyName;
+    @OneToOne
+    private LeagueTier leagueTier;
+
+    @OneToOne
+    private LeagueDivision leagueDivision;
 
     public short getId() {
         return id;
@@ -39,19 +42,28 @@ public class LeagueTier {
         this.id = id;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public LeagueTier getLeagueTier() {
+        return leagueTier;
     }
 
-    public void setKeyName(String tier) {
-        this.keyName = tier;
+    public void setLeagueTier(LeagueTier leagueTier) {
+        this.leagueTier = leagueTier;
+    }
+
+    public LeagueDivision getLeagueDivision() {
+        return leagueDivision;
+    }
+
+    public void setLeagueDivision(LeagueDivision leagueDivision) {
+        this.leagueDivision = leagueDivision;
     }
 
     @Override
     public String toString() {
-        return "LeagueTier{" +
+        return "LeagueTierDivision{" +
                 "id=" + id +
-                ", keyName='" + keyName + '\'' +
+                ", leagueTier=" + leagueTier +
+                ", leagueDivision=" + leagueDivision +
                 '}';
     }
 }

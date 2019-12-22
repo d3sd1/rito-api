@@ -82,6 +82,16 @@
       "name": "onriot.mail.sender.pass",
       "type": "java.lang.String",
       "description": "Mail sender password for SMTP access."
+    },
+    {
+      "name": "onriot.thread.core.pool.size",
+      "type": "java.lang.String",
+      "description": "Base core pool thread number."
+    },
+    {
+      "name": "onriot.thread.max.pool.size",
+      "type": "java.lang.String",
+      "description": "Limit pool size for thread count."
     }
   ]
 }

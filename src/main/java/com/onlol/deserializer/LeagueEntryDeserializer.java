@@ -13,12 +13,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.global.model.ApiKey;
 import com.global.model.Platform;
+import com.global.services.Logger;
 import com.onlol.model.*;
 import com.onlol.repository.LeagueEntryMiniSeriesRepository;
 import com.onlol.repository.LeagueEntryRepository;
 import com.onlol.repository.LeagueRepository;
 import com.onlol.util.SummonerHash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -38,6 +40,9 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
 
     @Autowired
     private LeagueRepository leagueRepository;
+
+    @Autowired
+    private Logger logger;
 
     public LeagueEntryDeserializer() {
         this(null);
@@ -74,7 +79,11 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
             if (league == null) {
                 league = new League();
                 league.setRiotId(riotId);
-                league = this.leagueRepository.save(league);
+                try {
+                    league = this.leagueRepository.save(league);
+                } catch (DataIntegrityViolationException e) { // Triggered due to async requests
+                    league = this.leagueRepository.findByRiotId(riotId);
+                }
             }
         }
 
@@ -85,6 +94,11 @@ public class LeagueEntryDeserializer extends StdDeserializer<LeagueEntry> {
             if (leagueEntryOpt.isPresent()) {
                 leagueEntry = leagueEntryOpt.get();
             }
+        }
+        if (summonerIdentity == null) {
+            this.logger.error("No summoner identity on LeagueEntryDeserializer. This exception should never be triggered." +
+                    "Data: " + currentNode);
+            return null;
         }
 
         if (leagueEntry == null) {
