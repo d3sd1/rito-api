@@ -1,1 +1,6 @@
 language: java
+
+
+after_success:
+  - git remote add deploy $GIT_REMOTE_URL
+  - git push deploy
